@@ -1,0 +1,8 @@
+afm software authors:
+Tim Schlesier
+
+data contributors:
+...
+
+...:
+...

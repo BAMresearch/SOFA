@@ -1,0 +1,4 @@
+*__pycache__
+/sofa/output_data/
+/test/.coverage
+/output_data/
