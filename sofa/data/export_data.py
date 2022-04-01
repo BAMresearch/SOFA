@@ -147,14 +147,18 @@ def export_to_sofa(
 		"numberOfBins": dataHandler.histogramParameters["numberOfBins"].get()
 	}
 
+	histogramData = {}
+
 	sofaData = {
 		"inactiveDataPoints": dataHandler.inactiveDataPoints.copy(),
 		"generalData": dataHandler.generalData.copy(),
 		"curveData": channelData,
+		"averageData": averageData,
 		"channelData": curveData,
 		"linePlotParameters": linePlotParameters,
 		"heatmapParameters": heatmapParameters,
-		"histogramParameters": histogramParameters
+		"histogramParameters": histogramParameters,
+		"histogramData": histogramData,
 	}
 
 	outPutFilePath = os.path.join(outputFolder, fileName)

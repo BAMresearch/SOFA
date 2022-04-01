@@ -356,10 +356,14 @@ class MainWindow(ttk.Frame):
 		self.progressbarCurrentLabel.set("Updating data")
 		self.progressbar.start()
 
+		self.root.update_idletasks()
+
 	def stop_progressbar(self) -> None:
 		"""Stop the progressbar."""
 		self.progressbar.stop()
 		self.progressbarCurrentLabel.set("")
+
+		self.root.update_idletasks()
 
 	@staticmethod
 	def _camel_case_to_text(inputString: str) -> str:

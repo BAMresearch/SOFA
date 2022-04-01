@@ -13,7 +13,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 """
-
+from collections import namedtuple
 from typing import List, Dict
 
 import numpy as np
@@ -45,6 +45,9 @@ class DataHandler():
 		self.generalData = combinedData["generalData"]
 		self.curveData = combinedData["curveData"]
 		self.channelData = combinedData["channelData"]
+
+		self.averageData["leftCurve"] = None
+		self.averageData["rightCurve"] = None
 
 	def set_plot_parameters(
 		self,
@@ -171,19 +174,15 @@ class DataHandler():
 		line.set_color(color)
 		line.zorder = zorder
 
-	def calculate_average(self):
+	def _calculate_average(self):
 		"""Calculate the average of the active data points."""
-		self.remove_average_curve()
-
 		# Return if all datapoints are inactive.
 		if len(self.inactiveDataPoints) == int(self.generalData["m"]) * int(self.generalData["n"]):
 			return
 
-		# Remove inactive data points.
-		activeXValues = np.delete(xValues, self.inactiveDataPoints, 0)
-		activeYValues = np.delete(yValues, self.inactiveDataPoints, 0)
-
-		NormedCurves = self.interpolate_normed_curves(activeXValues, activeYValues)
+		activeCurves, xMin, yMax = self._get_active_curve_data()
+		
+		NormedCurves = self._interpolate_normed_curves(activeCurves, xMin, yMax)
 
 		# Average the points along the x/y axis.
 		averagedYValuesLeft = [
@@ -208,10 +207,22 @@ class DataHandler():
 		self.averageData["standardDeviationLeft"] = np.asarray(standardDeviationLeft)
 		self.averageData["standardDeviationRight"] = np.asarray(standardDeviationRight)
 
-		self.plot_average_curve()
+	def _get_active_curve_data(self):
+		""""""
+		activeCurves = []
+		xMinValues = []
+		yMaxValues = []
+
+		for index, curve in enumerate(self.curveData["correctedCurves"]):
+			if index not in self.inactiveDataPoints:
+				activeCurves.append(curve)
+				xMinValues.append(min(curve[0]))
+				yMaxValues.append(max(curve[1]))
+
+		return activeCurves, min(xMinValues), max(yMaxValues)
 	
 	@staticmethod
-	def interpolate_normed_curves(activeXValues, activeYValues):
+	def _interpolate_normed_curves(activeCurves, xMin, yMax):
 		"""Normalize lines in preparation of averraging them.
 
 		Parameter:
@@ -221,74 +232,84 @@ class DataHandler():
 		Returns: 
 			NormedCurves(namedtuple): Tuple with a normed line for the left and right part.
 		"""
-		xMin = np.nanmin(activeXValues)
-		yMax = np.nanmax(activeYValues)
+		numberOfDataPoints = 2000
 
-		# Get the maximum length and increase it if it is to small.
-		maxLen = len(activeYValues) if len(activeYValues) > 2000 else 2000
-
-		normedXValuesLeft = np.linspace(xMin, 0, int(maxLen))
+		normedXValuesLeft = np.linspace(xMin, 0, numberOfDataPoints)
 		normedYValuesLeft = []
-		normedXValuesRight = np.linspace(0, yMax, int(maxLen))
+		normedXValuesRight = np.linspace(0, yMax, numberOfDataPoints)
 		normedYValuesRight = []
 		
 		# Interpolate y values for the left and right part.
-		for xValue, yValue in zip(activeXValues, activeYValues):
+		for curve in activeCurves:
 			# Split left and right part by the last zero crossing/point of contact.
-			lastZeroCrossing = np.where(xValue[~np.isnan(xValue)] < 0)[0][-1]
+			lastZeroCrossing = np.where(curve[0] < 0)[0][-1]
 
 			normedYValuesLeft.append(
 				np.interp(
 					normedXValuesLeft, 
-					xValue[:lastZeroCrossing], 
-					yValue[:lastZeroCrossing]
+					curve[0][:lastZeroCrossing], 
+					curve[1][:lastZeroCrossing]
 				)
 			)
 			normedYValuesRight.append(
 				np.interp(
 					normedXValuesRight, 
-					yValue[lastZeroCrossing:], 
-					xValue[lastZeroCrossing:]
+					curve[1][lastZeroCrossing:], 
+					curve[0][lastZeroCrossing:]
 				)
 			)
 
 		NormedCurves = namedtuple(
-			"NormedCurves", "xValuesLeft yValuesLeft xValuesRight yValuesRight"
+			"NormedCurves", 
+			[
+				"xValuesLeft",
+				"yValuesLeft",
+				"xValuesRight",
+				"yValuesRight"
+			]
 		)
 		return NormedCurves(
-			normedXValuesLeft, normedYValuesLeft, normedXValuesRight, normedYValuesRight
+			normedXValuesLeft, 
+			normedYValuesLeft, 
+			normedXValuesRight, 
+			normedYValuesRight
 		)
 
 	def plot_average_curve(self):
 		""" Plot the average as normal curve or as an errorbar with the standard deviation."""
+		self._calculate_average()
+
+		if self.averageData["leftCurve"] and self.averageData["rightCurve"]:
+			self.remove_average_curve()
+
 		# Plot the average as errorbar with with the standard deviation.
 		if self.linePlotParameters["displayErrorbar"]:
 			self.averageData["leftCurve"] = self.linePlotParameters["holder"].figure.get_axes()[0].errorbar(
 				self.averageData["leftXValues"], 
 				self.averageData["leftYValues"], 
 				yerr=self.averageData["standardDeviationLeft"], 
-				color="black", ecolor="black", zorder=2
+				color="black", ecolor="black", zorder=6
 			)
 			self.averageData["rightCurve"] = self.linePlotParameters["holder"].figure.get_axes()[0].errorbar(
-				self.averageData["averageRightY"], 
-				self.averageData["averageRightX"], 
+				self.averageData["rightYValues"], 
+				self.averageData["rightXValues"], 
 				xerr=self.averageData["standardDeviationRight"], 
-				color="black", ecolor="black", zorder=2
+				color="black", ecolor="black", zorder=6
 			)
 		# Plot the average as normal curve.
 		else:
 			self.averageData["leftCurve"] = self.linePlotParameters["holder"].figure.get_axes()[0].plot(
 				self.averageData["leftXValues"], 
 				self.averageData["leftYValues"], 
-				color="black", zorder=2
+				color="black", zorder=6
 			)[0]
 			self.averageData["rightCurve"] = self.linePlotParameters["holder"].figure.get_axes()[0].plot(
-				self.averageData["averageRightY"], 
-				self.averageData["averageRightX"],
-				color="black", zorder=2
+				self.averageData["rightYValues"], 
+				self.averageData["rightXValues"],
+				color="black", zorder=6
 			)[0]
 
-		self.curveData["holder"].draw()
+		self.linePlotParameters["holder"].draw()
 
 	def remove_average_curve(self):
 		"""Remove the average curve."""
@@ -464,7 +485,6 @@ class DataHandler():
 			activeData(np.ndarray): 2 dim data array with nan values at inactive data points.
 		"""
 		activeData = data.copy()
-		print(self.inactiveDataPoints)
 		np.put(activeData, self.inactiveDataPoints, np.nan)
 
 		return activeData[np.isfinite(activeData)]
@@ -508,7 +528,7 @@ class DataHandler():
 		self.update_lines()
 
 		if self.linePlotParameters["displayAverage"]:
-			self.calculate_average()
+			self.plot_average_curve()
 
 	def update_heatmap(self):
 		"""Update every active channel."""
