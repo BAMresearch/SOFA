@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License
 along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 """
 from collections import namedtuple
-from typing import List, Tuple, NamedTuple, Dict, Union
+from typing import List, Tuple, NamedTuple, Dict, Union, Callable
 import glob
 import os
 import re
@@ -24,8 +24,8 @@ import numpy as np
 from igor.binarywave import load as loadibw
 
 def import_bam_ibw_data(
-	importParameters,
-	update_progressbar
+	importParameters: NamedTuple,
+	update_progressbar: Callable
 ):
 	"""
 

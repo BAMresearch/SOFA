@@ -13,17 +13,26 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 """
-from typing import List, Tuple, NamedTuple, Dict, Union
+from typing import List, Tuple, NamedTuple, Dict, Union, Callable
 
 import numpy as np
 
 def calculate_channels(
-	correctedCurveData, 
-	m, 
-	n, 
-	update_progressbar
+	correctedCurveData: NamedTuple, 
+	m: int, 
+	n: int, 
+	update_progressbar: Callable
 ) -> Dict:
-	"""
+	"""Calculate every channel defined in the channels dictionary.
+
+	Parameters:
+		correctedCurveData(namedtuple): Data created while correcting the curves.
+		m(int): The number of rows.
+		n(int): The number of columns.
+		update_progressbar(callable): Function to show the calculation progress.
+
+	Returns:
+		channelData(dict): Contains the data of every channel.
 	"""
 	update_progressbar(
 		mode="reset",
@@ -34,11 +43,12 @@ def calculate_channels(
 
 	channelData = {}
 
-	for channel, caluclate_channel in channels.items():
+	for channelName, caluclate_channel in channels.items():
 		currentChannelData = caluclate_channel(
 			correctedCurveData
 		)
-		channelData[channel] = np.asarray(currentChannelData).reshape((int(m), int(n))).astype(float)
+		# Reshape the channel data to a 2 dimensional numpy array.
+		channelData[channelName] = np.asarray(currentChannelData).reshape((int(m), int(n))).astype(float)
 
 		update_progressbar(
 			mode="update",
@@ -47,14 +57,15 @@ def calculate_channels(
 
 	return channelData
 
-def calculate_topography(correctedCurveData):
-	"""
+def calculate_topography(correctedCurveData) -> List:
+	"""Calculate the topography channel as the y value 
+	   of the point of conatact for every corrected curve.
 
 	Parameters:
-		curveData(namedtuple): .
+		correctedCurveData(namedtuple): Data created while correcting the curves.
 
 	Returns:
-		topography(np.ndarray): .
+		channelTopography(list): The calculated topography values.
 	"""
 
 	return [
@@ -63,14 +74,15 @@ def calculate_topography(correctedCurveData):
 		in correctedCurveData.valuesPointOfContact
 	]
 
-def calculate_force_distance_topography(correctedCurveData):
-	""".
+def calculate_force_distance_topography(correctedCurveData) -> List:
+	"""Calculate the force distance topography channel as the y value 
+	   of the point of conatact for every corrected curve.
 	
 	Parameters:
-		().
+		correctedCurveData(namedtuple): Data created while correcting the curves.
 
 	Returns:
-		(float).
+		channelForceDistanceTopography(list): The calculated force distance topography values.
 	"""
 	return [
 		pointOfContact
@@ -78,14 +90,15 @@ def calculate_force_distance_topography(correctedCurveData):
 		in correctedCurveData.valuesPointOfContact
 	]
 
-def calculate_z_piezo_at_maximum_deflection(correctedCurveData):
-	""".
+def calculate_z_piezo_at_maximum_deflection(correctedCurveData) -> List:
+	"""Calculate the z piezo at maximum deflection channel as 
+	   the last x value of every corrected curve.
 	
 	Parameters:
-		(np.ndarray).
+		correctedCurveData(namedtuple): Data created while correcting the curves.
 
 	Returns:
-		(float).
+		channelZPiezoAtMaximumDeflection(list) The calculated z piezo at maximum deflection values.
 	"""
 	return [
 		correctedCurve[0][-1]
@@ -93,15 +106,15 @@ def calculate_z_piezo_at_maximum_deflection(correctedCurveData):
 		in correctedCurveData.correctedCurves
 	]
 
-def calculate_stiffness(correctedCurveData):
-	"""Calculate the stiffness of a curve as the slope of it's linear fit.
+def calculate_stiffness(correctedCurveData) -> List:
+	"""Calculate the stiffness channel as the slope of a linear
+	   fit of every corrected curve.
 
 	Parameters:
-		xData(np.ndarray):
-		yData(np.ndarray):
+		correctedCurveData(namedtuple): Data created while correcting the curves.
 
 	Returns:
-		().
+		channelStiffness(list) The calculated stiffness values.
 	"""
 	stiffness = []
 
@@ -114,14 +127,15 @@ def calculate_stiffness(correctedCurveData):
 
 	return stiffness
 
-def calculate_attractive_area(correctedCurveData):
-	""".
+def calculate_attractive_area(correctedCurveData) -> List:
+	"""Calculate the attractive area channel as the value of 
+	   the integral over the attractive area of every corrected curve.
 	
 	Parameters:
-		().
+		correctedCurveData(namedtuple): Data created while correcting the curves.
 
 	Returns:
-		().
+		channelAttractiveArea(list): The calculated values for the attractive areas.
 	"""
 	attractiveArea = []
 
@@ -136,30 +150,45 @@ def calculate_attractive_area(correctedCurveData):
 
 	return attractiveArea
 
-def calculate_raw_offset(correctedCurveData):
-	""""""
+def calculate_raw_offset(correctedCurveData) -> List:
+	"""Calculate the raw offset channel as the intersection value
+	   .
+	
+	Parameters:
+		correctedCurveData(namedtuple): Data created while correcting the curves.
+
+	Returns:
+		(list): .
+	"""
 	return [
 		rawOffset
 		for rawOffset
 		in correctedCurveData.valuesRawOffset
 	]
 
-def calculate_raw_stiffness(correctedCurveData):
-	""""""
+def calculate_raw_stiffness(correctedCurveData) -> List:
+	""".
+	
+	Parameters:
+		correctedCurveData(namedtuple): Data created while correcting the curves.
+
+	Returns:
+		(list): .
+	"""
 	return [
 		rawStiffness
 		for rawStiffness
 		in correctedCurveData.valuesRawStiffness
 	]
 
-def calculate_max_deflection(correctedCurveData):
+def calculate_max_deflection(correctedCurveData) -> List:
 	""".
 	
 	Parameters:
-		(np.ndarray).
+		correctedCurveData(namedtuple): Data created while correcting the curves.
 
 	Returns:
-		(float).
+		(list): .
 	"""
 	return [
 		correctedCurve[1][-1]
@@ -167,14 +196,14 @@ def calculate_max_deflection(correctedCurveData):
 		in correctedCurveData.correctedCurves
 	]
 
-def calculate_z_attractive(correctedCurveData):
+def calculate_z_attractive(correctedCurveData) -> List:
 	""".
 
 	Parameters:
-		().
+		correctedCurveData(namedtuple): Data created while correcting the curves.
 
 	Returns:
-		().
+		(list): .
 	"""
 	zAttractive = []
 
@@ -189,14 +218,14 @@ def calculate_z_attractive(correctedCurveData):
 
 	return zAttractive
 
-def calculate_deflection_attractive(correctedCurveData):
+def calculate_deflection_attractive(correctedCurveData) -> List:
 	""".
 	
 	Parameters:
-		().
+		correctedCurveData(namedtuple): Data created while correcting the curves.
 
 	Returns:
-		().
+		(list): .
 	"""
 	return [
 		np.nanmin(correctedCurve[1])
@@ -204,14 +233,14 @@ def calculate_deflection_attractive(correctedCurveData):
 		in correctedCurveData.correctedCurves
 	]
 
-def calculate_curves_with_artifacts(correctedCurveData):
+def calculate_curves_with_artifacts(correctedCurveData) -> List:
 	"""Check whether the curve is valid or not.
 	
 	Parameters:
-		yData(np.ndarray): 1 dim data array with the contact part of the curve.
+		correctedCurveData(namedtuple): Data created while correcting the curves.
 
 	Returns:
-		datapoint(int): 0 if the contact part is not monotonously increasing else 1. 
+		curvesWithArtifacts(list): 0 if the contact part is not monotonously increasing else 1. 
 	"""
 	return [
 		1 if np.min(np.diff(correctedCurve[1])) < 0
@@ -220,15 +249,16 @@ def calculate_curves_with_artifacts(correctedCurveData):
 		in correctedCurveData.correctedCurves
 	]
 
-def locate_attractive_area(yValues, indexPointOfContact):
-	"""Locate the start and endpoint of the curves attractive part.
+def locate_attractive_area(yValues, indexPointOfContact) -> Tuple:
+	"""Locate the start and endpoint of the attractive area of a curve.
 
 	Parameters:
-		yValues(np.ndarray):
-		indexPointOfContact(int):
+		yValues(np.ndarray): Y Values of the curve.
+		indexPointOfContact(int): Index of the point of contact.
 
 	Returns:
-		().
+		indexAttractiveStart(int): The index where the attractive area beginns.
+		indexAttractiveEnd(int): The index where the attractive area ends.
 	"""
 	# Take a first positiv value before the jtc as startpoint
 	flippedIndexAttractiveStart = np.where(np.flip(yValues[:indexPointOfContact]) > 0)[0][0]
@@ -237,15 +267,18 @@ def locate_attractive_area(yValues, indexPointOfContact):
 
 	return indexAttractiveStart, indexAttractiveEnd
 
+# Template to calculate a custom channel.
 '''
 def calculate_custom_channel(correctedCurveData):
-	"""
+	""".
 	
 	Parameters:
+		correctedCurveData(namedtuple): .
 
 	Returns:
+		customChannelData(list): .
 	"""
-
+	pass
 '''
 
 channels = {
@@ -260,5 +293,5 @@ channels = {
 	"zAttractive": calculate_z_attractive,
 	"deflectionAttractive": calculate_deflection_attractive,
 	"curvesWithArtifacts": calculate_curves_with_artifacts,
-	#"customChannel": calculate_custom_channel,
+	#"customChannelName": calculate_custom_channel,
 }

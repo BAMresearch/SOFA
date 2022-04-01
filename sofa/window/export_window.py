@@ -27,6 +27,7 @@ from ttkbootstrap.constants import *
 import data.export_data as exp_data
 
 class ExportWindow(ttk.Frame):
+	"""A subwindow to handle the data export."""
 	def __init__(self, dataHandler):
 		self.window = tk.Toplevel()
 		self.window.title("Export Data")
@@ -207,7 +208,11 @@ class ExportWindow(ttk.Frame):
 			self.folderPath.set(folderPath)
 
 	def _export_data(self) -> messagebox:
-		"""Export the current state of the data with the selected options."""
+		"""Export the current state of the data with the selected options.
+
+		Returns:
+			userFeedback(messagebox): Informs the user whether the data could be saved or not.
+		"""
 		# Check if a folder name is selected.
 		if not self.folderName.get():
 			return messagebox.showerror(
@@ -238,7 +243,11 @@ class ExportWindow(ttk.Frame):
 		return messagebox.showinfo("Success", "Data is saved.")
 
 	def _create_selected_export_parameters(self) -> NamedTuple:
-		"""Summarize the selected export options for easier use."""
+		"""Summarize the selected export options for easier use.
+
+		Returns:
+			ExportOptions(namedtuple): Contains the selected export opotions.
+		"""
 		ExportOptions = namedtuple(
 			"ExportOptions",
 			[

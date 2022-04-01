@@ -14,15 +14,14 @@ You should have received a copy of the GNU General Public License
 along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 """
 from collections import namedtuple
-from typing import List, Dict
+from typing import List, Dict, Tuple
 
 import numpy as np
 import matplotlib
 
 class DataHandler():
-	"""."""
+	"""Defines an interface between the data and the GUI."""
 	def __init__(self):
-		
 		self.heatmapParameters = {}
 		self.linePlotParameters = {}
 		self.histogramParameters = {}
@@ -41,6 +40,8 @@ class DataHandler():
 	) -> None:
 		""".
 
+		Parameters:
+			combinedData(dict): .
 		"""
 		self.generalData = combinedData["generalData"]
 		self.curveData = combinedData["curveData"]
@@ -52,9 +53,11 @@ class DataHandler():
 	def set_plot_parameters(
 		self,
 		guiComponents: Dict
-	):
+	) -> None:
 		"""
-		
+
+		Parameters:
+			guiComponents(dict): .
 		"""
 		self.linePlotParameters["interactive"] = guiComponents["interactiveLinePlot"]
 		self.linePlotParameters["holder"] = guiComponents["holderLinePlot"]
@@ -84,12 +87,12 @@ class DataHandler():
 			m * n
 		).reshape((m, n))
 
-	def reset_channel_data(self):
+	def reset_channel_data(self) -> None:
 		"""Reset the data of every channel."""
 		for channel in self.channelData.values():
 			channel["data"] = channel["sourceData"].copy()
 
-	def display_imported_data(self):
+	def display_imported_data(self) -> None:
 		"""Display the data as line plot heatmap and histogram."""
 		self.plot_lines()
 		self.plot_heatmap()
@@ -207,8 +210,12 @@ class DataHandler():
 		self.averageData["standardDeviationLeft"] = np.asarray(standardDeviationLeft)
 		self.averageData["standardDeviationRight"] = np.asarray(standardDeviationRight)
 
-	def _get_active_curve_data(self):
-		""""""
+	def _get_active_curve_data(self) -> Tuple:
+		"""
+		
+		Returns:
+
+		"""
 		activeCurves = []
 		xMinValues = []
 		yMaxValues = []
@@ -226,8 +233,9 @@ class DataHandler():
 		"""Normalize lines in preparation of averraging them.
 
 		Parameter:
-			activeXValues(np.ndarray): 2 dim array containing the x values of the curves.
-			activeYValues(np.ndarray): 2 dim array containing the y values of the curves.
+			activeCurves(list): .
+			xMin(float): .
+			yMax(float): .
 
 		Returns: 
 			NormedCurves(namedtuple): Tuple with a normed line for the left and right part.
@@ -520,8 +528,8 @@ class DataHandler():
 	def update_plots(self):
 		"""Update every plot."""
 		self.update_line_plot()
-		self.update_histogram()
 		self.update_heatmap()
+		self.update_histogram()
 
 	def update_line_plot(self):
 		"""Update the line plot."""
@@ -531,7 +539,7 @@ class DataHandler():
 			self.plot_average_curve()
 
 	def update_heatmap(self):
-		"""Update every active channel."""
+		"""Update the heatmap."""
 		self.plot_heatmap()
 
 	def update_histogram(self):

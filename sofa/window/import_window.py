@@ -29,6 +29,7 @@ import data.process_data as pd
 import data.active_channels as ac
 
 class ImportWindow(ttk.Frame):
+	"""A subwindow to handle the data import."""
 	def __init__(self, dataHandler, update_main_window):
 		self.window = tk.Toplevel()
 		self.window.title("Import Data")
@@ -203,7 +204,11 @@ class ImportWindow(ttk.Frame):
 			self.filePathChannel.set(filePathChannel)
 
 	def _import_data(self) -> messagebox:
-		"""Import the selected data."""
+		"""Import and process the selected data files.
+
+		Retuns:
+			userFeedback(messagebox): Informs the user whether the data could be imported or not.
+		"""
 		# Check if required data is selected.
 		if not os.path.isdir(self.filePathData.get()):
 			self._reset_import_window()
@@ -251,6 +256,7 @@ class ImportWindow(ttk.Frame):
 			combinedData
 		)
 
+		# Set filename in main window.
 		self.update_main_window(
 			combinedData["generalData"]["filename"]
 		)
@@ -265,7 +271,11 @@ class ImportWindow(ttk.Frame):
 		return messagebox.showinfo("Success", "Data is imported.")
 
 	def _create_selected_import_parameters(self) -> NamedTuple:
-		"""Summarize the selected import options for easier use."""
+		"""Summarize the selected import options for easier use.
+
+		Returns:
+			ImportOptions(namedtuple): Contains the selected import opotions.
+		"""
 		ImportOptions = namedtuple(
 			"ImportOptions",
 			[
@@ -283,14 +293,25 @@ class ImportWindow(ttk.Frame):
 			showPoorCurves=self.showPoorCurves.get()
 		)
 
-	def _reset_import_window(self):
+	def _reset_import_window(self) -> None:
 		"""Reset the user input."""
 		self.filePathData.set("")
 		self.filePathImage.set("")
 		self.filePathChannel.set("")
 
-	def update_progressbar(self, mode="update", value=0, label=""):
-		"""Update the progressbar."""
+	def update_progressbar(
+		self, 
+		mode="update", 
+		value=0, 
+		label=""
+	) -> None:
+		"""Reset or update the progressbar.
+
+		Parameters:
+			mode(str): Specifies whether to reset or update the progressbar.
+			value(float): .
+			label(str): .
+		"""
 		if mode == "reset":
 			self.progressbar["value"] = 0
 			self.progressbarCurrentLabel.set(label)

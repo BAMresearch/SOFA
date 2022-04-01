@@ -40,6 +40,7 @@ from toolbar.line_plot_toolbar import LinePlotToolbar
 from toolbar.heatmap_toolbar import HeatmapToolbar
 
 class MainWindow(ttk.Frame):
+	"""The main window of SOFA."""
 	def __init__(self, root):
 		self.root = root
 		self.versionNumber = "1.0"
@@ -332,15 +333,27 @@ class MainWindow(ttk.Frame):
 		self.stop_progressbar()
 
 	def _update_heatmap(self, newHeatmapChannel) -> None:
-		"""Update the displayed channel in the heatmap."""
+		"""Update the displayed channel in the heatmap.
+
+		Parameters:
+			newHeatmapChannel(str): Name of the new channel.
+		"""
 		self.dataHandler.plot_heatmap()
 
 	def _update_histogram(self, newHistogramChannel) -> None:
-		"""Update the displayed channel in the histogram."""
+		"""Update the displayed channel in the histogram.
+
+		Parameters:
+			newHeatmapChannel(str): Name of the new channel.
+		"""
 		self.dataHandler.plot_histogram()
 
 	def _restrict_histogram(self, direction) -> None:
-		"""Change the minimum or maximum border for the histogram values."""
+		"""Change the minimum or maximum border for the histogram values.
+
+		Parameters:
+			direction(str): .
+		"""
 		self.start_progressbar()
 		self.dataHandler.restrict_histogram(direction)
 

@@ -24,6 +24,7 @@ import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
 class InfoWindow(ttk.Frame):
+	"""A subwindow that contains some informations about SOFA."""
 	def __init__(self, versionNumber):
 		self.window = tk.Toplevel()
 		self.window.title("About")

@@ -29,10 +29,10 @@ def correct_approach_curves(
 
 	Parameters:
 		approachCurves(list): List of np.arrays with the x values.
-		update_progressbar(function): 
+		update_progressbar(function): Function to show the correction progress.
 
 	Returns:
-		correctedCurveData(NamedTuple)
+		correctedCurveData(NamedTuple): All the important data that is created while correcting the curves.
 	"""
 	update_progressbar(
 		mode="reset",
@@ -128,6 +128,8 @@ def shift_y_axis(
 	Returns:
 		shiftedYValueApproach(np.ndarray): .
 		endOfZeroLine(int): Position of the endOfZeroLine.
+		rawOffset(float): .
+		rawStiffness(float): . 
 
 	Raises:
 		(ValueError): .
@@ -169,21 +171,21 @@ def shift_y_axis(
 	return correctedYValues, endOfZeroline, coefficients[0], coefficients[1]
 
 def calculate_end_of_zeroline(
-	xValues, 
-	yValues, 
-	leftBorder, 
-	rightBorder
+	xValues: np.ndarray, 
+	yValues: np.ndarray, 
+	leftBorder: int, 
+	rightBorder: int
 ) -> int:
 	"""Calculate the end of the zero line as the last point with positive slope before the jump to contact.
 
 	Parameters:
 		xValues(np.ndarray): X values of the curve.
 		yValues(np.ndarray): Y values of the curve.
-		leftBorder(): Left limit to search within.
-		rightBorder(): Right limit to search within.
+		leftBorder(int): Left limit to search within.
+		rightBorder(int): Right limit to search within.
 
 	Returns:
-		endOfZeroline(int): .
+		endOfZeroline(int): The index of the end of the zeroline.
 
 	Raises:
 		(ValueError): .

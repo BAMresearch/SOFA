@@ -19,8 +19,11 @@ This file contains all style related parameters for every window
 in SOFA.
 """
 
+# Color settings
 backgroundColor = "#ffffff"
 backgroundColorVariant = "#ffffff"
 backgroundColorVariant = "#e5e5e5"
 buttonColor = "#14213d"
 buttonColorVariant = "#fca311"
+
+# Spacing settings
