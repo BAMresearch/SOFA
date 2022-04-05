@@ -281,7 +281,7 @@ class LinePlotToolbar(NavigationToolbar2Tk):
 			self.dataHandler.remove_average_curve()
 			self.dataHandler.linePlotParameters["holder"].draw()
 		else:
-			self.dataHandler.plot_average_curve()
+			self.dataHandler.update_average()
 			
 		self.dataHandler.linePlotParameters["displayAverage"] = not self.dataHandler.linePlotParameters["displayAverage"]
 
@@ -292,7 +292,7 @@ class LinePlotToolbar(NavigationToolbar2Tk):
 
 		self.dataHandler.linePlotParameters["displayErrorbar"] = not self.dataHandler.linePlotParameters["displayErrorbar"]
 
-		self.dataHandler.plot_average_curve()
+		self.dataHandler.update_average()
 
 	def _update_mode(self, newMode: str) -> None:
 		"""Update the mode of the toolbar.

@@ -338,7 +338,7 @@ class MainWindow(ttk.Frame):
 		Parameters:
 			newHeatmapChannel(str): Name of the new channel.
 		"""
-		self.dataHandler.plot_heatmap()
+		self.dataHandler.update_heatmap()
 
 	def _update_histogram(self, newHistogramChannel) -> None:
 		"""Update the displayed channel in the histogram.
@@ -346,7 +346,7 @@ class MainWindow(ttk.Frame):
 		Parameters:
 			newHeatmapChannel(str): Name of the new channel.
 		"""
-		self.dataHandler.plot_histogram()
+		self.dataHandler.update_histogram()
 
 	def _restrict_histogram(self, direction) -> None:
 		"""Change the minimum or maximum border for the histogram values.

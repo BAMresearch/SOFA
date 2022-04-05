@@ -255,6 +255,7 @@ class ImportWindow(ttk.Frame):
 		self.dataHandler.set_imported_data(
 			combinedData
 		)
+		self.dataHandler.init_data()
 
 		# Set filename in main window.
 		self.update_main_window(

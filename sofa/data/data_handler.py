@@ -20,13 +20,14 @@ import numpy as np
 import matplotlib
 
 class DataHandler():
-	"""Defines an interface between the data and the GUI."""
+	"""Handles the presentation of the data."""
 	def __init__(self):
 		self.heatmapParameters = {}
 		self.linePlotParameters = {}
 		self.histogramParameters = {}
 
 		self.generalData = {}
+
 		self.curveData = {}
 		self.averageData = {}
 		self.channelData = {}
@@ -47,8 +48,14 @@ class DataHandler():
 		self.curveData = combinedData["curveData"]
 		self.channelData = combinedData["channelData"]
 
-		self.averageData["leftCurve"] = None
-		self.averageData["rightCurve"] = None
+	def init_data(self):
+		""""""
+		self.inactiveDataPoints = []
+
+		self.averageData = {}
+		self.averageData["curves"] = []
+
+		self.histogramData = {}
 
 	def set_plot_parameters(
 		self,
@@ -100,7 +107,7 @@ class DataHandler():
 
 	def plot_heatmap(self) -> None:
 		"""Plot two dimensional data as a heatmap."""
-		data = self._get_current_heatmap_data()
+		data = self._get_heatmap_data()
 		m, n = np.shape(data)
 
 		# Make data displayable, if there are no valid values
@@ -154,7 +161,7 @@ class DataHandler():
 			return holder.figure.add_subplot(111)
 
 	def update_lines(self) -> None:
-		"""Update the state of all lines. """
+		"""Update the state of all lines."""
 		for index, line in enumerate(self.curveData["displayedLines"]):
 			if index in self.inactiveDataPoints and self.linePlotParameters["showInactive"]:
 				self.update_state_of_line(line, "gray", -1)
@@ -162,7 +169,7 @@ class DataHandler():
 				self.update_state_of_line(line, "white", -1)
 			else:
 				self.update_state_of_line(line, "red", 1)
-
+		
 		self.linePlotParameters["holder"].draw()
 
 	@staticmethod
@@ -177,12 +184,23 @@ class DataHandler():
 		line.set_color(color)
 		line.zorder = zorder
 
-	def _calculate_average(self):
-		"""Calculate the average of the active data points."""
+	def update_average(self):
+		""""""
+		self.remove_average_curves()
+
 		# Return if all datapoints are inactive.
 		if len(self.inactiveDataPoints) == int(self.generalData["m"]) * int(self.generalData["n"]):
 			return
 
+		self._calculate_average()
+
+		if self.linePlotParameters["displayErrorbar"]:
+			self._plot_average_as_errorbar()
+		else:
+			self._plot_average()
+
+	def _calculate_average(self):
+		"""Calculate the average of the active data points."""
 		activeCurves, xMin, yMax = self._get_active_curve_data()
 		
 		NormedCurves = self._interpolate_normed_curves(activeCurves, xMin, yMax)
@@ -214,7 +232,9 @@ class DataHandler():
 		"""
 		
 		Returns:
-
+			activeCurves(): .
+			minXValue(float): .
+			maxYValue(float): .
 		"""
 		activeCurves = []
 		xMinValues = []
@@ -283,53 +303,56 @@ class DataHandler():
 			normedYValuesRight
 		)
 
-	def plot_average_curve(self):
-		""" Plot the average as normal curve or as an errorbar with the standard deviation."""
-		self._calculate_average()
+	def _plot_average(self):
+		""""""
+		self.averageData["curves"].append(
+			self.linePlotParameters["holder"].figure.get_axes()[0].plot(
+				self.averageData["leftXValues"], 
+				self.averageData["leftYValues"], 
+				color="black", zorder=6
+			)[0]
+		)
+		self.averageData["curves"].append(
+			self.linePlotParameters["holder"].figure.get_axes()[0].plot(
+				self.averageData["rightYValues"], 
+				self.averageData["rightXValues"],
+				color="black", zorder=6
+			)[0]
+		)
 
-		if self.averageData["leftCurve"] and self.averageData["rightCurve"]:
-			self.remove_average_curve()
+		self.linePlotParameters["holder"].draw()
 
-		# Plot the average as errorbar with with the standard deviation.
-		if self.linePlotParameters["displayErrorbar"]:
-			self.averageData["leftCurve"] = self.linePlotParameters["holder"].figure.get_axes()[0].errorbar(
+	def _plot_average_as_errorbar(self):
+		""""""
+		self.averageData["curves"].append(
+			self.linePlotParameters["holder"].figure.get_axes()[0].errorbar(
 				self.averageData["leftXValues"], 
 				self.averageData["leftYValues"], 
 				yerr=self.averageData["standardDeviationLeft"], 
 				color="black", ecolor="black", zorder=6
 			)
-			self.averageData["rightCurve"] = self.linePlotParameters["holder"].figure.get_axes()[0].errorbar(
+		)
+		self.averageData["curves"].append(
+			self.linePlotParameters["holder"].figure.get_axes()[0].errorbar(
 				self.averageData["rightYValues"], 
 				self.averageData["rightXValues"], 
 				xerr=self.averageData["standardDeviationRight"], 
 				color="black", ecolor="black", zorder=6
 			)
-		# Plot the average as normal curve.
-		else:
-			self.averageData["leftCurve"] = self.linePlotParameters["holder"].figure.get_axes()[0].plot(
-				self.averageData["leftXValues"], 
-				self.averageData["leftYValues"], 
-				color="black", zorder=6
-			)[0]
-			self.averageData["rightCurve"] = self.linePlotParameters["holder"].figure.get_axes()[0].plot(
-				self.averageData["rightYValues"], 
-				self.averageData["rightXValues"],
-				color="black", zorder=6
-			)[0]
-
+		)
+		
 		self.linePlotParameters["holder"].draw()
 
-	def remove_average_curve(self):
+	def remove_average_curves(self):
 		"""Remove the average curve."""
-		self.averageData["leftCurve"].remove()
-		self.averageData["leftCurve"] = None
+		for curve in self.averageData["curves"]:
+			curve.remove()
 
-		self.averageData["rightCurve"].remove()
-		self.averageData["rightCurve"] = None
+		self.averageData["curves"] = []
 
 	def plot_histogram(self):
 		"""Display the data and active data as a histogram."""
-		data = self._get_current_histogram_data()
+		data = self._get_histogram_data()
 		activeData = self._get_active_histogram_data(data)
 
 		ax = self.get_axes(self.histogramParameters["holder"])
@@ -359,6 +382,7 @@ class DataHandler():
 		self.histogramData["indexOfMinValue"] = np.where(binValues <= np.min(activeData))[0][-1]
 		self.histogramData["indexOfMaxValue"] = np.where(binValues >= np.max(activeData))[0][0]
 
+		# Set zoom if selected.
 		if self.histogramParameters["zoom"].get():
 			ax.set_ylim(
 				binValues[self.histogramData["indexOfMinValue"]],
@@ -376,56 +400,57 @@ class DataHandler():
 		"""
 		minIndex = self.histogramData["indexOfMinValue"]
 		maxIndex = self.histogramData["indexOfMaxValue"]
-		data = self.histogramData["data"].flatten()
-		sourceData = self.histogramData["sourceData"].flatten()
-		binsAll = self.histogramData["binValues"]
+		binValues = self.histogramData["binValues"]
+		data = self._get_histogram_data()
 
 		# Increase the min border if it is still smaller then the current max border.
-		if direction == "minUp" and minIndex < maxIndex - 1:
+		if direction == "min up" and minIndex < maxIndex - 1:
 			minIndex += 1
-			newMin = binsAll[minIndex]
+			newMin = binValues[minIndex]
 			self.inactiveDataPoints.extend(np.where(data < newMin)[0])
 
 		# Decrease the min border if it is still bigger then the lowest border.
-		elif direction == "minDown" and minIndex > 0:
-			# Continue to decrease the min border until there are datapoints within the new border.
+		elif direction == "min down" and minIndex > 0:
+			# Continue to decrease the min border until there are datapoints within the new border or the lower border is reached.
 			while (True):
+				oldMin = binValues[minIndex]
 				minIndex -= 1
-				newMin = binsAll[minIndex]
-				activeIndex = np.where(
-					np.logical_and(sourceData >= newMin, sourceData < binsAll[minIndex + 1])
+				newMin = binValues[minIndex]
+				reactivatedDataPoints = np.where(
+					np.logical_and(data >= newMin, data < oldMin)
 				)[0]
-				if len(activeIndex) > 0:
+				if len(reactivatedDataPoints) > 0 or minIndex == 0:
 					break
 
-			for point in activeIndex:
+			for point in reactivatedDataPoints:
 				 self.inactiveDataPoints.remove(point)
 
 		# Increase the max border if it is still smaller then the highest border.
-		elif direction == "maxUp" and maxIndex < int(self.histogramData["numberOfBins"].get()):
-			# Continue to increase the max border until there are datapoints within the new border.
+		elif direction == "max up" and maxIndex < int(self.histogramParameters["numberOfBins"].get()):
+			# Continue to increase the max border until there are datapoints within the new border or the upper border is reached.
 			while (True):
+				oldMax = binValues[maxIndex]
 				maxIndex += 1
-				newMax = binsAll[maxIndex]
-				activeIndex = np.where(
-					np.logical_and(sourceData <= newMax, sourceData > binsAll[maxIndex - 1])
+				newMax = binValues[maxIndex]
+				reactivatedDataPoints = np.where(
+					np.logical_and(data <= newMax, data > oldMax)
 				)[0]
-				if len(activeIndex) > 0:
+				if len(reactivatedDataPoints) > 0 or maxIndex == int(self.histogramParameters["numberOfBins"].get()):
 					break
 
-			for point in activeIndex:
+			for point in reactivatedDataPoints:
 				 self.inactiveDataPoints.remove(point)
 
 		# Decrease the max border if it is still bigger then the current min border.
-		elif direction == "maxDown" and maxIndex > minIndex + 1:
+		elif direction == "max down" and maxIndex > minIndex + 1:
 			maxIndex -= 1
-			newMax = binsAll[maxIndex]
+			newMax = binValues[maxIndex]
 			self.inactiveDataPoints.extend(np.where(data > newMax)[0])
 
 		# Remove duplicates.
 		self.inactiveDataPoints = list(set(self.inactiveDataPoints))
 
-	def _get_current_heatmap_data(self) -> np.ndarray:
+	def _get_heatmap_data(self) -> np.ndarray:
 		""""""
 		channelKey = self._text_to_camel_case(
 			self.heatmapParameters["currentChannel"].get()
@@ -436,12 +461,12 @@ class DataHandler():
 
 		return activeHeatmapData
 
-	def _get_current_histogram_data(self) -> np.ndarray:
+	def _get_histogram_data(self) -> np.ndarray:
 		""""""
 		channelName = self._text_to_camel_case(
 			self.histogramParameters["currentChannel"].get()
 		)
-		histogramData = self.channelData[channelName]["data"]
+		histogramData = self.channelData[channelName]["sourceData"]
 
 		return histogramData[np.isfinite(histogramData)].flatten()
 
@@ -536,7 +561,7 @@ class DataHandler():
 		self.update_lines()
 
 		if self.linePlotParameters["displayAverage"]:
-			self.plot_average_curve()
+			self.update_average()
 
 	def update_heatmap(self):
 		"""Update the heatmap."""

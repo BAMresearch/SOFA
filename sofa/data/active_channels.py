@@ -234,7 +234,7 @@ def calculate_deflection_attractive(correctedCurveData) -> List:
 	]
 
 def calculate_curves_with_artifacts(correctedCurveData) -> List:
-	"""Check whether the curve is valid or not.
+	"""Check whether the corrected curves are valid or not. If 
 	
 	Parameters:
 		correctedCurveData(namedtuple): Data created while correcting the curves.

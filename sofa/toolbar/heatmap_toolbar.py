@@ -255,7 +255,7 @@ class HeatmapToolbar(NavigationToolbar2Tk):
 		if len(self.selectedArea) == 0:
 			return
 
-		m, n = np.shape(self.dataHandler._get_current_heatmap_data())
+		m, n = np.shape(self.dataHandler._get_heatmap_data())
 		# Map new inactive points in a two dimensional array to their corresponding points in a one dimensional array.
 		newInactiveDataPoints = [
 			i 
@@ -276,7 +276,7 @@ class HeatmapToolbar(NavigationToolbar2Tk):
 		if len(self.selectedArea) == 0:
 			return
 
-		m, n = np.shape(self.dataHandler._get_current_heatmap_data()) 
+		m, n = np.shape(self.dataHandler._get_heatmap_data()) 
 		# Map new inactive points in a two dimensional array to their corresponding points in a one dimensional array.
 		newInactiveDataPoints = [dataPoint[1] * n + dataPoint[0] for dataPoint in self.selectedArea]
 	
@@ -335,7 +335,7 @@ class HeatmapToolbar(NavigationToolbar2Tk):
 		Parameters:
 			line(Line2D): The line to be flipped.
 		"""
-		m, n = np.shape(self.dataHandler._get_current_heatmap_data())
+		m, n = np.shape(self.dataHandler._get_heatmap_data())
 		flippedLine = line.get_xydata().copy()
 
 		flippedLine[0][1] = m - flippedLine[0][1]
@@ -348,7 +348,7 @@ class HeatmapToolbar(NavigationToolbar2Tk):
 
 	def _flip_area_h(self) -> None:
 		"""Flip an area horizontal."""
-		m, n = np.shape(self.dataHandler._get_current_heatmap_data())
+		m, n = np.shape(self.dataHandler._get_heatmap_data())
 
 		for i in range(len(self.selectedArea)):
 			self.selectedArea[i][1] = m - self.selectedArea[i][1] - 1
@@ -359,7 +359,7 @@ class HeatmapToolbar(NavigationToolbar2Tk):
 		Parameters:
 			line(Line2D): The line to be flipped.
 		"""
-		m, n = np.shape(self.dataHandler._get_current_heatmap_data())
+		m, n = np.shape(self.dataHandler._get_heatmap_data())
 		flippedLine = line.get_xydata().copy()
 
 		flippedLine[0][0] = n - flippedLine[0][0]
@@ -372,7 +372,7 @@ class HeatmapToolbar(NavigationToolbar2Tk):
 
 	def _flip_area_v(self) -> None:
 		"""Flip an area vertical."""
-		m, n = np.shape(self.dataHandler._get_current_heatmap_data())
+		m, n = np.shape(self.dataHandler._get_heatmap_data())
 
 		for i in range(len(self.selectedArea)):
 			self.selectedArea[i][0] = n - self.selectedArea[i][0] - 1 
@@ -383,7 +383,7 @@ class HeatmapToolbar(NavigationToolbar2Tk):
 		Parameters:
 			line(Line2D): The line to be rotated.
 		"""
-		m, n = np.shape(self.dataHandler._get_current_heatmap_data())
+		m, n = np.shape(self.dataHandler._get_heatmap_data())
 		rotatedLine = line.get_xydata().copy()
 		
 		rotatedLine[0] = [rotatedLine[0][1], n-rotatedLine[0][0]]
@@ -396,7 +396,7 @@ class HeatmapToolbar(NavigationToolbar2Tk):
 
 	def _rotate_area(self) -> None:
 		"""Rotate an area by 90 degrees."""
-		m, n = np.shape(self.dataHandler._get_current_heatmap_data())
+		m, n = np.shape(self.dataHandler._get_heatmap_data())
 
 		for i in range(len(self.selectedArea)):
 			temp1, temp2 = self.selectedArea[i][1], n-self.selectedArea[i][0]-1

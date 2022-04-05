@@ -28,8 +28,14 @@ def export_data(
 	exportParameters,
 	progressbar,
 	progressbarLabel
-):
-	"""
+) -> None:
+	"""Export the current state of the data to every selected format.
+
+	Parameters:
+		dataHandler(): .
+		exportParameters(namedtuple): .
+		progressbar(): Reference to a indeterminate progressbar to .
+		progressbarLabel(): .
 	"""
 	progressbar.start()
 
@@ -64,8 +70,18 @@ def export_data(
 
 	progressbar.stop()
 
-def setup_output_folder(exportParameters, filename):
+def setup_output_folder(
+	exportParameters, 
+	filename
+) -> str:
 	"""
+	
+	Parameters:
+		exportParameters(namedtuple): .
+		filename(str): Name of the current datafile.
+
+	Returns:
+		pathOutputFolder(str): Path of the output folder.
 	"""
 	outputFolderPath = os.path.join(
 		exportParameters.folderPath, 
@@ -95,8 +111,14 @@ def create_session_folder(currentFolder):
 
 	return path_session_folder
 
-def get_session_number(pathSessionNumberFile):
+def get_session_number(pathSessionNumberFile: str) -> str:
 	"""
+
+	Parameters:
+		pathSessionNumberFile(str): .
+
+	Returns:
+		sessionNumber(str): .
 	"""
 	if os.path.exists(pathSessionNumberFile):
 		with open(pathSessionNumberFile, 'r+') as fileSessionNumber:
@@ -115,10 +137,10 @@ def get_session_number(pathSessionNumberFile):
 
 def export_to_sofa(
 	dataHandler, 
-	outputFolder, 
+	outputFolder: str, 
 	fileName="data.json", 
 	hidden=False
-):
+) -> None:
 	"""
 	"""
 	channelData = {}
@@ -169,12 +191,18 @@ def export_to_sofa(
 	if hidden == True and platform.system() == "Windows":
 		os.system("attrib +h " + outPutFilePath)
 
-def export_to_tex(dataHandler, outputFolder):
+def export_to_tex(
+	dataHandler, 
+	outputFolder: str
+) -> None:
 	"""
 	"""
 	pass
 
-def export_to_txt(dataHandler, outputFolder):
+def export_to_txt(
+	dataHandler, 
+	outputFolder: str
+) -> None:
 	"""
 	"""
 	outPutFilePath = os.path.join(outputFolder, "data.txt")
@@ -207,12 +235,18 @@ def export_to_txt(dataHandler, outputFolder):
 			np.savetxt(outputDatafileTxt, data, fmt="%1.8e")
 			outputDatafileTxt.write("\n")	
 
-def export_to_hdf5(dataHandler, outputFolder):
+def export_to_hdf5(
+	dataHandler, 
+	outputFolder: str
+) -> None:
 	"""
 	"""
 	pass
 
-def export_to_excel(dataHandler, outputFolder):
+def export_to_excel(
+	dataHandler, 
+	outputFolder: str
+) -> None:
 	"""
 	"""
 	generalDataFrame = pd.DataFrame(
@@ -260,7 +294,10 @@ def export_to_excel(dataHandler, outputFolder):
 		for channelDataFrameName, channelDataFrame in channelDataFrames.items():
 			channelDataFrame.to_excel(writer, sheet_name=channelDataFrameName)
 
-def export_plots(dataHandler, outputFolder):
+def export_plots(
+	dataHandler, 
+	outputFolder: str
+) -> None:
 	"""
 	"""
 
