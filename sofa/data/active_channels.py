@@ -69,9 +69,10 @@ def calculate_topography(correctedCurveData) -> List:
 	"""
 
 	return [
-		pointOfContact
-		for pointOfContact
-		in correctedCurveData.valuesPointOfContact
+		np.nan if index in correctedCurveData.curvesWithArtifacts
+		else pointOfContact
+		for index, pointOfContact
+		in enumerate(correctedCurveData.valuesPointOfContact)
 	]
 
 def calculate_force_distance_topography(correctedCurveData) -> List:
@@ -101,9 +102,10 @@ def calculate_z_piezo_at_maximum_deflection(correctedCurveData) -> List:
 		channelZPiezoAtMaximumDeflection(list) The calculated z piezo at maximum deflection values.
 	"""
 	return [
-		correctedCurve[0][-1]
-		for correctedCurve
-		in correctedCurveData.correctedCurves
+		np.nan if index in correctedCurveData.curvesWithArtifacts
+		else correctedCurve[0][-1]
+		for index, correctedCurve
+		in enumerate(correctedCurveData.correctedCurves)
 	]
 
 def calculate_stiffness(correctedCurveData) -> List:
@@ -118,12 +120,15 @@ def calculate_stiffness(correctedCurveData) -> List:
 	"""
 	stiffness = []
 
-	for correctedCurve in correctedCurveData.correctedCurves:
-		a = np.vstack([correctedCurve[0], np.zeros(len(correctedCurve[0]))]).T 
+	for index, correctedCurve in enumerate(correctedCurveData.correctedCurves):
+		if index in correctedCurveData.curvesWithArtifacts:
+			stiffness.append(np.nan)
+		else:
+			a = np.vstack([correctedCurve[0], np.zeros(len(correctedCurve[0]))]).T 
 
-		m, _ = np.linalg.lstsq(a, correctedCurve[1], rcond=None)[0]
+			m, _ = np.linalg.lstsq(a, correctedCurve[1], rcond=None)[0]
 
-		stiffness.append(m)
+			stiffness.append(m)
 
 	return stiffness
 
@@ -139,14 +144,22 @@ def calculate_attractive_area(correctedCurveData) -> List:
 	"""
 	attractiveArea = []
 
-	for correctedCurve, indexPointOfContact in zip (correctedCurveData.correctedCurves, correctedCurveData.indexePointOfContact):
-		indexAttractiveStart, indexAttractiveEnd = locate_attractive_area(
-			correctedCurve[1], 
-			indexPointOfContact
+	for index, (correctedCurve, indexPointOfContact) in enumerate(
+		zip(
+			correctedCurveData.correctedCurves, 
+			correctedCurveData.indexePointOfContact
 		)
-		attractiveArea.append(
-			np.trapz(correctedCurve[1][indexAttractiveStart:indexAttractiveEnd])
-		)
+	):
+		if index in correctedCurveData.curvesWithArtifacts:
+			attractiveArea.append(np.nan)
+		else:
+			indexAttractiveStart, indexAttractiveEnd = locate_attractive_area(
+				correctedCurve[1], 
+				indexPointOfContact
+			)
+			attractiveArea.append(
+				np.trapz(correctedCurve[1][indexAttractiveStart:indexAttractiveEnd])
+			)
 
 	return attractiveArea
 
@@ -161,9 +174,10 @@ def calculate_raw_offset(correctedCurveData) -> List:
 		(list): .
 	"""
 	return [
-		rawOffset
-		for rawOffset
-		in correctedCurveData.valuesRawOffset
+		np.nan if index in correctedCurveData.curvesWithArtifacts
+		else rawOffset
+		for index, rawOffset
+		in enumerate(correctedCurveData.valuesRawOffset)
 	]
 
 def calculate_raw_stiffness(correctedCurveData) -> List:
@@ -176,9 +190,10 @@ def calculate_raw_stiffness(correctedCurveData) -> List:
 		(list): .
 	"""
 	return [
-		rawStiffness
-		for rawStiffness
-		in correctedCurveData.valuesRawStiffness
+		np.nan if index in correctedCurveData.curvesWithArtifacts
+		else rawStiffness
+		for index, rawStiffness
+		in enumerate(correctedCurveData.valuesRawStiffness)
 	]
 
 def calculate_max_deflection(correctedCurveData) -> List:
@@ -191,9 +206,10 @@ def calculate_max_deflection(correctedCurveData) -> List:
 		(list): .
 	"""
 	return [
-		correctedCurve[1][-1]
-		for correctedCurve
-		in correctedCurveData.correctedCurves
+		np.nan if index in correctedCurveData.curvesWithArtifacts
+		else correctedCurve[1][-1]
+		for index, correctedCurve
+		in enumerate(correctedCurveData.correctedCurves)
 	]
 
 def calculate_z_attractive(correctedCurveData) -> List:
@@ -207,14 +223,22 @@ def calculate_z_attractive(correctedCurveData) -> List:
 	"""
 	zAttractive = []
 
-	for curve, indexPointOfContact in zip (correctedCurveData.correctedCurves, correctedCurveData.indexePointOfContact):
-		indexAttractiveStart, indexAttractiveEnd = locate_attractive_area(
-			curve[1], 
-			indexPointOfContact
+	for index, (curve, indexPointOfContact) in enumerate(
+		zip(
+			correctedCurveData.correctedCurves, 
+			correctedCurveData.indexePointOfContact
 		)
-		zAttractive.append(
-			indexAttractiveEnd - indexAttractiveStart
-		)
+	):
+		if index in correctedCurveData.curvesWithArtifacts:
+			zAttractive.append(np.nan)
+		else:
+			indexAttractiveStart, indexAttractiveEnd = locate_attractive_area(
+				curve[1], 
+				indexPointOfContact
+			)
+			zAttractive.append(
+				indexAttractiveEnd - indexAttractiveStart
+			)
 
 	return zAttractive
 
@@ -228,9 +252,10 @@ def calculate_deflection_attractive(correctedCurveData) -> List:
 		(list): .
 	"""
 	return [
-		np.nanmin(correctedCurve[1])
-		for correctedCurve
-		in correctedCurveData.correctedCurves
+		np.nan if index in correctedCurveData.curvesWithArtifacts
+		else np.nanmin(correctedCurve[1])
+		for index, correctedCurve
+		in enumerate(correctedCurveData.correctedCurves)
 	]
 
 def calculate_curves_with_artifacts(correctedCurveData) -> List:

@@ -353,7 +353,7 @@ class DataHandler():
 	def plot_histogram(self):
 		"""Display the data and active data as a histogram."""
 		data = self._get_histogram_data()
-		activeData = self._get_active_histogram_data(data)
+		activeData = self._get_active_histogram_data()
 
 		ax = self.get_axes(self.histogramParameters["holder"])
 
@@ -508,16 +508,18 @@ class DataHandler():
 
 		return np.reshape(data, (m, n))
 
-	def _get_active_histogram_data(self, data):
+	def _get_active_histogram_data(self):
 		"""Set inactive data points to nan.
-		
-		Parameters:
-			data(np.ndarray): 1 dim data array.
 
 		Returns:
 			activeData(np.ndarray): 2 dim data array with nan values at inactive data points.
 		"""
-		activeData = data.copy()
+		channelName = self._text_to_camel_case(
+			self.histogramParameters["currentChannel"].get()
+		)
+		histogramData = self.channelData[channelName]["sourceData"].flatten()
+
+		activeData = histogramData.copy()
 		np.put(activeData, self.inactiveDataPoints, np.nan)
 
 		return activeData[np.isfinite(activeData)]
