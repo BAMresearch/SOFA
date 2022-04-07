@@ -132,7 +132,7 @@ def shift_y_axis(
 		rawStiffness(float): . 
 
 	Raises:
-		(ValueError): .
+		ValueError: .
 	"""
 	coefficients = np.polyfit(xValueApproach, yValueApproach, 1)
 	fittedCurveFunction = np.poly1d(coefficients)
@@ -188,7 +188,7 @@ def calculate_end_of_zeroline(
 		endOfZeroline(int): The index of the end of the zeroline.
 
 	Raises:
-		(ValueError): .
+		ValueError: .
 	"""
 	smoothedDerivation = gaussian_filter1d(
 		(np.diff(yValues) / np.diff(xValues)), 

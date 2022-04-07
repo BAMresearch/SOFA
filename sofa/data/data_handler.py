@@ -84,6 +84,76 @@ class DataHandler():
 		self.histogramParameters["zoom"] = guiComponents["zoomHistogram"]
 		self.histogramParameters["numberOfBins"] = guiComponents["numberOfBins"]
 
+	def restore_session_data(
+		self, 
+		backupData: Dict
+	) -> None:
+		""""""
+		self._restore_gui_parameter(backupData["guiParameters"])
+		self._restore_toolbar_parameter(backupData["toolbarParameters"])
+		self._restore_data(backupData["data"])
+
+	def _restore_gui_parameter(
+		self, 
+		guiParameters: Dict
+	) -> None:
+		""""""
+		self.linePlotParameters["interactive"].set(
+			guiParameters["interactiveLinePlot"]
+		)
+		self.heatmapParameters["interactive"].set(
+			guiParameters["interactiveHeatmap"]
+		)
+		self.histogramParameters["interactive"].set(
+			guiParameters["interactiveHistogram"]
+		)
+		self.heatmapParameters["currentChannel"].set(
+			guiParameters["heatmapChannel"]
+		)
+		self.histogramParameters["currentChannel"].set(
+			guiParameters["histogramChannel"]
+		)
+		self.histogramParameters["zoom"].set(
+			guiParameters["histogramZoom"]
+		)
+		self.histogramParameters["numberOfBins"].set(
+			guiParameters["histogramNumberOfBins"]
+		)
+
+	def _restore_toolbar_parameter(
+		self, 
+		toolbarParameters: Dict
+	) -> None:
+		""""""
+		self.linePlotParameters["showInactive"].set(
+			toolbarParameters["showInactive"]
+		)
+		self.linePlotParameters["displayAverage"].set(
+			toolbarParameters["displayAverage"]
+		)
+		self.linePlotParameters["displayErrorbar"].set(
+			toolbarParameters["displayErrorbar"]
+		)
+		self.heatmapParameters["selectedArea"] = toolbarParameters["selectedArea"]
+		self.heatmapParameters["mappedIndices"] = np.asarray(
+			toolbarParameters["mappedIndices"]
+		)
+
+	def _restore_data(
+		self,
+		data
+	) -> None:
+		""""""
+		self.inactiveDataPoints = data["inactiveDataPoints"]
+
+		self.generalData = data["generalData"]
+		
+		self.curveData = data["curveData"]
+
+		self.averageData = data["averageData"]	
+
+		self.channelData = data["channelData"]
+
 	def init_mapped_indices(self) -> None:
 		"""Create a two dimensional array of indices 
 		   to map the datapoints to their original orientation."""	

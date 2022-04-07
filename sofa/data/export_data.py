@@ -16,6 +16,8 @@ along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
 import platform
+from typing import List, Tuple, NamedTuple, Dict
+
 import numpy as np
 import json
 import pandas as pd
@@ -33,8 +35,8 @@ def export_data(
 
 	Parameters:
 		dataHandler(): .
-		exportParameters(namedtuple): .
-		progressbar(): Reference to a indeterminate progressbar to .
+		exportParameters(namedtuple): Contains the selected export parameters and options.
+		progressbar(): Indeterminate progressbar to show the export progress.
 		progressbarLabel(): .
 	"""
 	progressbar.start()
@@ -71,13 +73,13 @@ def export_data(
 	progressbar.stop()
 
 def setup_output_folder(
-	exportParameters, 
-	filename
+	exportParameters: NamedTuple, 
+	filename: str
 ) -> str:
-	"""
+	"""Set up a folder structure to store the data.
 	
 	Parameters:
-		exportParameters(namedtuple): .
+		exportParameters(namedtuple): Contains the selected export parameters and options.
 		filename(str): Name of the current datafile.
 
 	Returns:
@@ -93,18 +95,21 @@ def setup_output_folder(
 
 	return create_session_folder(outputFolderPath)
 	
-def create_session_folder(currentFolder):
+def create_session_folder(currentFolderPath) -> str:
 	""".
 
 	Parameters:
-		currentFolder(string): .
+		currentFolderPath(str): Path to the parent folder.
+
+	Returns:
+		path_session_folder(str): Path to the sessoion folder.
 	"""
-	pathSessionNumberFile = os.path.join(currentFolder, ".sessionNumber")
+	pathSessionNumberFile = os.path.join(currentFolderPath, ".sessionNumber")
 
 	sessionNumber = get_session_number(pathSessionNumberFile)
 
 	path_session_folder = os.path.join(
-		currentFolder,
+		currentFolderPath,
 		"Session" + sessionNumber
 	)
 	os.mkdir(path_session_folder)
@@ -115,16 +120,18 @@ def get_session_number(pathSessionNumberFile: str) -> str:
 	"""
 
 	Parameters:
-		pathSessionNumberFile(str): .
+		pathSessionNumberFile(str): Path to the file that stores the session number.
 
 	Returns:
-		sessionNumber(str): .
+		sessionNumber(str): The number of the current session.
 	"""
+	# Read and update existing session number.
 	if os.path.exists(pathSessionNumberFile):
 		with open(pathSessionNumberFile, 'r+') as fileSessionNumber:
 			sessionNumber = int(fileSessionNumber.read(3)) + 1
 		with open(pathSessionNumberFile, 'r+') as fileSessionNumber:
 			fileSessionNumber.write(str(sessionNumber))
+	# Create new session number.
 	else:
 		with open(pathSessionNumberFile, 'w') as fileSessionNumber:
 			fileSessionNumber.write('1')
@@ -138,10 +145,16 @@ def get_session_number(pathSessionNumberFile: str) -> str:
 def export_to_sofa(
 	dataHandler, 
 	outputFolder: str, 
-	fileName="data.json", 
-	hidden=False
+	fileName: str="data.json", 
+	hidden: bool=False
 ) -> None:
-	"""
+	"""Export the current state of the session as a json file.
+
+	Parameters:
+		dataHandler():
+		outputFolder(str): Path to the save folder.
+		fileName(str): Name of the save file.
+		hidden(bool): Hides the save file if selected.
 	"""
 	channelData = {}
 	for channelName, channel in dataHandler.channelData.items():
@@ -299,6 +312,10 @@ def export_plots(
 	outputFolder: str
 ) -> None:
 	"""
+
+	Parameters:
+		dataHandler(): .
+		outputFolder(str): .
 	"""
 
 	linePlotFilePath = os.path.join(outputFolder, "lineplot")
@@ -316,8 +333,18 @@ def export_plots(
 		histogramFilePath, dpi=300
 	)
 
-def split_corrected_curves(correctedCurves):
-	""""""
+def split_corrected_curves(
+	correctedCurves: list
+) -> Tuple[list, list]:
+	"""
+	
+	Parameters:
+		correctedCurves(list): .
+
+	Returns: 
+		xValues(list): .
+		yValues(list): .
+	"""
 	xValues = []
 	yValues = []
 

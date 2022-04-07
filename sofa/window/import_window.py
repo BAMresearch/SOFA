@@ -272,10 +272,10 @@ class ImportWindow(ttk.Frame):
 		return messagebox.showinfo("Success", "Data is imported.")
 
 	def _create_selected_import_parameters(self) -> NamedTuple:
-		"""Summarize the selected import options for easier use.
+		"""Summarize the selected import parameters and options for easier use.
 
 		Returns:
-			ImportOptions(namedtuple): Contains the selected import opotions.
+			ImportOptions(namedtuple): Contains the selected import parameters and opotions.
 		"""
 		ImportOptions = namedtuple(
 			"ImportOptions",

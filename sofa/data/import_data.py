@@ -26,9 +26,22 @@ from igor.binarywave import load as loadibw
 def import_bam_ibw_data(
 	importParameters: NamedTuple,
 	update_progressbar: Callable
-):
-	"""
+) -> Dict:
+	"""Try to import selected data files in bam ibw file format.
 
+	Parameters:
+		importParameters(namedtuple): Contains the selected import parameters and options.
+		update_progressbar(function): Function to show the import progress.
+
+	Returns: 
+		importedData(dict): Contains the curve data and if selected additional image or channel data.
+
+	Raises:
+		Exception: Can not read the curve data files.
+		Exception: Can not read the image file.
+		Exception: Image data does not fit the curve data.
+		Exception: Can not read the channel file.
+		Exception: Channel data does not fit the curve data.
 	"""
 	importedData = {}
 
@@ -88,11 +101,17 @@ def import_bam_ibw_data(
 	return importedData
 
 def load_bam_ibw_data_files(
-	importParameters,
-	update_progressbar
-):
-	"""
+	importParameters: NamedTuple,
+	update_progressbar: Callable
+) -> NamedTuple:
+	"""Try to import the .
 
+	Parameters:
+		importParameters(namedtuple): Contains the selected import parameters and options.
+		update_progressbar(function): Function to show the import progress.
+
+	Returns: 
+		CurveData(namedTuple): Contains the .
 	"""
 	update_progressbar(
 		mode="reset",
@@ -154,12 +173,27 @@ def load_bam_ibw_data_files(
 		n=n
 	)
 
-def get_filename(filePathData):
-	""""""
+def get_filename(filePathData: str) -> str:
+	"""
+
+	Parameters:
+		filePathData(str): Filepath to the data dictionary.
+
+	Returns:
+		filename(str): Name .
+	"""
 	return os.path.basename(filePathData)
 
-def get_data_dimensions(filePathData):
-	""""""
+def get_data_dimensions(filePathData: str) -> Tuple[int, int]:
+	"""
+
+	Parameters:
+		filePathData(str):
+
+	Returns:
+		m(int): .
+		n(int): .
+	"""
 	m = len(
 		os.listdir(filePathData)
 	)
@@ -174,8 +208,9 @@ def get_data_dimensions(filePathData):
 	return m, n
 
 def split_curve(
-	xValues: np.ndarray, yValues: np.ndarray
-) -> Tuple[NamedTuple, NamedTuple]:
+	xValues: np.ndarray, 
+	yValues: np.ndarray
+) -> Tuple[np.ndarray, np.ndarray]:
 	"""Split measurement curve into an approach and retract part.
 
 	Parameters:
@@ -183,7 +218,8 @@ def split_curve(
 		yValues(np.ndarray): Y values of the current curve.
 
 	Returns:
-		(tuple): 
+		approachCurve(list): . 
+		retractCurve(list): .
 	"""
 	# 
 	splittingPoint = np.argmax(xValues)
@@ -199,11 +235,20 @@ def split_curve(
 	return approachCurve, retractCurve
 
 def load_bam_ibw_image_file(
-	importParameters,
-	update_progressbar
-):
-	"""
+	importParameters: NamedTuple,
+	update_progressbar: Callable
+) -> NamedTuple:
+	"""Try to import an optional image file.
+	
+	Parameters:
+		importParameters(namedtuple): Contains the selected import parameters and options.
+		update_progressbar(function): Function to show the import progress.
 
+	Returns:
+		ImageData(namedtuple): Contains the image data.
+
+	Raises:
+		Exception: Can not read the image file.
 	"""
 	ImageData = namedtuple(
 		"ImageData",
@@ -242,11 +287,20 @@ def load_bam_ibw_image_file(
 		raise Exception("Cant read image data!")
 
 def load_bam_ibw_channel_data(
-	importParameters,
-	update_progressbar
-):
-	"""
+	importParameters: NamedTuple,
+	update_progressbar: Callable
+) -> NamedTuple:
+	"""Try to import an addtional channel file.
+	
+	Parameters:
+		importParameters(namedtuple): Contains the selected import parameters and options.
+		update_progressbar(function): Function to show the import progress.
 
+	Returns:
+		ChannelData(namedtuple): Contains the channel data.
+
+	Raises:
+		Exception: Can not read the channel file.
 	"""
 	ChannelData = namedtuple(
 		"ChannelData",
@@ -259,14 +313,31 @@ def load_bam_ibw_channel_data(
 
 
 def import_sofa_data(
-	importParameters,
-	update_progressbar
-):
-	""""""
+	importParameters: NamedTuple,
+	update_progressbar: Callable
+) -> None:
+	"""Try to import selected data files in sofa file format.
+
+	Parameters:
+		importParameters(namedtuple): Contains the selected import parameters and options.
+		update_progressbar(function): Function to show the import progress.
+	"""
 	pass
 
-def restore_sofa_data(filePath):
-	""""""
+def restore_sofa_data(
+	filePath: str
+) -> Dict:
+	"""Restore the state of the last SOFA session.
+	
+	Parameters:
+		filePath(str): Path to the backup file.
+
+	Returns:
+		backupData(dict): .
+
+	Raises:
+		FileNotFoundError: Can not find a backup file.
+	"""
 	try:
 		with open(filePath, 'r+') as dataFile:
 			backupData = dataFile.read()
@@ -274,9 +345,10 @@ def restore_sofa_data(filePath):
 	except FileNotFoundError:
 		raise FileNotFoundError
 
-	data = json.loads(backupData)
+	return json.loads(backupData)
 
 
+# Defines all available import options.
 importFunctions = {
 	"BAM_IBW": (import_bam_ibw_data, "*.ibw"),
 	"SOFA": (import_sofa_data, "*.json")

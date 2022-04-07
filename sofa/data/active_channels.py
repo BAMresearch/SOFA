@@ -306,6 +306,8 @@ def calculate_custom_channel(correctedCurveData):
 	pass
 '''
 
+
+# Defines all available channels.
 channels = {
 	"topography": calculate_topography,
 	"forceDistanceTopography": calculate_force_distance_topography,

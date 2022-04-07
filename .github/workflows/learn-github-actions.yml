@@ -1,0 +1,8 @@
+name: execute-python-tests
+on: [push]
+jobs:
+  say-hello:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: echo "This job tests something"

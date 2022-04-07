@@ -53,12 +53,12 @@ class MainWindow(ttk.Frame):
 			self._camel_case_to_text(channelName)
 			for channelName in activeChannels.keys()
 		]
-		"""
+		
 		self.root.protocol(
 			"WM_DELETE_WINDOW", 
 			self._close_main_window
 		)
-		"""
+		
 		self._create_main_window()
 		self._set_plot_parameters_in_data_handler()
 		#self._specify_data_import()
@@ -432,9 +432,12 @@ class MainWindow(ttk.Frame):
 		try:
 			filePath = os.path.join(
 				self.sourceDirectory,
-				".sofaSession"
+				".sofaSessionBackup"
 			)
-			restore_sofa_data(filePath)
+			backupData = restore_sofa_data(filePath)
+			self.set_filename_in_labeled_frame(backupData["generalData"]["filename"])
+			self.dataHandler.restore_session_data(backupData)
+			self.dataHandler.display_imported_data()
 		except FileNotFoundError:
 			messagebox.showerror(
 				"Error", 
