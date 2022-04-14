@@ -64,7 +64,7 @@ def test_shift_x_axis_x_axis_can_not_be_corrected_simple_data():
 
 	results = pd.shift_x_axis(xData, yData, endOfZeroline)
 	
-	np.testing.assert_array_equal(xData - 6.5, results[0])
+	np.testing.assert_array_equal(xData, results[0])
 	assert 6.5 == results[1]
 	assert 5 == results[2]
 

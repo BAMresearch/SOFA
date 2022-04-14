@@ -139,7 +139,7 @@ class LinePlotToolbar(NavigationToolbar2Tk):
 		self._update_toolbar_buttons()
 
 	def _start_zoom_motion(self, event) -> None:
-		"""Buffer the starting point for zooming, if existing."""
+		"""If it exists, buffer the starting point for zooming."""
 		self.xStart = self.yStart = 0
 
 		if event.xdata:
@@ -147,7 +147,7 @@ class LinePlotToolbar(NavigationToolbar2Tk):
 			self.yStart = event.ydata
 
 	def _end_zoom_motion(self, event) -> None:
-		"""Zoom to the marked rectangle, if it's located in the axis'"""
+		"""Zoom to the marked rectangle, if it is within the axis'"""
 		# Return if zooming starts or ends outside of the lineplot.
 		if not self.xStart or not event.xdata or not event.ydata:
 			return
@@ -184,7 +184,7 @@ class LinePlotToolbar(NavigationToolbar2Tk):
 		self._update_toolbar_buttons()
 	
 	def _pick_single_line(self, event) -> None:
-		"""Click curve to toggle it's state.
+		"""Click a curve to toggle it's state.
 
 		Parameters:
 			event(event): Current click event.
@@ -228,7 +228,7 @@ class LinePlotToolbar(NavigationToolbar2Tk):
 			currentViewLimits(namedtuple): Tuple that contains the current view limits
 
 		Returns: 
-			hasIntersection(bool): True if a data point of the line lies within the current
+			hasIntersection(bool): True if the line has a data point within the current
 								   view limits, otherwise false.
 		"""
 		# Get valid line data.

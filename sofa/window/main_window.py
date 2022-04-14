@@ -43,6 +43,8 @@ class MainWindow(ttk.Frame):
 	"""The main window of SOFA."""
 	def __init__(self, root):
 		self.root = root
+		# Set tkinter dialog language to english.
+		self.root.tk.eval('::msgcat::mclocale en')
 		self.versionNumber = "1.0"
 		self.root.title("SOFA " + self.versionNumber)
 		self.sourceDirectory = os.path.abspath(os.path.dirname(__file__))
@@ -61,7 +63,7 @@ class MainWindow(ttk.Frame):
 		
 		self._create_main_window()
 		self._set_plot_parameters_in_data_handler()
-		#self._specify_data_import()
+		self._specify_data_import()
 
 	def _create_main_window(self) -> None:
 		"""Define all elements within the main window."""
@@ -311,9 +313,9 @@ class MainWindow(ttk.Frame):
 
 	def _create_import_window(self) -> None:
 		"""Open the window to import data."""
-		ImportWindow(self.dataHandler, self.set_filename_in_labeled_frame)
+		ImportWindow(self.dataHandler, self.set_filename)
 
-	def set_filename_in_labeled_frame(self, filename) -> None:
+	def set_filename(self, filename) -> None:
 		"""Display the name of the current data files."""
 		self.frameDiagrams.configure(text=filename)
 
@@ -416,7 +418,7 @@ class MainWindow(ttk.Frame):
 		self.root.destroy()
 
 	def _specify_data_import(self) -> None:
-		"""Ask the user to restore the last session or import new data."""
+		"""Ask the user if he wants to restore the last session or import new data."""
 		loadLastSession = messagebox.askyesno(
 			"Load last session", 
 			"Do you want to load the last session?"

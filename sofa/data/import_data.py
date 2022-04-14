@@ -27,14 +27,15 @@ def import_bam_ibw_data(
 	importParameters: NamedTuple,
 	update_progressbar: Callable
 ) -> Dict:
-	"""Try to import selected data files in bam ibw file format.
+	"""Try to import data files in bam ibw file format.
 
 	Parameters:
 		importParameters(namedtuple): Contains the selected import parameters and options.
 		update_progressbar(function): Function to show the import progress.
 
 	Returns: 
-		importedData(dict): Contains the curve data and if selected additional image or channel data.
+		importedData(dict): Contains the imoported curve data and 
+		                    if selected additional image or channel data.
 
 	Raises:
 		Exception: Can not read the curve data files.

@@ -32,7 +32,7 @@ def calculate_channels(
 		update_progressbar(callable): Function to show the calculation progress.
 
 	Returns:
-		channelData(dict): Contains the data of every channel.
+		channelData(dict): Contains the data of every calculated channel.
 	"""
 	update_progressbar(
 		mode="reset",
@@ -93,7 +93,7 @@ def calculate_force_distance_topography(correctedCurveData) -> List:
 
 def calculate_z_piezo_at_maximum_deflection(correctedCurveData) -> List:
 	"""Calculate the z piezo at maximum deflection channel as 
-	   the last x value of every corrected curve.
+	   the last x value for every corrected curve.
 	
 	Parameters:
 		correctedCurveData(namedtuple): Data created while correcting the curves.
@@ -110,7 +110,7 @@ def calculate_z_piezo_at_maximum_deflection(correctedCurveData) -> List:
 
 def calculate_stiffness(correctedCurveData) -> List:
 	"""Calculate the stiffness channel as the slope of a linear
-	   fit of every corrected curve.
+	   fit for every corrected curve.
 
 	Parameters:
 		correctedCurveData(namedtuple): Data created while correcting the curves.
@@ -134,7 +134,7 @@ def calculate_stiffness(correctedCurveData) -> List:
 
 def calculate_attractive_area(correctedCurveData) -> List:
 	"""Calculate the attractive area channel as the value of 
-	   the integral over the attractive area of every corrected curve.
+	   the integral over the attractive area for every corrected curve.
 	
 	Parameters:
 		correctedCurveData(namedtuple): Data created while correcting the curves.
@@ -274,7 +274,7 @@ def calculate_curves_with_artifacts(correctedCurveData) -> List:
 		in correctedCurveData.correctedCurves
 	]
 
-def locate_attractive_area(yValues, indexPointOfContact) -> Tuple:
+def locate_attractive_area(yValues, indexPointOfContact) -> Tuple[int, int]:
 	"""Locate the start and endpoint of the attractive area of a curve.
 
 	Parameters:

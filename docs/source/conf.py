@@ -18,8 +18,8 @@
 # -- Project information -----------------------------------------------------
 
 project = 'SOFA'
-copyright = '2020, Tim Schlesier, Sven Fritzsche'
-author = 'Tim Schlesier, Sven Fritzsche, Dorothee Silbernagl, Heinz Sturm'
+copyright = '2022, Tim Schleiser, Sven Fritzsche'
+author = 'Tim Schleiser, Sven Fritzsche'
 
 
 # -- General configuration ---------------------------------------------------
@@ -44,7 +44,7 @@ exclude_patterns = []
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'classic'
+html_theme = 'furo'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

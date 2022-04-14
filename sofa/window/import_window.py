@@ -30,12 +30,12 @@ import data.active_channels as ac
 
 class ImportWindow(ttk.Frame):
 	"""A subwindow to handle the data import."""
-	def __init__(self, dataHandler, update_main_window):
+	def __init__(self, dataHandler, set_filename):
 		self.window = tk.Toplevel()
 		self.window.title("Import Data")
 
 		self.dataHandler = dataHandler
-		self.update_main_window = update_main_window
+		self.set_filename = set_filename
 		self.dataTypes = impd.importFunctions.keys()
 
 		self._create_window()
@@ -256,14 +256,14 @@ class ImportWindow(ttk.Frame):
 			combinedData
 		)
 		self.dataHandler.init_data()
+		self.dataHandler.init_mapped_indices()
 
 		# Set filename in main window.
-		self.update_main_window(
+		self.set_filename(
 			combinedData["generalData"]["filename"]
 		)
 
 		# Display imported data
-		self.dataHandler.init_mapped_indices()
 		self.dataHandler.display_imported_data()
 
 		# Close window
@@ -310,8 +310,8 @@ class ImportWindow(ttk.Frame):
 
 		Parameters:
 			mode(str): Specifies whether to reset or update the progressbar.
-			value(float): .
-			label(str): .
+			value(float): The current progressvalue for each step.
+			label(str): Describes the current action.
 		"""
 		if mode == "reset":
 			self.progressbar["value"] = 0

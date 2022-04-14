@@ -48,7 +48,7 @@ class DataHandler():
 		self.curveData = combinedData["curveData"]
 		self.channelData = combinedData["channelData"]
 
-	def init_data(self):
+	def init_data(self) -> None:
 		""""""
 		self.inactiveDataPoints = []
 
@@ -56,6 +56,16 @@ class DataHandler():
 		self.averageData["curves"] = []
 
 		self.histogramData = {}
+
+	def init_mapped_indices(self) -> None:
+		"""Create a two dimensional array of indices 
+		   to map the datapoints to their original orientation."""	
+		m = int(self.generalData["m"])
+		n = int(self.generalData["n"])
+
+		self.heatmapParameters["mappedIndices"] = np.arange(
+			m * n
+		).reshape((m, n))
 
 	def set_plot_parameters(
 		self,
@@ -88,7 +98,11 @@ class DataHandler():
 		self, 
 		backupData: Dict
 	) -> None:
-		""""""
+		"""
+
+		Parameters:
+			backupData(dict): .
+		"""
 		self._restore_gui_parameter(backupData["guiParameters"])
 		self._restore_toolbar_parameter(backupData["toolbarParameters"])
 		self._restore_data(backupData["data"])
@@ -97,7 +111,11 @@ class DataHandler():
 		self, 
 		guiParameters: Dict
 	) -> None:
-		""""""
+		"""
+
+		Parameters:
+			guiParameters(dict): .
+		"""
 		self.linePlotParameters["interactive"].set(
 			guiParameters["interactiveLinePlot"]
 		)
@@ -124,7 +142,11 @@ class DataHandler():
 		self, 
 		toolbarParameters: Dict
 	) -> None:
-		""""""
+		"""
+
+		Parameters:
+			toolbarParameters(dict): .
+		"""
 		self.linePlotParameters["showInactive"].set(
 			toolbarParameters["showInactive"]
 		)
@@ -143,7 +165,11 @@ class DataHandler():
 		self,
 		data
 	) -> None:
-		""""""
+		"""
+
+		Parameters:
+			data(dict): .
+		"""
 		self.inactiveDataPoints = data["inactiveDataPoints"]
 
 		self.generalData = data["generalData"]
@@ -153,16 +179,6 @@ class DataHandler():
 		self.averageData = data["averageData"]	
 
 		self.channelData = data["channelData"]
-
-	def init_mapped_indices(self) -> None:
-		"""Create a two dimensional array of indices 
-		   to map the datapoints to their original orientation."""	
-		m = int(self.generalData["m"])
-		n = int(self.generalData["n"])
-
-		self.heatmapParameters["mappedIndices"] = np.arange(
-			m * n
-		).reshape((m, n))
 
 	def reset_channel_data(self) -> None:
 		"""Reset the data of every channel."""
@@ -555,7 +571,7 @@ class DataHandler():
 
 		return inputString
 
-	def _get_active_heatmap_data(self, data):
+	def _get_active_heatmap_data(self, data) -> np.ndarray:
 		"""Remove inactive data points from the given data in the dependence of its current alignment.
 		
 		Parameters:
@@ -578,7 +594,7 @@ class DataHandler():
 
 		return np.reshape(data, (m, n))
 
-	def _get_active_histogram_data(self):
+	def _get_active_histogram_data(self) -> np.ndarray:
 		"""Set inactive data points to nan.
 
 		Returns:
@@ -594,7 +610,7 @@ class DataHandler():
 
 		return activeData[np.isfinite(activeData)]
 
-	def add_inactive_data_points(self, newPoints):
+	def add_inactive_data_points(self, newPoints) -> None:
 		"""Add data points to the inactive data points in 
 		   dependence of the current alignment of the data.
 		
@@ -610,7 +626,7 @@ class DataHandler():
 		# Remove duplicates.
 		self.inactiveDataPoints = list(set(self.inactiveDataPoints))
 	
-	def remove_inactive_data_points(self, newPoints):
+	def remove_inactive_data_points(self, newPoints) -> None:
 		"""Remove data points from the inactive data 
 		   points in dependence of the current alignment of the data.
 		
@@ -622,23 +638,23 @@ class DataHandler():
 		for point in newPoints:
 			self.inactiveDataPoints.remove(self.heatmapParameters["mappedIndices"].flatten()[point])
 
-	def update_plots(self):
+	def update_plots(self) -> None:
 		"""Update every plot."""
 		self.update_line_plot()
 		self.update_heatmap()
 		self.update_histogram()
 
-	def update_line_plot(self):
+	def update_line_plot(self) -> None:
 		"""Update the line plot."""
 		self.update_lines()
 
 		if self.linePlotParameters["displayAverage"]:
 			self.update_average()
 
-	def update_heatmap(self):
+	def update_heatmap(self) -> None:
 		"""Update the heatmap."""
 		self.plot_heatmap()
 
-	def update_histogram(self):
+	def update_histogram(self) -> None:
 		"""Update the histogram."""
 		self.plot_histogram()

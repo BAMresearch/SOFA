@@ -163,7 +163,7 @@ class HeatmapToolbar(NavigationToolbar2Tk):
 		self.holder.draw()
 
 	def _delete_equal_lines(self, selectedAreaLines: List) -> None:
-		"""Finds all lines that exist more than once and deletes them."""
+		"""Find all lines that exist more than once and delete them."""
 		lineData = [line.get_xydata() for line in selectedAreaLines]
 		
 		uniqueValues, count = np.unique(
@@ -228,27 +228,27 @@ class HeatmapToolbar(NavigationToolbar2Tk):
 
 	@staticmethod
 	def _create_selected_area(
-		xStart: int, xEnd: int, 
-		yStart: int, yEnd: int
+		xStart: int, 
+		xEnd: int, 
+		yStart: int, 
+		yEnd: int
 	) -> List[List[int]]:
-		"""Convert start and endpoint to an area. 
+		"""Spans a rectangle between a start and end point. 
 
 		Parameters:
-			xStart(int): .
-			xEnd(int): .
-			yStart(int): .
-			yEnd(int): .
+			xStart(int): X value of the start point.
+			xEnd(int): X value of the end point.
+			yStart(int): Y value of the start point.
+			yEnd(int): Y value of the end point.
 
 		Returns: 
-			selectedArea(list): .
+			selectedArea(list): A list of all points within the rectangle.
 		"""
-		selectedArea = [
+		return [
 			[i, j] 
 			for i in range(xStart, xEnd) 
 			for j in range(yStart, yEnd)
 		]
-
-		return selectedArea
 
 	def _include_area(self) -> None:
 		"""Add everything except the selected area to the inactive data points."""
