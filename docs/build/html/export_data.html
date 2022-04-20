@@ -2,8 +2,7 @@
 <html class="no-js">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="prev" title="Import Data" href="import_data.html" />
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Supported Data Types" href="supported_data_types.html" /><link rel="prev" title="SOFA Toolbars" href="sofa_toolbars.html" />
 
     <meta name="generator" content="sphinx-4.5.0, furo 2022.04.07"/>
         <title>Export Data - SOFA documentation</title>
@@ -154,11 +153,28 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <ul class="current">
+  <ul>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="contribution.html">Contribution</a></li>
+</ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="import_data.html">Import Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sofa_workflow.html">SOFA workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sofa_toolbars.html">SOFA toolbars</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Export Data</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="supported_data_types.html">Supported Data Types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="correction_algorithm.html">Correction algorithm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="channels.html">SOFA Channels</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contribution.html">Contribution</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 </ul>
 
 </div>
@@ -191,24 +207,40 @@
           </label>
         </div>
         <article role="main">
-          <section id="export-data">
+          <div class="section" id="export-data">
 <h1>Export Data<a class="headerlink" href="#export-data" title="Permalink to this headline">#</a></h1>
-</section>
+<p>Once a subgroup has been defined and the selected curves have been averaged the analysis cycle of SOFA has been completed. Before selecting another subset of curves or analyzing the next FSD the results have to be exported.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>As of version 1.0 SOFA has no capacities to remember previous selected subsets of Force Curves or previous averaged curves. Results have to be exported to be stored.</p>
+</div>
+<p>Please use <strong>export</strong>, which can be found within the control frame of SOFA’s GUI, to store your results. You will be asked for the path and name of the subfolder in which the results are stored. Data can be exported in different formats: sofa, tex, txt, hdf5 and excel. Complete by <strong>Export data</strong>.</p>
+<p><strong>Foldername</strong> is supposed to be a comprehensive name of the experiment. SOFA will create a numbered subfolder (session#) in which all output data is stored, including images of all stacked plots.</p>
+<p>Data is saved and you can continue with SOFA after this message appears.</p>
+</div>
 
         </article>
       </div>
       <footer>
         
         <div class="related-pages">
-          
-          <a class="prev-page" href="import_data.html">
+          <a class="next-page" href="supported_data_types.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Supported Data Types</div>
+              </div>
+              <svg><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="sofa_toolbars.html">
               <svg><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Import Data</div>
+                <div class="title">SOFA Toolbars</div>
                 
               </div>
             </a>

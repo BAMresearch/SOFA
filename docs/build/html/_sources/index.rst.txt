@@ -1,6 +1,6 @@
 About SOFA
 ==========
-SOFA (SOftware for Force Analysis) is an open-source software for analyzing Atomic Force Microscopy (AFM) Force Spectroscopy data (FSD). SOFA is provided under `github <https://github.com/2Puck/sofa>`_.
+**SOFA** (**SO**\ftware for **F**\orce **A**\nalysis) is an open-source software for analyzing Atomic Force Microscopy (AFM) Force Spectroscopy data (FSD). SOFA is provided under `github <https://github.com/2Puck/sofa>`_.
 
 We kindly ask to cite (doi:pub einfügen) if any information of this manual or data resulting from using SOFA is published.  
 
@@ -28,13 +28,7 @@ SOFA Reference
    Supported Data Types <supported_data_types>
    Correction algorithm <correction_algorithm>
    SOFA Channels <channels>
-
-Contribution
-============
-.. toctree::
-   :maxdepth: 1
-
-   Contribution <contribution>
+   SOFA toolbars <sofa_toolbars>
 
 License
 ========

@@ -2,8 +2,7 @@
 <html class="no-js">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Channels" href="channels.html" /><link rel="prev" title="Export Data" href="export_data.html" />
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Correction algorithm" href="correction_algorithm.html" /><link rel="prev" title="Export Data" href="export_data.html" />
 
     <meta name="generator" content="sphinx-4.5.0, furo 2022.04.07"/>
         <title>Supported Data Types - SOFA documentation</title>
@@ -134,7 +133,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -159,17 +158,20 @@
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="import_data.html">Import Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sofa_workflow.html">SOFA workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="export_data.html">Export Data</a></li>
 </ul>
 <ul class="current">
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Supported Data Types</a></li>
-<li class="toctree-l1"><a class="reference internal" href="channels.html">Channels</a></li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="contribution.html">Contribution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="correction_algorithm.html">Correction algorithm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="channels.html">SOFA Channels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sofa_toolbars.html">SOFA toolbars</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 </ul>
 
 </div>
@@ -196,27 +198,50 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main">
-          <section id="supported-data-types">
+          <div class="section" id="supported-data-types">
 <h1>Supported Data Types<a class="headerlink" href="#supported-data-types" title="Permalink to this headline">#</a></h1>
-</section>
+<p>Please make sure that the raw FSD can be exported from your AFM device. SOFA 1.0 can only import directly *.ibw (igor binary wave, supported by oxford instrument Asylum AFM) and *.hdf5.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>We intend to make data import possible for most common FSD formats. If you wish to use SOFA for analyzing your experimental data, please contact <a class="reference external" href="mailto:sofa%40bam.de">sofa<span>@</span>bam<span>.</span>de</a> and provide us with a small data set of exemplary FSD (2x2 curves are sufficient), model and maker of your AFM and the maker and version of the used software.</p>
+</div>
+<p>In case your FSD format is accepted by SOFA, please make also sure that the data is organized as a Force Volume (FV), i.e. each FS curve is assigned to a x,y-coordinate in a spatial grid, as described in detail in <a class="reference internal" href="#force-spectroscopy-data-structure"><span class="std std-ref">Force Spectroscopy data structure</span></a>. SOFA 1.0 can only handle FV with a square grid i.e., number of curves in x and y direction is identical.</p>
+<div class="section" id="force-spectroscopy-data-structure">
+<span id="id1"></span><h2>Force Spectroscopy data structure<a class="headerlink" href="#force-spectroscopy-data-structure" title="Permalink to this headline">#</a></h2>
+<p>FSD contains single Force Curves (aka Force-Distance curves, FDC) which consist of two data sets of equal dimensions, the controlled variable <strong>piezo displacement Z</strong> and the measured variable <strong>force F</strong>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For simplicity’s sake we refer in this manual to the raw data as piezo displacement Z and force F, although individual AFM set-ups export cantilever deflection δ [nm] or t-b-signal [V] instead of force F [N]. These observables can be treated as equal since they are proportional to each other. Deflection δ and t-b signal are connected through their proportionality factor sensitivity Ω [nm/V], provided by calibration procedure of the AFM set-up (δ = (t-b)*Ω). Cantilever deflection δ is proportional to the force F since the AFM cantilever is assumed to be an elastic spring with the proportionality factor or spring constant kc [N/nm], as provided by Hooke’s law (F = kc*δ). Usage of different observables is only of consequence when absolute values are calculated, which is addressed in <a class="reference internal" href="channels.html#channels-based-on-physical-values"><span class="std std-ref">Channels based on physical values</span></a>.</p>
+</div>
+<p>Force curves can be differently stored, depending on the software used in AFM set-ups. Approach and retract part of the curve can be merged in one data set, or already split in two separate data sets. As of version 1.0, SOFA’s algorithm expects a merged data set and provides a step to split the approach part from the retract part. All subsequent steps of SOFA ignore the retract part and analyze the approach part. Incorporation of the retract part in the analysis will be provided in future versions of SOFA.</p>
+<p>Also, storage of a FV can differ significantly, depending on the software used in the AFM set-up. The two most common forms are depicted in a schematic drawing in Figure 1.</p>
+<div class="figure align-default" id="id2">
+<img alt="drawing of typical data organization of FSD sets" src="_images/data_organization_of_fsd_sets.jpg"/>
+<p class="caption"><span class="caption-text">Figure 1 schematic drawing of typical data organization of FSD sets force and distance. A) 3D in n x n matrices, with n being the number of lines and rows of the measurement grid. B) 2D in a (n*n) linear data set.</span><a class="headerlink" href="#id2" title="Permalink to this image">#</a></p>
+</div>
+<p>Besides the most common ways of storing FSD in a compact form as shown above, single curves can be stored in a hierarchical folder system.</p>
+<p>Most exported FSD formats also include notes or headers which describe the experimental set-up, i.e. time, date, temperature, calibration data, measurement rate, maximum force, dimension of FV in points, lines, x and y-range. In case this additional data is available, SOFA will import information, which is necessary for further analysis, such as the spring constant kc or the sensitivity Ω.</p>
+<p>Also included in the exported FSD are raw parameter maps, which can be also uploaded and used for further analysis in SOFA, as shown in Parameter maps.</p>
+</div>
+</div>
 
         </article>
       </div>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="channels.html">
+          <a class="next-page" href="correction_algorithm.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Channels</div>
+                <div class="title">Correction algorithm</div>
               </div>
               <svg><use href="#svg-arrow-right"></use></svg>
             </a>
@@ -251,8 +276,27 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contents
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Supported Data Types</a><ul>
+<li><a class="reference internal" href="#force-spectroscopy-data-structure">Force Spectroscopy data structure</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

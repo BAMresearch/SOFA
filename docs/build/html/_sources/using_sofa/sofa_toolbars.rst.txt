@@ -1,0 +1,10 @@
+SOFA Toolbars
+=============
+
+SOFA
+
+Lineplot toolbar
+----------------
+
+Heatmap toolbar
+---------------

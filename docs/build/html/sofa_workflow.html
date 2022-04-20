@@ -2,8 +2,7 @@
 <html class="no-js">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Export Data" href="export_data.html" /><link rel="prev" title="Import Data" href="import_data.html" />
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Export Data" href="export_data.html" /><link rel="prev" title="Import Data" href="import_data.html" />
 
     <meta name="generator" content="sphinx-4.5.0, furo 2022.04.07"/>
         <title>SOFA Workflow - SOFA documentation</title>
@@ -134,7 +133,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -159,19 +158,20 @@
 </ul>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="import_data.html">Import Data</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">SOFA Workflow</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">SOFA workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="export_data.html">Export Data</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="supported_data_types.html">Supported Data Types</a></li>
 <li class="toctree-l1"><a class="reference internal" href="correction_algorithm.html">Correction algorithm</a></li>
-<li class="toctree-l1"><a class="reference internal" href="channels.html">Channels</a></li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="contribution.html">Contribution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="channels.html">SOFA Channels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sofa_toolbars.html">SOFA toolbars</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 </ul>
 
 </div>
@@ -198,15 +198,62 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main">
-          <section id="sofa-workflow">
+          <div class="section" id="sofa-workflow">
 <h1>SOFA Workflow<a class="headerlink" href="#sofa-workflow" title="Permalink to this headline">#</a></h1>
-</section>
+<div class="section" id="sofa-gui">
+<h2>SOFA GUI<a class="headerlink" href="#sofa-gui" title="Permalink to this headline">#</a></h2>
+<p>The GUI is divided in different sections, as indicated by the orange dashed rectangles in Figure 1.
+Add text</p>
+</div>
+<div class="section" id="selection-process">
+<span id="id1"></span><h2>Selection Process<a class="headerlink" href="#selection-process" title="Permalink to this headline">#</a></h2>
+<p>After importing FSD to SOFA, subgroups of Force Curves can be created. This is done to get averaged Force Curves with high signal-to-noise ratio for comparison and analysis. Subgroups of Force Curves are created by selecting and rejecting single curves due to their spatial position in a parameter map (Parameter maps), due to an untypical shape (Outliers) and value ranges in histograms of channels (Histogram). These selection steps can be combined in any particular order, but we recommend to follow the order, in which these steps are presented here.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>By <em>update plots</em> any made selection in either plot is adopted by the other plots. To keep all plots synchronized automatically <em>Interactive Elements</em> must be activated by ticking <em>Heatmap</em> (for the parameter maps), <em>Lineplot</em> (for the center plot) and/or <em>Histogram</em>. Be aware that this can slow down the responds time significantly.</p>
+</div>
+<p>Excluded Curves appear gray instead of red in the center plot. The histogram of the ROI is plotted in red and in front of the histogram of the whole channel map, which is plotted in blue. Any selection step can reselect curves, which were rejected before.</p>
+<div class="section" id="parameter-maps">
+<span id="id2"></span><h3>Parameter maps<a class="headerlink" href="#parameter-maps" title="Permalink to this headline">#</a></h3>
+<p>Parameter maps corresponding to Channels are automatically created when FSD is imported to SOFA. Maps can be viewed on the middle bottom section of the SOFA GUI, together with any raw parameter map, which was created during the experiment.</p>
+<p>In these maps the topography and spatial distribution of parameters can be used as a filter criterion for subgroups. In order to define a ROI SOFA provides a custom <a class="reference internal" href="sofa_toolbars.html#heatmap-toolbar"><span class="std std-ref">Heatmap Toolbar</span></a>.</p>
+<p>By drawing a rectangle mask and using the <em>ROI inside mask button</em>, the following selection was done via parameter map.</p>
+<p>In case <em>Interactive Elements</em> are not ticked, all plots are synchronizing by <em>update plots</em>. Deselected data appears grey in curve plot and blue in the hoistogram.</p>
+</div>
+<div class="section" id="outliers">
+<span id="id3"></span><h3>Outliers<a class="headerlink" href="#outliers" title="Permalink to this headline">#</a></h3>
+<p>One of the advantages of SOFA is that all force curves are plotted in one graph and therefore can be compared directly. In this plot it also becomes evident that in some cases either the experimental curve is not ideal and/or SOFA’s algorithm did not succeed to correct the curve as expected. Those curves are clearly visible as outliers. If these outliers might change significantly and unnecessarily the outcome of average curves and their standard deviation, as explained in detail in <a class="reference internal" href="#averaged-subgroups-of-force-curves"><span class="std std-ref">Averaged Subgroups of Force Curves</span></a>. To deselect such outliers, SOFA has a custom <a class="reference internal" href="sofa_toolbars.html#lineplot-toolbar"><span class="std std-ref">Lineplot Toolbar</span></a>.</p>
+<p>Force Curves are expected to have a certain typical shape in order to interpret the contact between probe and sample according to theories and physical models. In case a curve shows any deviation from F = 0 for Z &lt; 0 beyond certain noise (areas are shown by horizontal yellow markings), the point of contact can not be identified conclusively. These curves need to be discarded. Also, in case curves show extensive non-monotonous behavior (zigzag) for Z &gt; 0 (area also shown yellow marking), the contact between probe and sample may have been unstable and therefore these curves must be discarded as well. By using update plots, Maps on the left and histogram on the right adopt the selection.</p>
+<p>In case <em>Interactive Elements</em> are not ticked, all plots can be synchronizing by <em>update plots</em>.</p>
+</div>
+<div class="section" id="histogram">
+<span id="id4"></span><h3>Histogram<a class="headerlink" href="#histogram" title="Permalink to this headline">#</a></h3>
+<p>Every Channel can be either displayed as a map (containing the spatial information) or as a histogram (containing the statistical information). By choosing the channel of interest in the pull-down menu and confirming by Histogram, the histogram is plotted, giving the numbers of bins (by default 100) and the maximum and minimum value of the chosen channel, with the bin width = (max-min)/100. In order to select a certain value range please use the up and down buttons for the maximum and minimum value.</p>
+<p>To avoid a histogram, that is distorted by extreme outliers, one can use a zoom function, which can be activated by ticking <em>zoom</em>. Please be aware, that the zoomed range equals the selected range.</p>
+<p>In case <em>Interactive Elements</em> are not ticked, all plots can be synchronizing by <em>update plots</em>.</p>
+</div>
+</div>
+<div class="section" id="averaged-subgroups-of-force-curves">
+<span id="id5"></span><h2>Averaged Subgroups of Force Curves<a class="headerlink" href="#averaged-subgroups-of-force-curves" title="Permalink to this headline">#</a></h2>
+<p>After selecting a subgroup of curves an average curve can be calculated using the <a class="reference internal" href="sofa_toolbars.html#lineplot-toolbar"><span class="std std-ref">Lineplot Toolbar</span></a>. The average curve is then plotted on top of the active Force Curves.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The average curve is on purpose divided into two parts. The contact part (Z &gt; 0 &amp; F &gt; 0) is averaged in respect to the force F (y- axis) and the non-contact part of the curve (Z ≤ 0) is averaged in respect to the piezo displacement Z (x-axis).</p>
+</div>
+<p>Error bars representing the standard deviation can be added by using the <a class="reference internal" href="sofa_toolbars.html#lineplot-toolbar"><span class="std std-ref">Lineplot Toolbar</span></a>. Please note that due to the density of points, single error bars can only be made out when zooming into the plot.</p>
+<p>Please note again the change of direction of the error bars at Z = 0. As pointed out above the average is calculated differently for the non-contact part and the contact part.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Average Curve and its error are always recalculated when the Force Curve plot is updated. Force Curves can be further deselected and reselected, while the average curve is already plotted. But this might slow down the responds time of SOFA.</p>
+</div>
+</div>
+</div>
 
         </article>
       </div>
@@ -253,8 +300,34 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contents
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">SOFA Workflow</a><ul>
+<li><a class="reference internal" href="#sofa-gui">SOFA GUI</a></li>
+<li><a class="reference internal" href="#selection-process">Selection Process</a><ul>
+<li><a class="reference internal" href="#parameter-maps">Parameter maps</a></li>
+<li><a class="reference internal" href="#outliers">Outliers</a></li>
+<li><a class="reference internal" href="#histogram">Histogram</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#averaged-subgroups-of-force-curves">Averaged Subgroups of Force Curves</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

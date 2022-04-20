@@ -2,8 +2,7 @@
 <html class="no-js">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Contribution" href="contribution.html" /><link rel="prev" title="Supported Data Types" href="supported_data_types.html" />
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="SOFA Toolbars" href="sofa_toolbars.html" /><link rel="prev" title="Correction algorithm" href="correction_algorithm.html" />
 
     <meta name="generator" content="sphinx-4.5.0, furo 2022.04.07"/>
         <title>Channels - SOFA documentation</title>
@@ -134,7 +133,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -159,17 +158,20 @@
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="import_data.html">Import Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sofa_workflow.html">SOFA workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="export_data.html">Export Data</a></li>
 </ul>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="supported_data_types.html">Supported Data Types</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Channels</a></li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="contribution.html">Contribution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="correction_algorithm.html">Correction algorithm</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">SOFA Channels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sofa_toolbars.html">SOFA toolbars</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 </ul>
 
 </div>
@@ -196,38 +198,224 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main">
-          <section id="channels">
+          <div class="section" id="channels">
 <h1>Channels<a class="headerlink" href="#channels" title="Permalink to this headline">#</a></h1>
-</section>
+<p>A large number of parameters and physical values can be derived from Force Curves. These parameters/values are scalars (1D) extracted from the 2D Force Curve. Consequently, the information of a 3D FV measurement is decreased to a 2D visualization - a spatial distribution of a property associated with the parameter or physical value in question. This parameter/value map is called <strong>channel</strong>.</p>
+<p>In general, we distinguish between <strong>parameters</strong> (<a class="reference internal" href="#channels-based-on-parameters"><span class="std std-ref">Channels based on parameters</span></a>), which can be directly estimated from force curves and used as a quantitative measure within one experimental set-up, and <strong>physical values</strong> (<a class="reference internal" href="#channels-based-on-physical-values"><span class="std std-ref">Channels based on physical values</span></a>), such as the Young’s modulus, which result from a multivariable fit, based on general theories (e.g., Hertz, DMT or JKR) and can be used as absolute quantities. This distinction is very important for the succession of steps taken in the analysis of FSD.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Maps of physical values such as the Young’s modulus make multivariant fitting of single curves with a low signal-to-noise ratio necessary. This is only advised after subsets of curves have been averaged and investigated to narrow down the range of fit variables. This will be explained in detail in <a class="reference internal" href="#channels-based-on-physical-values"><span class="std std-ref">Channels based on physical values</span></a>.</p>
+</div>
+<p>All parameters and physical values are explained and demonstrated in <a class="reference internal" href="#channels-based-on-parameters"><span class="std std-ref">Channels based on parameters</span></a> and <a class="reference internal" href="#channels-based-on-physical-values"><span class="std std-ref">Channels based on physical values</span></a>. Real averaged Force Curves have been used for graphical demonstrations. The FSD Data is available in the test data folder on <a class="reference external" href="https://github.com/2Puck/sofa">github</a>.</p>
+<div class="section" id="channels-based-on-parameters">
+<span id="id1"></span><h2>Channels based on parameters<a class="headerlink" href="#channels-based-on-parameters" title="Permalink to this headline">#</a></h2>
+<p>Channels based on parameters have the advantage that they can be used as a quantitative measure within one experimental set-up (identical tip and calibration) and therefore can be used to evaluate and categorize Force Curves within one experiment, e.g. mechanical heterogeneities and gradients.
+There are three categories of parameters.</p>
+<ol class="arabic simple">
+<li><p>Result of SOFA’s correction algorithm (e.g., raw stiffness)</p></li>
+<li><p>Measurement parameters (e.g., fzMax)</p></li>
+<li><p>Physical properties of the sample (e.g., stiffness)</p></li>
+</ol>
+<div class="section" id="result-of-sofa-s-correction-algorithm">
+<h3>Result of SOFA’s correction algorithm<a class="headerlink" href="#result-of-sofa-s-correction-algorithm" title="Permalink to this headline">#</a></h3>
+<p><strong>raw offset</strong> and <strong>raw stiffness</strong></p>
+<div class="table-wrapper"><table class="docutils align-left">
+<colgroup>
+<col style="width: 43%"/>
+<col style="width: 57%"/>
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><img alt="_images/raw_offset_raw_stiffness.jpg" src="_images/raw_offset_raw_stiffness.jpg"/>
+</td>
+<td><p>First step of correcting Force Curves for topography
+and force offset is a linear fit of the whole approach
+part of the curve (red line). The fit follows the linear
+equation, with <strong>a</strong> being the <strong>raw offset</strong> and <strong>b</strong>
+the <strong>raw stiffness</strong>.
+The raw stiffness channel gives a first hint on the mechanical
+heterogeneity. Both channels are useful to find and exclude
+extreme outliers, which do not meet the typical shape of a
+Force Curve due to a failed or instable contact.</p></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>dF</strong> and <strong>dZ</strong> (ForceDistanceTopography)</p>
+<div class="table-wrapper"><table class="docutils align-left">
+<colgroup>
+<col style="width: 43%"/>
+<col style="width: 57%"/>
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><img alt="_images/force_distance_topography.jpg" src="_images/force_distance_topography.jpg"/>
+</td>
+<td><p>Once SOFA’s algorithm has found the point of contact
+(Z = 0) in the approach part of the Force Curve, the
+curve’s scales are corrected by <strong>dF</strong> and <strong>dZ</strong>. The offset
+of force <strong>dF</strong> is usually fairly constant within one
+measurement and hence the <strong>dF</strong> channel is not shown in SOFA.
+However, the offset <strong>dZ</strong> has an important physical meaning.
+Distance between tip and sample at the beginning of a
+Force Curve varies with the sample’s topography at each
+measuring point. The correction of the Force Curve’s
+Z scale by shifting the point of contact to Z=0 by <strong>dZ</strong>
+compensates for the topography and is also called
+<strong>ForceDistanceTopography</strong>.</p></td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="section" id="measurement-parameters">
+<h3>Measurement parameters<a class="headerlink" href="#measurement-parameters" title="Permalink to this headline">#</a></h3>
+<p><strong>fzMax</strong> (Error Channel)</p>
+<div class="table-wrapper"><table class="docutils align-left">
+<colgroup>
+<col style="width: 43%"/>
+<col style="width: 57%"/>
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><img alt="_images/fz_max.jpg" src="_images/fz_max.jpg"/>
+</td>
+<td><p>Before recording a Force Curve, the user is usually asked
+to give a limit for a control variable e.g., a maximum for
+the force <strong>fzMax</strong>. Depending on the software used to
+record Force Curves, this might be a maximum deflection
+or a (T-B) signal value, since all these values are
+proportional to each other. Once the chosen value is
+reached, the end of the approach and the start of the
+retract movement of the Z piezo is triggered.
+Since this is the control value during the experiment, this
+channel can be considered as an <strong>Error Channel</strong> with a
+scattering around the given control value <strong>fzMax</strong>.</p></td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="section" id="physical-properties">
+<h3>Physical properties<a class="headerlink" href="#physical-properties" title="Permalink to this headline">#</a></h3>
+<p><strong>zMax</strong></p>
+<div class="table-wrapper"><table class="docutils align-left">
+<colgroup>
+<col style="width: 43%"/>
+<col style="width: 57%"/>
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><img alt="_images/z_max.jpg" src="_images/z_max.jpg"/>
+</td>
+<td><p><strong>zMax</strong> is the z piezo displacement Z at maximum Force
+<strong>fzMax</strong> of the corrected curve. This channel gives a map of
+the maximum deformation i.e., compliant areas of the
+sample will allow for higher deformations and stiffer
+areas smaller deformations.</p></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Stiffness</strong></p>
+<div class="table-wrapper"><table class="docutils align-left">
+<colgroup>
+<col style="width: 42%"/>
+<col style="width: 58%"/>
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><img alt="_images/stiffness.jpg" src="_images/stiffness.jpg"/>
+</td>
+<td><p><strong>Stiffness</strong> is obtained from the slope of the approach part
+of a corrected Force Curve by a linear fit. It makes a
+difference if the FSD is F(Z) or δ(Z). In the former case the
+obtained parameter is the effective stiffness <strong>keff</strong>:
+In the latter case the parameter is the relative stiffness <strong>kr</strong>:
+with the sample’s and probe’s spring constant k and kc.
+[zitat] However, both quantities are connected by kc, and
+therefore contain comparable information as a channel.</p></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>FAttractive, ZAttractive and AttractiveArea</strong></p>
+<div class="table-wrapper"><table class="docutils align-left">
+<colgroup>
+<col style="width: 43%"/>
+<col style="width: 57%"/>
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><img alt="_images/attractive_area.jpg" src="_images/attractive_area.jpg"/>
+</td>
+<td><p><strong>Attractive forces</strong> can be evaluated by either work of
+attractive forces, which corresponds to the <strong>Attractive</strong>
+<strong>Area</strong> or the maximum attractive force <strong>FAttractive</strong>. Please
+note, that if your FSD is comprised of deflection instead
+of force, parameters have to be multiplied by kc in order
+to get attractive work [J] and force [N]. <strong>ZAttractive</strong>
+describes the z piezo position (relative to point of contact
+is Z=0) at which the attractive regime starts. [zitat ccc]</p></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Curves with Artefacts</strong></p>
+<div class="table-wrapper"><table class="docutils align-left">
+<colgroup>
+<col style="width: 45%"/>
+<col style="width: 55%"/>
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><img alt="_images/curves_with_artifacts.jpg" src="_images/curves_with_artifacts.jpg"/>
+</td>
+<td><p>The contact line of a force curve is considered to be
+monotonously increasing. Due to rough sample
+topography, sudden sample failure [zitat Adam], loose
+material or vibrational noise the force curves show non-
+monotonic increase, so-called zigzag lines. SOFA
+identifies those curves in a separate channel
+<strong>CurvesWithArtefacts</strong>, and assigns values
+1 for curves with artefacts
+0 for a monotonously increasing curve.</p></td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+<div class="section" id="channels-based-on-physical-values">
+<span id="id2"></span><h2>Channels based on physical values<a class="headerlink" href="#channels-based-on-physical-values" title="Permalink to this headline">#</a></h2>
+<p>Physical values, such as Young’s modulus are independent from the experimental set-up and can be directly compared to literature values. In order to evaluate experimental force spectroscopy data for physical values, one must apply a general theory, such as the Hertz Theory, DMT or JKR.
+Unfortunately, an indiscriminate and automated application of such fits on single curves can lead to rather large systematic and statistic errors. First, the exact geometry and mechanical properties of the AFM probe has to be established (tip shape and tip radius R, cantilever spring constant kc, the tip’s Young’s modulus Etip and poisson ratio νtip). Getting any of those parameters wrong leads to a systematic error affecting all subsequent analysis. Second, the proper theory which fits the conditions of the measurement needs to be chosen. Within one heterogeneous sample the applicability of a theory may change from one measured point to another, leading to a systematic error which affects the analysis only partially. For example, composite behavior (a mixture of more than one material in the measured volume cannot be described completely by any of the above theories. Third, individual force curves have a very low signal-to-noise ratio, resulting in a large statistical error.</p>
+<p>Consequently, before single curves are fitted for physical values it is advisable to start the analysis with parameters and averaged curves as described in the workflow in chapter <a class="reference internal" href="sofa_workflow.html#selection-process"><span class="std std-ref">Selection Process</span></a> and <a class="reference internal" href="sofa_workflow.html#averaged-subgroups-of-force-curves"><span class="std std-ref">Averaged Subgroups of Force Curves</span></a>.</p>
+</div>
+<div class="section" id="customized-channels">
+<span id="id3"></span><h2>Customized channels<a class="headerlink" href="#customized-channels" title="Permalink to this headline">#</a></h2>
+<p>The option to create additional customized channel is not built into SOFA as of version 1.0.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Please contact us via <a class="reference external" href="mailto:sofa%40bam.de">sofa<span>@</span>bam<span>.</span>de</a> to request additional Channels.</p>
+</div>
+</div>
+</div>
 
         </article>
       </div>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="contribution.html">
+          <a class="next-page" href="sofa_toolbars.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Contribution</div>
+                <div class="title">SOFA Toolbars</div>
               </div>
               <svg><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="supported_data_types.html">
+          <a class="prev-page" href="correction_algorithm.html">
               <svg><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Supported Data Types</div>
+                <div class="title">Correction algorithm</div>
                 
               </div>
             </a>
@@ -251,8 +439,34 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contents
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Channels</a><ul>
+<li><a class="reference internal" href="#channels-based-on-parameters">Channels based on parameters</a><ul>
+<li><a class="reference internal" href="#result-of-sofa-s-correction-algorithm">Result of SOFA’s correction algorithm</a></li>
+<li><a class="reference internal" href="#measurement-parameters">Measurement parameters</a></li>
+<li><a class="reference internal" href="#physical-properties">Physical properties</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#channels-based-on-physical-values">Channels based on physical values</a></li>
+<li><a class="reference internal" href="#customized-channels">Customized channels</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
