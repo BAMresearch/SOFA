@@ -27,14 +27,14 @@ matplotlib.use("TkAgg")
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-from window.export_window import ExportWindow
-from window.import_window import ImportWindow
-from window.info_window import InfoWindow
+from gui.export_window import ExportWindow
+from gui.import_window import ImportWindow
+from gui.info_window import InfoWindow
 
-from data.data_handler import DataHandler
-from data.active_channels import channels as activeChannels
-from data.import_data import restore_sofa_data
-from data.export_data import export_to_sofa
+from data_handling.data_handler import DataHandler
+from data_handling.active_channels import channels as activeChannels
+from data_handling.import_data import restore_sofa_data
+from data_handling.export_data import export_to_sofa
 
 from toolbar.line_plot_toolbar import LinePlotToolbar
 from toolbar.heatmap_toolbar import HeatmapToolbar
