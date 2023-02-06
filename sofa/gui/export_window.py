@@ -28,9 +28,10 @@ import data_handling.export_data as exp_data
 
 class ExportWindow(ttk.Frame):
 	"""A subwindow to handle the data export."""
-	def __init__(self, dataHandler):
-		self.window = tk.Toplevel()
-		self.window.title("Export Data")
+	def __init__(self, root, dataHandler):
+		super().__init__(root)
+		
+		self.pack(fill=BOTH, expand=YES)
 
 		self.dataHandler = dataHandler
 
@@ -45,11 +46,11 @@ class ExportWindow(ttk.Frame):
 
 	def _create_frame_data_location(self) -> None:
 		"""Define all elements within the data location frame."""
-		frameDataLocation = ttk.Labelframe(self.window, text="Data Location", padding=15)
+		frameDataLocation = ttk.Labelframe(self, text="Data Location", padding=15)
 		frameDataLocation.pack(fill=X, expand=YES, anchor=N, padx=15, pady=(15, 5))
 
-		self.folderName = tk.StringVar(self.window, value="")
-		self.folderPath = tk.StringVar(self.window, value="")
+		self.folderName = tk.StringVar(self, value="")
+		self.folderPath = tk.StringVar(self, value="")
 
 		# Folder name
 		rowFolderName = ttk.Frame(frameDataLocation)
@@ -80,15 +81,15 @@ class ExportWindow(ttk.Frame):
 
 	def _create_frame_data_types(self) -> None:
 		"""Define all elements within the data types frame."""
-		frameDataTypes = ttk.Labelframe(self.window, text="Data Types", padding=15)
+		frameDataTypes = ttk.Labelframe(self, text="Data Types", padding=15)
 		frameDataTypes.pack(fill=X, expand=YES, anchor=N, padx=15, pady=5)
 
-		self.exportToSofa = tk.BooleanVar(self.window, value=0)
-		self.exportToTex = tk.BooleanVar(self.window, value=0)
-		self.exportToTxt = tk.BooleanVar(self.window, value=0)
-		self.exportToHdf5 = tk.BooleanVar(self.window, value=0)
-		self.exportToExcel = tk.BooleanVar(self.window, value=0)
-		self.exportPlots = tk.BooleanVar(self.window, value=0)
+		self.exportToSofa = tk.BooleanVar(self, value=0)
+		self.exportToTex = tk.BooleanVar(self, value=0)
+		self.exportToTxt = tk.BooleanVar(self, value=0)
+		self.exportToHdf5 = tk.BooleanVar(self, value=0)
+		self.exportToExcel = tk.BooleanVar(self, value=0)
+		self.exportPlots = tk.BooleanVar(self, value=0)
 
 		# Export to sofa
 		rowExportToSofa = ttk.Frame(frameDataTypes)
@@ -170,7 +171,7 @@ class ExportWindow(ttk.Frame):
 
 	def _create_export_button(self) -> None:
 		"""Define the export button."""
-		rowExportButton = ttk.Frame(self.window)
+		rowExportButton = ttk.Frame(self)
 		rowExportButton.pack(fill=X, expand=YES, pady=(20, 10))
 
 		buttonExportData = ttk.Button(
@@ -182,16 +183,16 @@ class ExportWindow(ttk.Frame):
 
 	def _create_progressbar(self) -> None:
 		"""Define the progressbar."""	
-		rowLabelProgressbar = ttk.Frame(self.window)
+		rowLabelProgressbar = ttk.Frame(self)
 		rowLabelProgressbar.pack(fill=X, expand=YES)
 
-		self.progressbarCurrentLabel = tk.StringVar(self.window, value="")
+		self.progressbarCurrentLabel = tk.StringVar(self, value="")
 
 		labelProgressbar = ttk.Label(rowLabelProgressbar, textvariable=self.progressbarCurrentLabel)
 		labelProgressbar.pack(side=RIGHT, padx=15)
 
 		self.progressbar = ttk.Progressbar(
-			self.window,
+			self,
 			mode=INDETERMINATE, 
             bootstyle=SUCCESS
 		)
@@ -201,7 +202,7 @@ class ExportWindow(ttk.Frame):
 		"""Select the directory in which the data will be saved."""
 		folderPath = fd.askdirectory(
 			title="Select directory",
-			parent=self.window
+			parent=self
 		)
 
 		if folderPath:
@@ -218,7 +219,7 @@ class ExportWindow(ttk.Frame):
 			return messagebox.showerror(
 				"Error", 
 				"Please specify a name for the ouput folder.", 
-				parent=self.window
+				parent=self
 			)
 
 		# Check if a output folder is selected.
@@ -226,7 +227,7 @@ class ExportWindow(ttk.Frame):
 			return messagebox.showerror(
 				"Error", 
 				"Please specify a location to save your data.", 
-				parent=self.window
+				parent=self
 			)
 
 		selectedExportParameters = self._create_selected_export_parameters()
@@ -238,7 +239,7 @@ class ExportWindow(ttk.Frame):
 			self.progressbarCurrentLabel
 		)
 		# Close window
-		self.window.destroy()
+		self.destroy()
 
 		return messagebox.showinfo("Success", "Data is saved.")
 

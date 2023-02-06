@@ -30,9 +30,10 @@ import data_handling.active_channels as ac
 
 class ImportWindow(ttk.Frame):
 	"""A subwindow to handle the data import."""
-	def __init__(self, dataHandler, set_filename):
-		self.window = tk.Toplevel()
-		self.window.title("Import Data")
+	def __init__(self, root, dataHandler, set_filename):
+		super().__init__(root, padding=10)
+		
+		self.pack(fill=BOTH, expand=YES)
 
 		self.dataHandler = dataHandler
 		self.set_filename = set_filename
@@ -49,7 +50,7 @@ class ImportWindow(ttk.Frame):
 
 	def _create_frame_required_data(self) -> None:
 		"""Define all elements within the required data frame."""
-		frameRequiredData = ttk.Labelframe(self.window, text="Required Data", padding=15)
+		frameRequiredData = ttk.Labelframe(self, text="Required Data", padding=15)
 		frameRequiredData.pack(fill=X, expand=YES, anchor=N, padx=15, pady=(15, 5))
 
 		# Data type
@@ -59,7 +60,7 @@ class ImportWindow(ttk.Frame):
 		dataTypeLabel = ttk.Label(rowDataType, text="Data Type")
 		dataTypeLabel.pack(side=LEFT, padx=(15, 0))
 
-		self.selectedDataType = tk.StringVar(self.window, value="BAM_IBW")
+		self.selectedDataType = tk.StringVar(self, value="BAM_IBW")
 		
 		dropdownDataType = ttk.OptionMenu(
 			rowDataType, self.selectedDataType, 
@@ -68,7 +69,7 @@ class ImportWindow(ttk.Frame):
 		dropdownDataType.pack(side=RIGHT, padx=5)
 
 		# Data files
-		self.filePathData = tk.StringVar(self.window)
+		self.filePathData = tk.StringVar(self)
 
 		rowDataFiles = ttk.Frame(frameRequiredData)
 		rowDataFiles.pack(fill=X, expand=YES, pady=(10, 15))
@@ -87,7 +88,7 @@ class ImportWindow(ttk.Frame):
 		buttonBrowseData.pack(side=LEFT, padx=5)
 
 		# Options
-		self.showPoorCurves = tk.StringVar(self.window)
+		self.showPoorCurves = tk.StringVar(self)
 
 		rowOptions = ttk.Frame(frameRequiredData)
 		rowOptions.pack(fill=X, expand=YES)
@@ -103,11 +104,11 @@ class ImportWindow(ttk.Frame):
 
 	def _create_frame_optional_data(self) -> None:
 		"""Define all elements within the optional data frame."""	
-		frameOptionalData = ttk.Labelframe(self.window, text="Optional Data", padding=15)
+		frameOptionalData = ttk.Labelframe(self, text="Optional Data", padding=15)
 		frameOptionalData.pack(fill=X, expand=YES, anchor=N, padx=15, pady=5)
 
 		# Image file
-		self.filePathImage = tk.StringVar(self.window)
+		self.filePathImage = tk.StringVar(self)
 
 		rowImageFile = ttk.Frame(frameOptionalData)
 		rowImageFile.pack(fill=X, expand=YES, pady=(0, 10))
@@ -126,7 +127,7 @@ class ImportWindow(ttk.Frame):
 		buttonBrowseImage.pack(side=LEFT, padx=5)
 
 		# Additional channel
-		self.filePathChannel = tk.StringVar(self.window)
+		self.filePathChannel = tk.StringVar(self)
 
 		rowChannelFile = ttk.Frame(frameOptionalData)
 		rowChannelFile.pack(fill=X, expand=YES)
@@ -146,7 +147,7 @@ class ImportWindow(ttk.Frame):
 
 	def _create_import_button(self) -> None: 
 		"""Define the import button."""
-		rowImportButton = ttk.Frame(self.window)
+		rowImportButton = ttk.Frame(self)
 		rowImportButton.pack(fill=X, expand=YES, pady=(20, 10))
 
 		buttonImportData = ttk.Button(
@@ -158,16 +159,16 @@ class ImportWindow(ttk.Frame):
 
 	def _create_progressbar(self) -> None:
 		"""Define the progressbar."""	
-		rowLabelProgressbar = ttk.Frame(self.window)
+		rowLabelProgressbar = ttk.Frame(self)
 		rowLabelProgressbar.pack(fill=X, expand=YES)
 
-		self.progressbarCurrentLabel = tk.StringVar(self.window, value="")
+		self.progressbarCurrentLabel = tk.StringVar(self, value="")
 
 		labelProgressbar = ttk.Label(rowLabelProgressbar, textvariable=self.progressbarCurrentLabel)
 		labelProgressbar.pack(side=RIGHT, padx=15)
 
 		self.progressbar = ttk.Progressbar(
-			self.window,
+			self,
 			mode=DETERMINATE, 
             bootstyle=SUCCESS
 		)
@@ -177,7 +178,7 @@ class ImportWindow(ttk.Frame):
 		"""Select the directory that contains the data."""
 		filePathData = fd.askdirectory(
 			title="Select directory",
-			parent=self.window
+			parent=self
 		)
 
 		if filePathData:
@@ -187,7 +188,7 @@ class ImportWindow(ttk.Frame):
 		"""Select the image file."""
 		filePathImage = fd.askopenfilename(
 			title="Select File",
-			parent=self.window
+			parent=self
 		)
 
 		if filePathImage:
@@ -197,7 +198,7 @@ class ImportWindow(ttk.Frame):
 		"""Select the channel file."""
 		filePathChannel = fd.askopenfilename(
 			title="Select Channel",
-			parent=self.window
+			parent=self
 		)
 
 		if filePathChannel:
@@ -212,7 +213,7 @@ class ImportWindow(ttk.Frame):
 		# Check if required data is selected.
 		if not os.path.isdir(self.filePathData.get()):
 			self._reset_import_window()
-			return messagebox.showerror("Error", "A data dictionary is required!", parent=self.window)
+			return messagebox.showerror("Error", "A data dictionary is required!", parent=self)
 
 		selectedImportParameters = self._create_selected_import_parameters()
 		selected_import_function = impd.importFunctions[self.selectedDataType.get()][0]
@@ -227,7 +228,7 @@ class ImportWindow(ttk.Frame):
 		except Exception as e:
 			self._reset_import_window()
 			print(str(e))
-			return messagebox.showerror("Error", str(e), parent=self.window)
+			return messagebox.showerror("Error", str(e), parent=self)
 
 		# Correct imported data.
 		correctedCurveData = pd.correct_approach_curves(
@@ -267,7 +268,7 @@ class ImportWindow(ttk.Frame):
 		self.dataHandler.display_imported_data()
 
 		# Close window
-		self.window.destroy()
+		self.destroy()
 
 		return messagebox.showinfo("Success", "Data is imported.")
 
@@ -320,4 +321,4 @@ class ImportWindow(ttk.Frame):
 		elif mode == "update":
 			self.progressbar["value"] += value
 
-		self.window.update_idletasks()
+		self.update_idletasks()

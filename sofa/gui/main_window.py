@@ -29,7 +29,6 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 from gui.export_window import ExportWindow
 from gui.import_window import ImportWindow
-from gui.info_window import InfoWindow
 
 from data_handling.data_handler import DataHandler
 from data_handling.active_channels import channels as activeChannels
@@ -42,54 +41,123 @@ from toolbar.heatmap_toolbar import HeatmapToolbar
 class MainWindow(ttk.Frame):
 	"""The main window of SOFA."""
 	def __init__(self, root):
-		self.root = root
+		super().__init__(root, padding=20)
+
+		self.pack(fill=BOTH, expand=YES)
+
 		# Set tkinter dialog language to english.
-		self.root.tk.eval('::msgcat::mclocale en')
-		self.versionNumber = "1.0"
-		self.root.title("SOFA " + self.versionNumber)
+		self.tk.eval('::msgcat::mclocale en')
 		self.sourceDirectory = os.path.abspath(os.path.dirname(__file__))
-		self.iconPath = os.path.join(self.sourceDirectory, "icons", "sofa_icon_50.png")
 		self.dataHandler = DataHandler()
 
 		self.channelNames = [
 			self._camel_case_to_text(channelName)
 			for channelName in activeChannels.keys()
 		]
-		
-		self.root.protocol(
+
+		self.colorPlot = "#e6f7f4"
+		'''
+		root.protocol(
 			"WM_DELETE_WINDOW", 
 			self._close_main_window
 		)
+		'''
 		
 		self._create_main_window()
 		self._set_plot_parameters_in_data_handler()
-		self._specify_data_import()
 
 	def _create_main_window(self) -> None:
 		"""Define all elements within the main window."""
-		self._create_interactive_plots_frame()
-		self._create_control_frame()
+		self._create_first_row()
+		self._create_second_row()
 
-		# Diagram frame
-		self.frameDiagrams = ttk.Labelframe(self.root, text="", padding=10, relief=RIDGE)
-		self.frameDiagrams.grid(row=1, column=0, columnspan=2, padx=15, pady=15)
+	def _create_first_row(self) -> None: 
+		""""""
+		frameFirstRow = ttk.Frame(self)
+		frameFirstRow.pack(fill=X, expand=YES, pady=(0, 20))
 
-		self._create_line_plot_frame(self.frameDiagrams)
-		self._create_heatmap_frame(self.frameDiagrams)
-		self._create_histogram_frame(self.frameDiagrams)
+		self._create_frame_files(frameFirstRow)
+		self._create_frame_active_data(frameFirstRow)
+		self._create_frame_interactive_plots(frameFirstRow)
+		self._create_frame_control(frameFirstRow)
 
-		self.root.grid_columnconfigure(0, weight=1)
-		self.root.grid_columnconfigure(1, weight=3)
+	def _create_second_row(self) -> None:
+		""""""
+		frameSecondRow = ttk.Frame(self)
+		frameSecondRow.pack(fill=X, expand=YES)
 
-		self.root.grid_rowconfigure(0, weight=1)
-		self.root.grid_rowconfigure(1, weight=1)
+		self._create_line_plot_frame(frameSecondRow)
+		self._create_heatmap_frame(frameSecondRow)
+		self._create_histogram_frame(frameSecondRow)
 
-	def _create_interactive_plots_frame(self) -> None:
+	def _create_frame_files(self, frameParent) -> None: 
+		"""Define all elements within the files frame."""
+		frameFiles = ttk.Labelframe(frameParent, text="Files", padding=15)
+		frameFiles.pack(side=LEFT, fill=BOTH, expand=YES, padx=(0, 15))
+
+		buttonImport = ttk.Button(
+			frameFiles, text="Import Data", 
+			bootstyle="", command=self._create_import_window
+		)
+		buttonImport.grid(row=0, column=0, padx=10, sticky=W)
+
+		buttonExport = ttk.Button(
+			frameFiles, text="Export Data",
+			bootstyle="", command=self._create_export_window
+		)
+		buttonExport.grid(row=1, column=0, padx=10, pady=10, sticky=W)
+
+	def _create_frame_active_data(self, frameParent) -> None: 
+		""""""
+		frameActiveData = ttk.Labelframe(frameParent, text="Active Data", padding=15)
+		frameActiveData.pack(side=LEFT, fill=BOTH, expand=YES, padx=(0, 15))
+
+		self.stringVarActiveData = ttk.StringVar(self, value="")
+		self.stringVarActiveDataLocation = ttk.StringVar(self, value="")
+		self.stringVarActiveDataSize = ttk.StringVar(self, value="")
+
+		labelActiveData = ttk.Label(
+			frameActiveData, 
+			text="Name:"
+		)
+		labelActiveData.grid(row=0, column=0, padx=10, sticky=W)
+
+		valueActiveData = ttk.Label(
+			frameActiveData,
+			textvariable=self.stringVarActiveData
+		)
+		valueActiveData.grid(row=0, column=1, padx=10, sticky=W)
+
+		labelActiveDataLocation = ttk.Label(
+			frameActiveData, 
+			text="Location:"
+		)
+		labelActiveDataLocation.grid(row=1, column=0, padx=10, sticky=W)
+
+		valueActiveDataLocation = ttk.Label(
+			frameActiveData,
+			textvariable=self.stringVarActiveDataLocation
+		)
+		valueActiveDataLocation.grid(row=1, column=1, padx=10, sticky=W)
+
+		labelActiveDataSize = ttk.Label(
+			frameActiveData, 
+			text="Size:"
+		)
+		labelActiveDataSize.grid(row=2, column=0, padx=10, sticky=W)
+
+		valueActiveDataSize = ttk.Label(
+			frameActiveData,
+			textvariable=self.stringVarActiveDataSize
+		)
+		valueActiveDataSize.grid(row=2, column=1, padx=10, sticky=W)
+
+	def _create_frame_interactive_plots(self, frameParent) -> None:
 		"""Define all elements within the interactive plots frame."""
-		frameInteractivePlots = ttk.Labelframe(self.root, text="Interactive Plots", padding=15)
-		frameInteractivePlots.grid(row=0, column=0, padx=15, pady=15, sticky=NSEW)
+		frameInteractivePlots = ttk.Labelframe(frameParent, text="Interactive Plots", padding=15)
+		frameInteractivePlots.pack(side=LEFT, fill=BOTH, expand=YES, padx=(0, 15))
 
-		self.interactiveLinePlot = tk.BooleanVar(self.root, value=False)
+		self.interactiveLinePlot = tk.BooleanVar(self, value=False)
 		checkbuttonInteractiveLinePlot = ttk.Checkbutton(
 			frameInteractivePlots, 
 			text="Line Plot", 
@@ -98,7 +166,7 @@ class MainWindow(ttk.Frame):
 		)
 		checkbuttonInteractiveLinePlot.grid(row=0, column=0, padx=10, sticky=W)
 
-		self.interactiveHeatmap = tk.BooleanVar(self.root, value=False)
+		self.interactiveHeatmap = tk.BooleanVar(self, value=False)
 		checkbuttonInteractiveHeatmap = ttk.Checkbutton(
 			frameInteractivePlots, 
 			text="Heatmap", 
@@ -107,7 +175,7 @@ class MainWindow(ttk.Frame):
 		)
 		checkbuttonInteractiveHeatmap.grid(row=1, column=0, padx=10, sticky=W)
 
-		self.interactiveHistogram = tk.BooleanVar(self.root, value=False)
+		self.interactiveHistogram = tk.BooleanVar(self, value=False)
 		checkbuttonInteractiveHistogram = ttk.Checkbutton(
 			frameInteractivePlots, 
 			text="Histogram", 
@@ -128,56 +196,32 @@ class MainWindow(ttk.Frame):
 		frameInteractivePlots.columnconfigure(1, weight=1)
 		frameInteractivePlots.columnconfigure(2, weight=1)
 
-	def _create_control_frame(self) -> None:
+	def _create_frame_control(self, frameParent) -> None:
 		"""Define all the elements within the control frame."""
-		frameControl = ttk.Labelframe(self.root, text="Control", padding=15)
-		frameControl.grid(row=0, column=1, columnspan=2, padx=15, pady=15, sticky=NSEW)
+		frameControl = ttk.Labelframe(frameParent, text="Control", padding=15)
+		frameControl.pack(side=LEFT, fill=BOTH, expand=YES)
 
-		buttonImport = ttk.Button(
-			frameControl, text="Import Data", 
-			bootstyle="", command=self._create_import_window
-		)
-		buttonImport.grid(row=0, column=0, padx=10, sticky=W)
-
-		self.progressbarCurrentLabel = tk.StringVar(self.root, value="")
+		self.progressbarCurrentLabel = tk.StringVar(self, value="Test")
 
 		progressbarLabel = ttk.Label(frameControl, textvariable=self.progressbarCurrentLabel)
-		progressbarLabel.grid(row=0, column=1, padx=10)
-
-		buttonInfo = ttk.Button(
-			frameControl, text="Info", 
-			bootstyle="", command=self._create_info_window
-		)
-		buttonInfo.grid(row=0, column=2, padx=10, sticky=E)
-
-		buttonExport = ttk.Button(
-			frameControl, text="Export Data",
-			bootstyle="", command=self._create_export_window
-		)
-		buttonExport.grid(row=1, column=0, padx=10, pady=10, sticky=W)
+		progressbarLabel.grid(row=0, column=0, padx=10)
 
 		self.progressbar = ttk.Progressbar(
 			frameControl,
 			mode=INDETERMINATE,
             bootstyle=SUCCESS
 		)
-		self.progressbar.grid(row=1, column=1, padx=10)
-
-		frameControl.columnconfigure(0, weight=1)
-		frameControl.columnconfigure(1, weight=1)
-
-		frameControl.rowconfigure(0, weight=1)
-		frameControl.rowconfigure(1, weight=1)
-
-	def _create_line_plot_frame(self, parentFrame) -> None:
+		self.progressbar.grid(row=1, column=0, padx=10)
+		
+	def _create_line_plot_frame(self, frameParent) -> None:
 		"""Define all the elements within the line plot frame."""
-		frameLinePlot = ttk.Labelframe(parentFrame, text="Line Plot", padding=10)
-		frameLinePlot.grid(row=0, column=0, padx=10, pady=15, sticky=N)
+		frameLinePlot = ttk.Labelframe(frameParent, text="Line Plot", padding=10)
+		frameLinePlot.pack(side=LEFT, fill=BOTH, expand=YES, padx=(0, 15))
 
 		labelEmpty = ttk.Label(frameLinePlot, text="")
 		labelEmpty.grid(row=0, column=0, pady=15)
 
-		figureLineplot = Figure(figsize=(6, 4.8), facecolor=("#d3d3d3"))
+		figureLineplot = Figure(figsize=(6, 4.8), facecolor=self.colorPlot)
 		self.holderFigureLineplot = FigureCanvasTkAgg(figureLineplot, frameLinePlot)
 		frameToolbarLineplot = ttk.Frame(frameLinePlot)
 		toolbarLineplot = LinePlotToolbar(
@@ -187,12 +231,12 @@ class MainWindow(ttk.Frame):
 		self.holderFigureLineplot.get_tk_widget().grid(row=1, column=0)
 		frameToolbarLineplot.grid(row=2, column=0)
 
-	def _create_heatmap_frame(self, parentFrame) -> None:
+	def _create_heatmap_frame(self, frameParent) -> None:
 		"""Define all the elements within the heatmap frame."""
-		frameHeatmap= ttk.Labelframe(parentFrame, text="Heatmap", padding=10)
-		frameHeatmap.grid(row=0, column=1, padx=10, pady=15, sticky=N)
+		frameHeatmap= ttk.Labelframe(frameParent, text="Heatmap", padding=10)
+		frameHeatmap.pack(side=LEFT, fill=BOTH, expand=YES, padx=(0, 15))
 
-		self.heatmapChannel = tk.StringVar(self.root, value="Topography")
+		self.heatmapChannel = tk.StringVar(self, value="Topography")
 		
 		dropdownHeatmapChannel = ttk.OptionMenu(
 			frameHeatmap, 
@@ -204,7 +248,7 @@ class MainWindow(ttk.Frame):
 		)
 		dropdownHeatmapChannel.grid(row=0, column=0, pady=10, sticky=E)
 
-		figureHeatmap = Figure(figsize=(6, 4.8), facecolor=("#d3d3d3"))
+		figureHeatmap = Figure(figsize=(6, 4.8), facecolor=self.colorPlot)
 		self.holderFigureHeatmap = FigureCanvasTkAgg(figureHeatmap, frameHeatmap)
 		frameToolbarHeatmap = ttk.Frame(frameHeatmap)
 		toolbarHeatmap = HeatmapToolbar(
@@ -214,12 +258,12 @@ class MainWindow(ttk.Frame):
 		self.holderFigureHeatmap.get_tk_widget().grid(row=1, column=0)
 		frameToolbarHeatmap.grid(row=2, column=0)
 
-	def _create_histogram_frame(self, parentFrame) -> None:
+	def _create_histogram_frame(self, frameParent) -> None:
 		"""Define all the elements within the histogram frame."""
-		frameHistogram = ttk.Labelframe(parentFrame, text="Histogram", padding=10)
-		frameHistogram.grid(row=0, column=2, padx=10, pady=15)
+		frameHistogram = ttk.Labelframe(frameParent, text="Histogram", padding=10)
+		frameHistogram.pack(side=LEFT, fill=BOTH, expand=YES)
 
-		self.zoomHistogram = tk.BooleanVar(self.root, value=False)
+		self.zoomHistogram = tk.BooleanVar(self, value=False)
 		checkbuttonZoom = ttk.Checkbutton(
 			frameHistogram, 
 			text="Zoom", 
@@ -227,7 +271,7 @@ class MainWindow(ttk.Frame):
 			bootstyle="round-toggle")
 		checkbuttonZoom.grid(row=0, column=0, padx=10, sticky=W)
 
-		self.histogramChannel = tk.StringVar(self.root, value="Topography")
+		self.histogramChannel = tk.StringVar(self, value="Topography")
 		
 		dropdownHistogramChannel = ttk.OptionMenu(
 			frameHistogram, 
@@ -239,14 +283,14 @@ class MainWindow(ttk.Frame):
 		)
 		dropdownHistogramChannel.grid(row=0, column=0, columnspan=4, pady=10, sticky=E)
 
-		figureHistogram = Figure(figsize=(3.5, 4.8), facecolor=("#d3d3d3"))
+		figureHistogram = Figure(figsize=(3.5, 4.8), facecolor=self.colorPlot)
 		self.holderFigureHistogram = FigureCanvasTkAgg(figureHistogram, frameHistogram)
 		self.holderFigureHistogram.get_tk_widget().grid(row=1, column=0, columnspan=4)
 
 		labelNumberOfBins = ttk.Label(frameHistogram, text="Number of bins:")
 		labelNumberOfBins.grid(row=2, column=0, padx=10, sticky=SW)
 
-		self.numberOfBins = tk.IntVar(self.root, value=100)
+		self.numberOfBins = tk.IntVar(self, value=100)
 
 		entryBins = ttk.Entry(frameHistogram, textvariable=self.numberOfBins)
 		entryBins.grid(row=3, column=0, padx=10, sticky=NW)
@@ -313,7 +357,12 @@ class MainWindow(ttk.Frame):
 
 	def _create_import_window(self) -> None:
 		"""Open the window to import data."""
-		ImportWindow(self.dataHandler, self.set_filename)
+		toplevelImport = ttk.Toplevel("Import Data")
+		ImportWindow(
+			toplevelImport,
+			self.dataHandler, 
+			self.set_filename
+		)
 
 	def set_filename(self, filename) -> None:
 		"""Display the name of the current data files."""
@@ -321,7 +370,11 @@ class MainWindow(ttk.Frame):
 
 	def _create_export_window(self) -> None:
 		"""Open the window to export data."""
-		ExportWindow(self.dataHandler)
+		toplevelExport = ttk.Toplevel("Export Data")
+		ExportWindow(
+			toplevelExport,
+			self.dataHandler
+		)
 
 	def _create_info_window(self) -> None:
 		"""Open the info window."""
@@ -371,14 +424,14 @@ class MainWindow(ttk.Frame):
 		self.progressbarCurrentLabel.set("Updating data")
 		self.progressbar.start()
 
-		self.root.update_idletasks()
+		self.update_idletasks()
 
 	def stop_progressbar(self) -> None:
 		"""Stop the progressbar."""
 		self.progressbar.stop()
 		self.progressbarCurrentLabel.set("")
 
-		self.root.update_idletasks()
+		self.update_idletasks()
 
 	@staticmethod
 	def _camel_case_to_text(inputString: str) -> str:
@@ -414,8 +467,8 @@ class MainWindow(ttk.Frame):
 				hidden=True
 			)
 
-		self.root.quit()
-		self.root.destroy()
+		self.quit()
+		self.destroy()
 
 	def _specify_data_import(self) -> None:
 		"""Ask the user if he wants to restore the last session or import new data."""

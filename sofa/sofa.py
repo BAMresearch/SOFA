@@ -20,6 +20,6 @@ import ttkbootstrap as ttk
 from gui.main_window import MainWindow
 
 if __name__ == "__main__":
-	app = ttk.Window()
+	app = ttk.Window("SOFA", "minty")
 	MainWindow(app)
 	app.mainloop()
