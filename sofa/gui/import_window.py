@@ -24,9 +24,9 @@ from tkinter import messagebox
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
-import data_handling.import_data as impd
-import data_handling.process_data as pd
-import data_handling.active_channels as ac
+import data_processing.import_data as impd
+import data_processing.process_data as pd
+import data_processing.active_channels as ac
 
 class ImportWindow(ttk.Frame):
 	"""A subwindow to handle the data import."""

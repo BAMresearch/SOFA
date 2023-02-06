@@ -30,10 +30,10 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from gui.export_window import ExportWindow
 from gui.import_window import ImportWindow
 
-from data_handling.data_handler import DataHandler
-from data_handling.active_channels import channels as activeChannels
-from data_handling.import_data import restore_sofa_data
-from data_handling.export_data import export_to_sofa
+from data_processing.data_handler import DataHandler
+from data_processing.active_channels import channels as activeChannels
+from data_processing.import_data import restore_sofa_data
+from data_processing.export_data import export_to_sofa
 
 from toolbar.line_plot_toolbar import LinePlotToolbar
 from toolbar.heatmap_toolbar import HeatmapToolbar
