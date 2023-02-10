@@ -92,7 +92,7 @@ class MainWindow(ttk.Frame):
 
 	def _create_frame_files(self, frameParent) -> None: 
 		"""Define all elements within the files frame."""
-		frameFiles = ttk.Labelframe(frameParent, text="Files", padding=15)
+		frameFiles = ttk.Labelframe(frameParent, text="File", padding=15)
 		frameFiles.pack(side=LEFT, fill=BOTH, expand=YES, padx=(0, 15))
 
 		buttonImport = ttk.Button(
@@ -109,7 +109,7 @@ class MainWindow(ttk.Frame):
 
 	def _create_frame_active_data(self, frameParent) -> None: 
 		""""""
-		frameActiveData = ttk.Labelframe(frameParent, text="Active Data", padding=15)
+		frameActiveData = ttk.Labelframe(frameParent, text="Imported Data", padding=15)
 		frameActiveData.pack(side=LEFT, fill=BOTH, expand=YES, padx=(0, 15))
 
 		self.stringVarActiveData = ttk.StringVar(self, value="")
