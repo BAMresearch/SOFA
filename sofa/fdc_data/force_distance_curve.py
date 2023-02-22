@@ -13,8 +13,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 """
-from collections import namedtuple
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, NamedTuple
 
 import numpy as np
 from matplotlib.lines import Line2D
@@ -30,21 +29,20 @@ class ForceDistanceCurve():
 	----------
 	identifier : str
 		
-	dataApproachRaw : np.ndarray
+	dataApproachRaw : namedTuple
 		
-	dataApproachCorrected : np.ndarray
+	dataApproachCorrected : namedTuple
 		
 	couldBeCorrected : bool
 		
-	channelMetaData : dict
+	channelMetadata : namedtuple
 		
-	lineRepresentationRawData : Line2D
+	lineRepresentationRawData : mpl.lines.Line2D
 		
-	lineRepresentationCorrectedData : Line2D
+	lineRepresentationCorrectedData : mpl.lines.Line2D
 		
 	"""
-
-	def __init__(self, identifier: str, dataApproachRaw: np.ndarray):
+	def __init__(self, identifier: str, dataApproachRaw: NamedTuple):
 		"""
 		
 		Parameters
@@ -56,18 +54,20 @@ class ForceDistanceCurve():
 		"""
 		self.identifier: str = identifier
 		
-		self.dataApproachRaw: np.ndarray = dataApproachRaw
-		self.dataApproachCorrected: np.ndarray
+		self.dataApproachRaw: NamedTuple = dataApproachRaw
+		self.dataApproachCorrected: NamedTuple
 		self.couldBeCorrected: bool
-		self.channelMetaData: Dict
+		self.channelMetadata: NamedTuple
 
 		self.lineRepresentationRawData: matplotlib.lines.Line2D
 		self.lineRepresentationCorrectedData: matplotlib.lines.Line2D
 
 	def correct_raw_data(self) -> None:
-		""""""
+		"""
+		
+		"""
 		try:
-			self.dataApproachCorrected, self.channelMetaData = correct_approach_curve(
+			self.dataApproachCorrected, self.channelMetadata = correct_approach_curve(
 				self.dataApproachRaw
 			)
 			self.couldBeCorrected = True
@@ -76,17 +76,19 @@ class ForceDistanceCurve():
 			self.couldBeCorrected = False 
 
 	def create_line_representation_raw_data(self) -> None:
-		""""""
+		"""
+
+		"""
 		self.lineRepresentationRawData = plt_data.create_raw_line(
 			self.identifier
-			self.dataApproachRaw[0], 
-			self.dataApproachRaw[1],
+			self.dataApproachRaw
 		)
 
 	def create_line_representation_corrected_data(self) -> None:
-		""""""
+		"""
+		
+		"""
 		self.lineRepresentationCorrectedData = plt_data.create_corrected_line(
 			self.identifier
-			self.dataApproachCorrected[0], 
-			self.dataApproachCorrected[1],
+			self.dataApproachCorrected
 		)

@@ -13,13 +13,16 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 """
-from collections import namedtuple
 from typing import List, Dict, Tuple
 
 import numpy as np
 
 class AverageForceDistanceCurve():
+	"""
+	"""
 	def __init__(self):
+		"""
+		"""
 		self.DataApproach: np.ndarray 	# need better name
 		self.DataContact: np.ndarray 	# need better name
 		self.averageDataApproach: np.ndarray

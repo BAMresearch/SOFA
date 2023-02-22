@@ -14,21 +14,23 @@ You should have received a copy of the GNU General Public License
 along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from collections import namedtuple
+from typing import NamedTuple
+from numpy import ndarray
 
-ForceDistanceCurve = namedtuple(
-	"ForceDistanceCurve",
-	[
-		"piezo",
-		"deflection"
-	]
-)
+class ForceDistanceCurve(NamedTuple): 
+	piezo: ndarray
+	deflection: ndarray
 
-ForceDistancePoint = namedtuple(
-	"ForceDistancePoint",
-	[  
-		"index",
-		"piezo",
-		"deflection"
-	]
-)
+class ForceDistancePoint(NamedTuple):
+	index: int
+	piezo: float
+	deflection: float
+
+class LinearCoefficients(NamedTuple):
+	slope: float
+	intercept: float
+
+class ChannelMetadata(NamedTuple):
+	endOfZeroline: ForceDistancePoint
+	pointOfContact: ForceDistancePoint
+	linearCoefficients: LinearCoefficients

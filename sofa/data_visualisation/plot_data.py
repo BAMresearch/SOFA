@@ -19,22 +19,24 @@ import matplotlib as mpl
 
 def create_raw_line(
 	identifier: str, 
-	xData: np.ndarray,
-	yData: np.ndarray
+	dataRaw: nt.ForceDistanceCurve
 ) -> mpl.lines.Line2D:
 	"""
-	
-	Parameters:
-		identifier(str): .
-		xData(np.ndarray): .
-		yData(np.ndarray): .
 
-	Returns:
-		rawLine(Line2D): .
+	
+	Parameters
+	----------
+	identifier : str
+	dataRaw : nt.ForceDistanceCurve
+
+	Returns
+	-------
+	rawLine : mpl.lines.Line2D
+
 	"""
 	return mpl.lines.Line2D(
-		xData, 
-		yData, 
+		dataRaw.piezo, 
+		dataRaw.deflection, 
 		c="darkred", 
 		label=identifier + "_raw",
 		linewidth=0.5, 
@@ -45,22 +47,24 @@ def create_raw_line(
 
 def create_corrected_line(
 	identifier: str, 
-	xData: np.ndarray,
-	yData: np.ndarray
+	dataCorrected: nt.ForceDistanceCurve
 ) -> mpl.lines.Line2D:
 	"""
-	
-	Parameters:
-		identifier(str): .
-		xData(np.ndarray): .
-		yData(np.ndarray): .
 
-	Returns:
-		correctedLine(Line2D): .
+	
+	Parameters
+	----------
+	identifier : str
+	dataRaw : nt.ForceDistanceCurve
+
+	Returns
+	-------
+	rawLine : mpl.lines.Line2D
+	
 	"""
 	return mpl.lines.Line2D(
-		xData, 
-		yData, 
+		dataCorrected.piezo, 
+		dataCorrected.deflection, 
 		c="red", 
 		label=identifier + "_corrected",
 		linewidth=0.5, 
@@ -72,13 +76,18 @@ def create_corrected_line(
 def get_axes(
 	holder: mpl.backends.backend_tkagg.FigureCanvasTkAgg
 ) -> mpl.axes:
-	"""Create or get axis of a given holder.
+	"""
+	Create or get axis of a given holder.
 
-	Parameters:
-		holder(FigureCanvasTkAgg): Holder which requires an axes.
+	Parameters
+	----------
+	holder : mpl.backends.backend_tkagg.FigureCanvasTkAgg
+		Holder which requires an axes.
 
-	Returns:
-		axes(mpl.axes): New or existing axes of the given holder.
+	Returns
+	-------
+	axes : mpl.axes
+		New or existing axes of the given holder.
 	"""
 	try:
 		return holder.figure.get_axes()[0]
@@ -90,10 +99,14 @@ def plot_line_plot(
 	lines: List[mpl.lines.Line2D]
 ) -> None: 
 	"""
+	
 
-	Parameters:
-		holder(FigureCanvasTkAgg): .
-		lines(list): .
+	Parameters
+	----------
+	holder : mpl.backends.backend_tkagg.FigureCanvasTkAgg
+
+	lines : list
+
 	"""
 	ax = get_axes(holder)
 	ax.cla()
@@ -118,10 +131,15 @@ def plot_heatmap(
 ) -> None:
 	"""
 
-	Parameters:
-		holder(FigureCanvasTkAgg): .
-		data(np.ndarray): .
-		markingLines(list): .
+
+	Parameters
+	----------
+	holder : mpl.backends.backend_tkagg.FigureCanvasTkAgg
+
+	data : np.ndarray
+
+	markingLines : list
+
 	"""
 	m, n = np.shape(data)
 
@@ -145,13 +163,20 @@ def plot_histogram(
 	zoom: bool
 ) -> None:
 	"""
+
 	
-	Parameters:
-		holder(FigureCanvasTkAgg): .
-		data(np.ndarray): .
-		activeData(np.ndarray): .
-		numberOfBins(int): .
-		zoom(bool): .
+	Parameters
+	----------
+	holder : mpl.backends.backend_tkagg.FigureCanvasTkAgg
+
+	data : np.ndarray
+
+	activeData : np.ndarray
+
+	numberOfBins : int
+
+	zoom : bool
+
 	"""
 	ax = get_axes(holder)
 
@@ -192,20 +217,27 @@ def update_line(
 ) -> None:
 	"""
 
-	Parameters:
-		line(Line2D): .
-		color(str): .
-		zorder(int): .
+
+	Parameters
+	----------
+	line : mpl.lines.Line2D
+	
+	color : str
+
+	zorder : int
+
 	"""
 	line.set_color(color)
 	line.zorder = zorder
 
 def add_average_curve_to_line_plot() -> None: 
-	""""""
+	"""
+	"""
 	pass 
 
 def remove_average_curve_from_line_plot() -> None:
-	""""""
+	"""
+	"""
 	pass
 
 def update_line_plot(
@@ -216,11 +248,16 @@ def update_line_plot(
 ) -> None:
 	"""
 
-	Parameters:
-		holder(FigureCanvasTkAgg): .
-		lines(list): .
-		inactiveForceDistanceCurves(list): .
-		showInactive(bool): .
+	Parameters
+	----------
+	holder : mpl.backends.backend_tkagg.FigureCanvasTkAgg,
+	
+	lines : list
+	
+	inactiveForceDistanceCurves : list
+	
+	showInactive : bool
+	
 	"""
 	for index, line in enumerate(lines):
 		if index in inactiveForceDistanceCurves and showInactive:
