@@ -17,38 +17,58 @@ from collections import namedtuple
 from typing import List, Dict, Tuple
 
 import numpy as np
-
-from collections import namedtuple
-from typing import List, Dict, Tuple
-
-import numpy as np
 from matplotlib.lines import Line2D
 
+from data_processing.correct_data import correct_approach_curves
+import data_visualization.plot_data as plt_data
+
 class ForceDistanceCurve():
-	""""""
-	def __init__(self):
-		self.identifier: str
-		self.rawDataApproach: np.ndarray
+	"""
+	
+
+	Attributes
+	----------
+	identifier : str
+		
+	dataApproachRaw : np.ndarray
+		
+	dataApproachCorrected : np.ndarray
+		
+	couldBeCorrected : bool
+		
+	channelMetaData : dict
+		
+	lineRepresentationRawData : Line2D
+		
+	lineRepresentationCorrectedData : Line2D
+		
+	"""
+
+	def __init__(self, identifier: str, dataApproachRaw: np.ndarray):
+		"""
+		
+		Parameters
+		----------
+		identifier : str
+
+		dataApproachRaw : np.ndarray
+
+		"""
+		self.identifier: str = identifier
+		
+		self.dataApproachRaw: np.ndarray = dataApproachRaw
+		self.dataApproachCorrected: np.ndarray
 		self.couldBeCorrected: bool
-		self.correctedDataApproach: np.ndarray
-		self.correctionMetaData: Dict 	# needs better name
+		self.channelMetaData: Dict
+
 		self.lineRepresentationRawData: matplotlib.lines.Line2D
 		self.lineRepresentationCorrectedData: matplotlib.lines.Line2D
-
-	def import_raw_data(
-		self, 
-		identifier: str, 
-		rawDataApproach: np.ndarray
-	) -> None:
-		""""""
-		self.identifier = identifier
-		self.rawDataApproach = rawDataApproach
 
 	def correct_raw_data(self) -> None:
 		""""""
 		try:
-			self.correctedDataApproach, self.correctionMetaData = correct_approach_curve(
-				self.rawDataApproach
+			self.dataApproachCorrected, self.channelMetaData = correct_approach_curve(
+				self.dataApproachRaw
 			)
 			self.couldBeCorrected = True
 
@@ -57,16 +77,16 @@ class ForceDistanceCurve():
 
 	def create_line_representation_raw_data(self) -> None:
 		""""""
-		self.lineRepresentationRawData = create_raw_line(
+		self.lineRepresentationRawData = plt_data.create_raw_line(
 			self.identifier
-			self.rawDataApproach[0], 
-			self.rawDataApproach[1],
+			self.dataApproachRaw[0], 
+			self.dataApproachRaw[1],
 		)
 
 	def create_line_representation_corrected_data(self) -> None:
 		""""""
-		self.lineRepresentationCorrectedData = create_corrected_line(
+		self.lineRepresentationCorrectedData = plt_data.create_corrected_line(
 			self.identifier
-			self.correctedDataApproach[0], 
-			self.correctedDataApproach[1],
+			self.dataApproachCorrected[0], 
+			self.dataApproachCorrected[1],
 		)
