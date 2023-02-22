@@ -72,7 +72,7 @@ class ForceDistanceCurve():
 			)
 			self.couldBeCorrected = True
 
-		except ValueError:
+		except CorrectionError:
 			self.couldBeCorrected = False 
 
 	def create_line_representation_raw_data(self) -> None:
