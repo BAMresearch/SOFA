@@ -20,7 +20,7 @@ from scipy.stats import linregress
 from scipy.ndimage import gaussian_filter1d
 
 import exceptions.custom_exceptions as ce
-import data_processing.named_tuples as nt
+import named_tuples.named_tuples_correct_data as nt_cd
 
 def correct_approach_curve(
 	approachCurve: nt.ForceDistanceCurve,
