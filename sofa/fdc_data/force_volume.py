@@ -23,6 +23,25 @@ from fdc_data.channel import Channel
 
 class ForceVolume():
 	"""
+	A set of force distance curves and 
+
+	Attributes
+	----------
+	identifier : str
+		Name of the measurement data.
+	size : tuple[int]
+		Number of force distance curves as the width and height 
+		of the measurement grid.
+	forceDistanceCurves : list[ForceDistanceCurve]
+		
+	averageForceDistanceCurve : AverageForceDistanceCurve
+		The average of the currently active force distance
+		curves.
+	channels : list[Channel]
+		
+	inactiveForceDistanceCurves : list[int]
+		
+	guiInterface : dict
 
 	"""
 	def __init__(self):
@@ -39,6 +58,9 @@ class ForceVolume():
 
 	def import_data(self, importedData:nt.): -> None:
 		"""
+
+		Parameters
+		----------
 		"""
 		self.identifier = importedData.filename
 		self.size = importedData.size
@@ -51,6 +73,9 @@ class ForceVolume():
 		importedApproachCurves: List[nt.ForceDistanceCurve]
 	) -> None
 		"""
+		
+		Parameters
+		----------
 		"""
 		for index, approachCurve in enumerate(importedApproachCurves):
 			self.forceDistanceCurves.append(
@@ -62,12 +87,15 @@ class ForceVolume():
 
 	def correct_data(self) -> None:
 		"""
+		Correct the data of all force distance curves in the
+		force volume.
 		"""
 		for forceDistanceCurve in self.forceDistanceCurves:
 			forceDistanceCurve.correct_raw_data()
 
 	def calculate_channel_data(self) -> None: 
 		"""
+
 		"""
 		for channelName, caluclate_channel in channels.items():
 			self.channels.append(

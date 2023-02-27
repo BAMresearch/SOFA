@@ -28,8 +28,15 @@ class HeatmapToolbar(NavigationToolbar2Tk):
 	"""
 	A custom toolbar to process data, displayed as a heatmap.
 	
-	Parameters:
-		dataHandler(object): Handles the state and different display options of the data.
+	Attributes
+	----------
+	forceVolume : ForceVolume
+
+	holder : 
+
+	eventConnections : list[]
+
+	selectedArea : list[]
 	"""
 	def __init__(self, canvas_, parent_, dataHandler):
 		# Set path for toolbar icons.

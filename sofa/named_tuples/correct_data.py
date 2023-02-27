@@ -26,11 +26,11 @@ class ForceDistancePoint(NamedTuple):
 	piezo: float
 	deflection: float
 
-class LinearCoefficients(NamedTuple):
+class CoefficientsFitApproachCurve(NamedTuple):
 	slope: float
 	intercept: float
 
 class ChannelMetadata(NamedTuple):
 	endOfZeroline: ForceDistancePoint
 	pointOfContact: ForceDistancePoint
-	linearCoefficients: LinearCoefficients
+	coefficientsFitApproachCurve: CoefficientsFitApproachCurve

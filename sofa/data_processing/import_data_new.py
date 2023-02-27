@@ -25,14 +25,18 @@ from igor.binarywave import load as loadibw
 
 def decorator_check_file_size_image(function):
 	"""
-
+	Check that the size of the measurement data 
+	matches that of the image.
 	"""
 	@functools.wraps(function)
 	def wrapper_check_file_size_image(*args, **kwargs):
 		imagedData = function(*args, **kwargs)
 		measurementDataSize = args[1]
 		if measurementDataSize != imagedData.size:
-			raise WrongImageSizeError()
+			raise WrongImageSizeError(
+				"The image size does not match the " 
+				"size of the measurement data."
+			)
 		else:
 			return imagedData
 
@@ -40,14 +44,18 @@ def decorator_check_file_size_image(function):
 
 def decorator_check_file_size_channel(function):
 	"""
-
+	Check that the size of the measurement data 
+	matches that of the channel.
 	"""
 	@functools.wraps(function)
 	def wrapper_check_file_size_image(*args, **kwargs):
 		channelData = function(*args, **kwargs)
 		measurementDataSize = args[1]
 		if measurementDataSize != channelData.size:
-			raise WrongChannelSizeError()
+			raise WrongChannelSizeError(
+				"The channel size does not match the "
+				"size of the measurement data."
+			)
 		else:
 			return channelData
 
@@ -55,8 +63,18 @@ def decorator_check_file_size_channel(function):
 
 def import_ibw_data(
 	importParameter: ImportParameter,
-) -> :
+) -> ImportedData:
 	"""
+	Import measurement data in the .ibw file format.
+
+	Parameters
+	----------
+	importParameter : ImportParameter
+		
+
+	Returns
+	-------
+	importedData : ImportedData
 
 	"""
 	# Import required data.
@@ -103,30 +121,34 @@ def import_ibw_measurement(
 
 def get_folder_name(folderPathMeasurementData: str) -> str:
 	"""
+	
 
 	Parameters
 	----------
 	folderPathMeasurementData : str
-		Filepath to the data dictionary.
+		Path to the data folder.
 
 	Returns
 	-------
 	folderName : str
-
+		Basename of the folder path.
 	"""
 	return os.path.basename(folderPathMeasurementData)
 
 def get_data_size(folderPathMeasurementData: str) -> Tuple[int, int]:
 	"""
 
+
 	Parameters
 	----------
 	folderPathMeasurementData : str
+		Path to the data folder.
 
 	Returns
 	-------
 	size : tuple
-
+		The number of data points as the width and height 
+		of the measurement grid.
 	"""
 	numberOfLines = len(
 		os.listdir(folderPathMeasurementData)
@@ -261,30 +283,85 @@ def import_ibw_image(
 	-------
 	ImageData : ImageData
 		Contains the image data.
-
-	Raises
 	------
 
 	"""
+	imageData = loadibw(importParameters.filePathImage)
+
+	imageSize = get_image_size(imageData)
+	imageDataNote = get_image_data_note(imageData)
+	imageChannelData = get_image_channel_data(imageData)
+
+	return ImageData(
+		size=imageSize,
+		fss=imageDataNote[imageDataNote.index("FastScanSize")+1],
+		sss=imageDataNote[imageDataNote.index("SlowScanSize")+1],
+		xOffset=imageDataNote[imageDataNote.index("XOffset")+1],
+		yOffset=imageDataNote[imageDataNote.index("YOffset")+1],
+		springConstant=imageDataNote[imageDataNote.index("SpringConstant")+1],
+		channelHeight=imageChannelData[:, :, 0],
+		channelAdhesion=imageChannelData[:, :, 1]
+	)
+
+def get_image_size(
+	imageData
+) -> Tuple[int]:
+	"""
+	"""
 	try:
-		imageData = loadibw(importParameters.filePathImage)
-		imageDataNote = re.split(r'[\r:]', imageData['wave']['note'].decode("utf-8", errors="replace"))
-		imageChannelData = np.flip(np.rot90(np.asarray(imageData["wave"]["wData"]), 3), 1)
-	except ValueError as e:
-		raise UnableToReadImageFileError("Cant read image data!") from e
-	else:
 		imageSize = (
 			imageData['wave']['wave_header']['nDim'][1],
 			imageData['wave']['wave_header']['nDim'][0]
 		)
-		
-		return ImageData(
-			size=imageSize,
-			fss=imageDataNote[imageDataNote.index("FastScanSize")+1],
-			sss=imageDataNote[imageDataNote.index("SlowScanSize")+1],
-			xOffset=imageDataNote[imageDataNote.index("XOffset")+1],
-			yOffset=imageDataNote[imageDataNote.index("YOffset")+1],
-			springConstant=imageDataNote[imageDataNote.index("SpringConstant")+1],
-			channelHeight=imageChannelData[:, :, 0],
-			channelAdhesion=imageChannelData[:, :, 1]
+	except ValueError as e:
+		raise UnableToReadImageFileError(
+			"Can't read image data size. Unable to find" 
+			"'wave|wave_header' key in the image file."
+		) from e
+	else:
+		return imageSize
+
+def get_image_data_note(
+	imageData
+) -> None:
+	"""
+	"""
+	try:
+		imageDataNote = re.split(
+			r'[\r:]', imageData['wave']['note'].decode("utf-8", errors="replace")
 		)
+	except ValueError as e:
+		raise UnableToReadImageFileError(
+			"Can't read image data note. Unable to find" 
+			"'wave|note' key in the image file."
+		) from e
+	else:
+		return imageDataNote
+
+def get_image_channel_data(
+	imageData
+) -> None:
+	"""
+	"""
+	try:
+		imageChannelData = np.flip(
+			np.rot90(
+				np.asarray(imageData["wave"]["wData"]), 
+				3
+			), 
+			1
+		)
+	except ValueError as e:
+		raise UnableToReadImageFileError(
+			"Can't read image channel data. Unable to find" 
+			"'wave|wData' key in the image file."
+		) from e
+	else:
+		return imageChannelData
+
+def import_ibw_channel(
+
+) -> None: 
+	"""
+	"""
+	pass

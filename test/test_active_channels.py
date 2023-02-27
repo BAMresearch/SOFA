@@ -1,6 +1,6 @@
 import numpy as np
 
-import sofa.data.active_channels as ac
+import sofa.data_processing.active_channels as ac
 
 def test_calculate_topography_simple_data():
 	""""""

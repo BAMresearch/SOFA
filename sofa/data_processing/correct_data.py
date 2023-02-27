@@ -41,7 +41,7 @@ def correct_approach_curve(
 		Metadata generated during the correction of the curve, which is used for 
 		calculating the different channels.
 	"""
-	correctedDeflectionValues, endOfZeroline, linearCoefficients = correct_deflection_values(
+	correctedDeflectionValues, endOfZeroline, coefficientsFitApproachCurve = correct_deflection_values(
 		approachCurve
 	)
 	correctedPiezoValues, pointOfContact = correct_piezo_values(
@@ -57,14 +57,14 @@ def correct_approach_curve(
 	channelMetadata = nt.ChannelMetadata(
 		endOfZeroline=endOfZeroline,
 		pointOfContact=pointOfContact,
-		linearCoefficients=linearCoefficients
+		coefficientsFitApproachCurve=coefficientsFitApproachCurve
 	)
 
 	return correctedDataApproach, channelMetadata
 
 def correct_deflection_values(
 	approachCurve: nt.ForceDistanceCurve,
-) -> Tuple[np.ndarray, nt.ForceDistancePoint, nt.LinearCoefficients]:
+) -> Tuple[np.ndarray, nt.ForceDistancePoint, nt.coefficientsFitApproachCurve]:
 	"""
 	Correct the deflection values of an approach curve by removing the 
 	virtual deflection.
@@ -81,91 +81,69 @@ def correct_deflection_values(
 	endOfZeroline : nt.ForceDistancePoint
 		Index, piezo and deflection value from the last point 
 		of the zero line.
-	linearCoefficients : nt.LinearCoefficients
+	coefficientsFitApproachCurve : nt.coefficientsFitApproachCurve
 		Slope and intercept value of a lineare fit to the raw data.
 	"""
-	smoothedDerivation = calculate_smoothed_derivation(
+	endOfZeroline, coefficientsFitApproachCurve = calculate_end_of_zeroline(
 		approachCurve
 	)
-	linearCurveFit, linearCoefficients = calculate_linear_fit_to_approach_curve(
-		approachCurve
-	)
-	indexLeftBorder, indexRightBorder = restrict_deflection_values(
-		approachCurve,
-		linearCurveFit
-	)
-	endOfZeroline = locate_end_of_zeroline(
-		smoothedDerivation,
-		indexLeftBorder,
-		indexRightBorder
-	)
-	fittedLine = calculate_linear_fit_to_zeroline(
+	fitEndOfZeroline = calculate_linear_fit_to_zeroline(
 		approachCurve,
 		endOfZeroline
 	)
 	correctedDeflectionValues = shif_deflection_values(
 		approachCurve,
 		endOfZeroline,
-		fittedLine
+		fitEndOfZeroline
 	)
 
-	return correctedDeflectionValues, endOfZeroline, linearCoefficients
+	return correctedDeflectionValues, endOfZeroline, coefficientsFitApproachCurve
 
-def calculate_smoothed_derivation(
+def calculate_end_of_zeroline(
 	approachCurve: nt.ForceDistanceCurve,
-) -> np.ndarray:
+) -> nt.ForceDistancePoint: 
 	"""
-	"""
-	derivation = derivate_curve(approachCurve)
-	smoothedDerivation = smooth_derivation(derivation)
+	Calculate the end of the zero line as the last measurement point
+	with a positive slope before the jump to contact.
 
-	return smoothedDerivation
-
-def derivate_curve(
-	approachCurve: nt.ForceDistanceCurve,
-) -> np.ndarray:
-	"""
-
-	
 	Parameters
 	----------
-	
+	approachCurve : nt.ForceDistanceCurve
+		Raw approach curve with piezo (x) and deflection (y) values.
 
 	Returns
 	-------
-
-
+	endOfZeroline : nt.ForceDistancePoint
+		Index, piezo and deflection value from the last point 
+		of the zero line.
+	coefficientsFitApproachCurve : nt.coefficientsFitApproachCurve
+		Slope and intercept value of a lineare fit to the raw data.
+		
 	"""
-	return (
-		np.diff(approachCurve.deflection) / np.diff(approachCurve.piezo)
+	fitApproachCurve, coefficientsFitApproachCurve = calculate_linear_fit_to_approach_curve(
+		approachCurve
+	)
+	smoothedDerivationDeflection = calculate_smoothed_derivation(
+		approachCurve
+	)
+	indexLeftBorder, indexRightBorder = calculate_deflection_borders(
+		approachCurve,
+		fitApproachCurve
+	)
+	endOfZeroline = locate_end_of_zeroline(
+		approachCurve,
+		smoothedDerivationDeflection,
+		indexLeftBorder,
+		indexRightBorder
 	)
 
-def smooth_derivation(
-	derivationApproachCurve: np.ndarray,
-	smoothFactor: int = 10
-) -> np.ndarray:
-	"""
-
-	
-	Parameters
-	----------
-	
-
-	Returns
-	-------
-
-
-	"""
-	return gaussian_filter1d(
-		derivationApproachCurve,
-		sigma=smoothFactor
-	)
+	return endOfZeroline, coefficientsFitApproachCurve
 
 def calculate_linear_fit_to_approach_curve(
 	approachCurve: nt.ForceDistanceCurve
-) -> Tuple[nt.ForceDistanceCurve, nt.LinearCoefficients]:
+) -> Tuple[nt.ForceDistanceCurve, nt.coefficientsFitApproachCurve]:
 	"""
-
+	Calculate linear regression curve to a raw approach curve.
 
 	Parameters
 	----------
@@ -174,10 +152,12 @@ def calculate_linear_fit_to_approach_curve(
 
 	Returns
 	-------
-	linearCurveFit : nt.ForceDistanceCurve
-
-	linearCoefficients : nt.LinearCoefficients
-		Slope (raw stiffness) and intercept (raw offset) 
+	fitApproachCurve : nt.ForceDistanceCurve
+		Linear regression curve with the same piezo (x) values and
+		new calculated deflection (y) values.
+	coefficientsFitApproachCurve : nt.coefficientsFitApproachCurve
+		Slope (raw stiffness) and intercept (raw offset) of the fitted
+		line.
 	"""
 	slope, intercept, _, _, _ = linregress(
 		approachCurve.piezo,
@@ -187,157 +167,213 @@ def calculate_linear_fit_to_approach_curve(
 		[intercept + slope*approachCurve.piezo]
 	)
 
-	linearCurveFit = nt.ForceDistanceCurve(
+	fitApproachCurve = nt.ForceDistanceCurve(
 		piezo=approachCurve.piezo,
 		deflection=linearDeflectionValues
 	)
-	linearCoefficients = nt.LinearCoefficients(
+	coefficientsFitApproachCurve = nt.coefficientsFitApproachCurve(
 		slope=slope,
 		intercept=intercept
 	)
 
-	return linearCurveFit, linearCoefficients
+	return fitApproachCurve, coefficientsFitApproachCurve
 
-def restrict_deflection_values(
+def calculate_smoothed_derivation(
 	approachCurve: nt.ForceDistanceCurve,
-	linearCurveFit: nt.ForceDistanceCurve
-) -> Tuple[int, int, nt.LinearCoefficients]:
+) -> np.ndarray:
 	"""
-
+	Calculate the first derivation of the raw measurement curve and 
+	smooth it.
 
 	Parameters
 	----------
 	approachCurves : namedTuple
 		Raw approach curve with piezo (x) and deflection (y) values.
-	linearCurveFit : nt.ForceDistanceCurve
+
+	Returns
+	-------
+	smoothedDerivationDeflection : np.ndarray
+		Smoothed first derivation of the deflection (y) values.
+	"""
+	derivationDeflection = derivate_curve(approachCurve)
+	smoothedDerivationDeflection = smooth_derivation(derivationDeflection)
+
+	return smoothedDerivationDeflection
+
+def derivate_curve(
+	approachCurve: nt.ForceDistanceCurve,
+) -> np.ndarray:
+	"""
+	Calculate the first derivation of the deflection (y) values
+	of the approach curve.
 	
+	Parameters
+	----------
+	approachCurves : namedTuple
+		Raw approach curve with piezo (x) and deflection (y) values.
+
+	Returns
+	-------
+	derivationDeflection : np.ndarray
+		First derivate of the deflection (y) values.
+	"""
+	return (
+		np.diff(approachCurve.deflection) / np.diff(approachCurve.piezo)
+	)
+
+def smooth_derivation(
+	derivationDeflection: np.ndarray,
+	smoothFactor: int = 10
+) -> np.ndarray:
+	"""
+	Smooth the first derivation of the deflection (y) values
+	of the approach curve.
+	
+	Parameters
+	----------
+	derivationDeflection : np.ndarray
+		First derivate of the deflection (y) values.
+	smoothFactor : int
+
+
+	Returns
+	-------
+	smoothedDerivationDeflection : np.ndarray
+		Smoothed first derivation of the deflection (y) values.
+	"""
+	return gaussian_filter1d(
+		derivationApproachCurve,
+		sigma=smoothFactor
+	)
+
+def calculate_deflection_borders(
+	approachCurve: nt.ForceDistanceCurve,
+	fitApproachCurve: nt.ForceDistanceCurve
+) -> Tuple[int, int, nt.coefficientsFitApproachCurve]:
+	"""
+	
+	
+	Parameters
+	----------
+	approachCurves : namedTuple
+		Raw approach curve with piezo (x) and deflection (y) values.
+	fitApproachCurve : nt.ForceDistanceCurve
+		Linear curve fit to the approach curve with the same 
+		piezo (x) values and adjusted deflection (y) values.
+
 	Returns
 	-------
 	indexLeftBorder : int
-
-	adjustedIndexRightBorder: int
-
-	linearCoefficients: nt.LinearCoefficients
-		Slope (raw stiffness) and intercept (raw offset) 
+		Index of the first intersection point between the approach curve
+		and it's linear fit.
+	indexRightBorder: int
+		.
 	"""
-	indexLeftBorder, indexRightBorder = calculate_curve_intersections(
+	indexFirstIntersection, indexLastIntersection = calculate_curve_intersections(
 		approachCurve, 
-		linearCurveFit
+		fitApproachCurve
 	)
-	adjustedIndexRightBorder = adjust_intersection_border(
+	indexRightBorder = adjust_intersection_border(
 		approachCurve, 
-		linearCurveFit,
-		indexLeftBorder,
-		indexRightBorder
+		fitApproachCurve,
+		indexFirstIntersection,
+		indexLastIntersection
 	)
 
-	return indexLeftBorder, adjustedIndexRightBorder, linearCoefficients
+	return indexFirstIntersection, indexRightBorder
 
 def calculate_curve_intersections(
 	approachCurve: nt.ForceDistanceCurve,
-	linearCurveFit: nt.ForceDistanceCurve
+	fitApproachCurve: nt.ForceDistanceCurve
 ) -> Tuple[int]:
 	"""
-
+	Calculate intersections of the approach curve and it's linear 
+	fit.
 
 	Parameters
 	----------
-	approachCurve : nt.ForceDistanceCurve
+	approachCurves : namedTuple
+		Raw approach curve with piezo (x) and deflection (y) values.
+	fitApproachCurve : nt.ForceDistanceCurve
+		Linear curve fit to the approach curve with the same 
+		piezo (x) values and adjusted deflection (y) values.
 		
-	linearCurveFit : nt.ForceDistanceCurve
-		
-
 	Returns
 	-------
-	indexLeftBorder : int 
-		
-	indexRightBorder : int
-
-
-	Raises
-	------
-	LinearFitIntersectionError : ce.CorrectionError
-
+	indexFirstIntersection : int 
+		Index of the first intersection point.
+	indexLastIntersection : int
+		Index of the last intersection point.
 	"""
-	temp = np.where(
-		approachCurve.deflection < linearCurveFit.deflection
+	innerIntersection = np.where(
+		approachCurve.deflection < fitApproachCurve.deflection
 	)[0]
 
-	try:
-		indexLeftBorder = temp[0]
-		indexRightBorder = temp[-1]
-	except IndexError as e:
-		raise ce.LinearFitIntersectionError from e
-	else:
-		return indexLeftBorder, indexRightBorder
+	indexFirstIntersection = innerIntersection[0]
+	indexLastIntersection = innerIntersection[-1]
+	
+	return indexFirstIntersection, indexLastIntersection
 
 def adjust_intersection_border(
 	approachCurve: nt.ForceDistanceCurve,
-	linearCurveFit: nt.ForceDistanceCurve,
-	indexLeftBorder: int,
-	indexRightBorder: int
+	fitApproachCurve: nt.ForceDistanceCurve,
+	indexFirstIntersection: int,
+	indexLastIntersection: int
 ) -> int:
 	"""
-
+	
 
 	Parameters
 	----------
-	approachCurve : nt.ForceDistanceCurve
+	approachCurves : namedTuple
+		Raw approach curve with piezo (x) and deflection (y) values.
+	fitApproachCurve : nt.ForceDistanceCurve
 	
-	linearCurveFit : nt.ForceDistanceCurve
-	
-	indexLeftBorder : int
+	indexFirstIntersection : int
 
-	indexRightBorder : int
+	indexLastIntersection : int
 
 
 	Returns
 	-------
-	adjustedIndexRightBorder : int
+	adjustedIndexMaxDeflectionDifference : int
 
 	"""
 	deflectionDifferences = np.absolute(
-		linearCurveFit.deflection - approachCurve.deflection
-	)
-	indexMaxDeflectionDifference = np.argmax(
-		deflectionDifferences[indexLeftBorder:indexRightBorder]
-	) + indexLeftBorder
-	adjustedIndexRightBorder = int(
-		indexMaxDeflectionDifference 
-		+ ((indexRightBorder - indexMaxDeflectionDifference) * 0.05)
+		fitApproachCurve.deflection - approachCurve.deflection
 	)
 
-	return adjustedIndexRightBorder
+	indexMaxDeflectionDifference = np.argmax(
+		deflectionDifferences[indexFirstIntersection:indexLastIntersection]
+	) + indexFirstIntersection
+	adjustedIndexMaxDeflectionDifference = int(
+		indexMaxDeflectionDifference 
+		+ ((indexLastIntersection - indexMaxDeflectionDifference) * 0.05)
+	)
+
+	return adjustedIndexMaxDeflectionDifference
 
 def locate_end_of_zeroline(
-	smoothedDerivationApproachCurve: np.ndarray,
-	indexLeftBorder: int,
+	approachCurve: nt.ForceDistanceCurve,
+	smoothedDerivationDeflection: np.ndarray,
+	indexLeftBorder: int, 
 	indexRightBorder: int
-) -> nt.ForceDistancePoint: 
+) -> nt.ForceDistancePoint:
 	"""
-	
 
 	Parameters
 	----------
-	smoothedDerivationApproachCurve : np.ndarray
-
-	indexLeftBorder : int
-		
-	indexRightBorder : int
-
+	approachCurves : namedTuple
+		Raw approach curve with piezo (x) and deflection (y) values.
 
 	Returns
 	-------
-	endOfZeroline : nt.ForceDistancePoint
-	
 
 	Raises
 	------
-	: CorrectionError
-
 	"""
 	endOfZeroline = np.where(
-		smoothedDerivationApproachCurve[indexLeftBorder:indexRightBorder] < 0
+		smoothedDerivationDeflection[indexLeftBorder:indexRightBorder] < 0
 	)
 
 	try:
@@ -354,8 +390,18 @@ def locate_end_of_zeroline(
 def calculate_linear_fit_to_zeroline(
 	approachCurve: nt.ForceDistanceCurve,
 	endOfZeroline: nt.ForceDistancePoint
-):
+) -> nt.ForceDistanceCurve:
 	"""
+
+	Parameters
+	----------
+	approachCurves : namedTuple
+		Raw approach curve with piezo (x) and deflection (y) values.
+
+	Returns
+	-------
+	
+
 	"""
 	slope, intercept, _, _, _ = linregress(
 		approachCurve.piezo[0:endOfZeroline.index],
@@ -366,24 +412,40 @@ def calculate_linear_fit_to_zeroline(
 		[intercept + slope*approachCurve.piezo[0:endOfZeroline.index]]
 	)
 
-	linearCurveFit = nt.ForceDistanceCurve(
+	fitApproachCurve = nt.ForceDistanceCurve(
 		piezo=approachCurve.piezo[0:endOfZeroline.index],
 		deflection=linearDeflectionValues
 	)
 
-	return linearCurveFit
+	return fitApproachCurve
 
 def shif_deflection_values(
 	approachCurve: nt.ForceDistanceCurve,
 	endOfZeroline: nt.ForceDistancePoint,
-	fittedLine: nt.ForceDistanceCurve
+	fitEndOfZeroline: nt.ForceDistanceCurve
 ) -> np.ndarray:
 	"""
+	Shift the deflection values a long the zero line to zero.
+	Values to the end of the zero line are smoothed.
+
+	Parameters
+	----------
+	approachCurves : namedTuple
+		Raw approach curve with piezo (x) and deflection (y) values.
+	endOfZeroline : nt.ForceDistancePoint
+		
+	fitEndOfZeroline : nt.ForceDistanceCurve
+		
+
+	Returns
+	-------
+	correctedDeflectionValues : np.ndarray
+		
 	"""
 	return np.concatenate(
 		[
-			approachCurve.deflection[0:endOfZeroline.index] - fittedLine.deflection,
-			approachCurve.deflection[endOfZeroline.index:] - fittedLine.deflection[-1]
+			approachCurve.deflection[0:endOfZeroline.index] - fitEndOfZeroline.deflection,
+			approachCurve.deflection[endOfZeroline.index:] - fitEndOfZeroline.deflection[-1]
 		]
 	)
 
@@ -401,10 +463,10 @@ def correct_piezo_values(
 	approachCurve : nt.ForceDistanceCurve
 		Raw approach curve with piezo (x) and deflection (y) values.
 	correctedDeflectionValues : np.ndarray
-		Deflection values shifted to zero along the zero line.
+		Deflection (y) values shifted to zero along the zero line.
 	endOfZeroline : nt.ForceDistancePoint
-		Index, piezo and deflection value from the last point 
-		of the zero line.
+		Index, piezo (x) and deflection (y) value from the last 
+		point of the zero line.
 
 	Returns
 	-------
@@ -468,6 +530,14 @@ def interpolate_unshifted_point_of_contact(
 	indexZeroCrossing: int
 ) -> nt.ForceDistancePoint:
 	"""
+
+	Parameters
+	----------
+
+	Returns
+	-------
+	
+
 	"""
 	piezoUnshiftedPointOfContact = np.interp(
 		0, 
@@ -486,6 +556,14 @@ def shif_piezo_values(
 	unshiftedPointOfContact: nt.ForceDistancePoint
 ) -> np.ndarray:
 	"""
+
+	Parameters
+	----------
+
+	Returns
+	-------
+	
+
 	"""
 	return (
 		approachCurve.piezo - unshiftedPointOfContact.piezo

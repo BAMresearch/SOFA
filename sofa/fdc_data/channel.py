@@ -19,18 +19,20 @@ import numpy as np
 
 class Channel():
 	"""
-	hier steht allgemeine beschreibung
+	
 
 	Attributes
 	----------
-	identifier(str):
-		hier steht beschreibung
-	rawData(np.ndarray):
-		hier steht beschreibung
-	data(np.ndarray):
-		hier steht beschreibung
-	activeData(np.ndarray):
-		hier steht beschreibung
+	identifier : str
+		Name of the channel.
+	rawData : np.ndarray
+		Unmodified data of the channel used to restore
+		data and orientation.
+	data : np.ndarray
+		Data of the channel with the current orientation,
+		can be flipped or rotated.
+	activeData : np.ndarray
+		Active data of the channel with the current orientation.
 	"""
 	def __init__(
 		self, 
@@ -44,7 +46,7 @@ class Channel():
 		self.data: np.ndarray = data.copy()
 		self.activeData: np.ndarray = data.copy()
 
-	def update_active_data(
+	def get_active_data(
 		inactiveForceDistanceCurves: List[int]
 	) -> None:
 		""""""

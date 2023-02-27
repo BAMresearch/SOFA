@@ -28,29 +28,37 @@ class ForceDistanceCurve():
 	Attributes
 	----------
 	identifier : str
-		
+		Name of the force distance curve.
 	dataApproachRaw : namedTuple
-		
+		Raw imported approach data with piezo (x) and
+		deflection (y) values.
 	dataApproachCorrected : namedTuple
-		
+		Corrected approach data with shifted piezo (x) 
+		and deflection (y) values.
 	couldBeCorrected : bool
-		
+		Indicates whether the curve could be corrected.
 	channelMetadata : namedtuple
-		
+		Data created while correcting the curve used
+		to calculate the different channels.
 	lineRepresentationRawData : mpl.lines.Line2D
-		
+		Line of the raw data used to represent the 
+		curve in a plot. 
 	lineRepresentationCorrectedData : mpl.lines.Line2D
-		
+		Line of the corrected data used to represent 
+		the curve in a plot.
 	"""
 	def __init__(self, identifier: str, dataApproachRaw: NamedTuple):
 		"""
-		
+		Initialize a force distance curve by setting it's identifier 
+		and raw data. 
+
 		Parameters
 		----------
 		identifier : str
-
-		dataApproachRaw : np.ndarray
-
+			Name of the force distance curve.
+		dataApproachRaw : namedTuple
+			Raw imported approach data with piezo (x) and
+			deflection (y) values.
 		"""
 		self.identifier: str = identifier
 		
@@ -64,7 +72,7 @@ class ForceDistanceCurve():
 
 	def correct_raw_data(self) -> None:
 		"""
-		
+		Try to correct the raw data of the approach curve.
 		"""
 		try:
 			self.dataApproachCorrected, self.channelMetadata = correct_approach_curve(
@@ -77,7 +85,8 @@ class ForceDistanceCurve():
 
 	def create_line_representation_raw_data(self) -> None:
 		"""
-
+		Create a displayable line from the raw data of the force
+		distance curve.
 		"""
 		self.lineRepresentationRawData = plt_data.create_raw_line(
 			self.identifier
@@ -86,7 +95,8 @@ class ForceDistanceCurve():
 
 	def create_line_representation_corrected_data(self) -> None:
 		"""
-		
+		Create a displayable line from the corrected data of 
+		the force distance curve.
 		"""
 		self.lineRepresentationCorrectedData = plt_data.create_corrected_line(
 			self.identifier

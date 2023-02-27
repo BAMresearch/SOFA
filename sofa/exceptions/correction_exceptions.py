@@ -17,5 +17,5 @@ along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 class CorrectionError(exception):
 	pass
 
-class LinearFitIntersectionError(CorrectionError):
+class Error(CorrectionError):
 	pass
