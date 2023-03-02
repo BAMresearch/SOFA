@@ -17,16 +17,21 @@ along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 from typing import NamedTuple
 from numpy import ndarray
 
+#
 class ImportParameter(NamedTuple):
 	folderPathMeasurementData: str 
 	filePathImage: str 
 	filePathChannel: str 
 	showPoorCurves: bool
 
-class ImportedData(NamedTuple):
-	measurementData: MeasurementData
-	imageData: ImageData
-	channelData: ChannelData
+class ExportParameter(NamedTuple):
+	folderName: str
+	folderPath: str 
+	exportToTex: bool
+	exportToTxt: bool
+	exportToHdf5: bool
+	exportToExcel: bool
+	exportPlots: bool
 
 class MeasurementData(NamedTuple):
 	folderName: str
@@ -48,3 +53,22 @@ class ChannelData(NamedTuple):
 	name: str
 	size: Tuple[int]
 	channelData: np.ndarray
+
+#
+class ForceDistanceCurve(NamedTuple): 
+	piezo: ndarray
+	deflection: ndarray
+
+class ForceDistancePoint(NamedTuple):
+	index: int
+	piezo: float
+	deflection: float
+
+class CoefficientsFitApproachCurve(NamedTuple):
+	slope: float
+	intercept: float
+
+class ChannelMetadata(NamedTuple):
+	endOfZeroline: ForceDistancePoint
+	pointOfContact: ForceDistancePoint
+	coefficientsFitApproachCurve: CoefficientsFitApproachCurve

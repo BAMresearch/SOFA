@@ -23,7 +23,7 @@ import data_visualization.plot_data as plt_data
 
 class ForceDistanceCurve():
 	"""
-	
+	A single force distance curve.
 
 	Attributes
 	----------

@@ -56,11 +56,14 @@ class ForceVolume():
 
 		self.guiInterface: Dict
 
-	def import_data(self, importedData:nt.): -> None:
+	def import_data(self, importedData: Dict): -> None:
 		"""
+
 
 		Parameters
 		----------
+		importedData : dict
+
 		"""
 		self.identifier = importedData.filename
 		self.size = importedData.size
@@ -73,9 +76,14 @@ class ForceVolume():
 		importedApproachCurves: List[nt.ForceDistanceCurve]
 	) -> None
 		"""
+		Create a ForceDistanceCurve object for every imported
+		approach measurement curve.
 		
 		Parameters
 		----------
+		importedApproachCurves : List[nt.ForceDistanceCurve]
+			Contains every imported approach curve of the 
+			measurement.
 		"""
 		for index, approachCurve in enumerate(importedApproachCurves):
 			self.forceDistanceCurves.append(
@@ -95,7 +103,7 @@ class ForceVolume():
 
 	def calculate_channel_data(self) -> None: 
 		"""
-
+		
 		"""
 		for channelName, caluclate_channel in channels.items():
 			self.channels.append(

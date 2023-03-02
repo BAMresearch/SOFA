@@ -13,7 +13,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 """
-from collections import namedtuple
 import os
 
 import tkinter as tk
@@ -30,17 +29,27 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from gui.export_window import ExportWindow
 from gui.import_window import ImportWindow
 
-from data_processing.data_handler import DataHandler
-from data_processing.active_channels import channels as activeChannels
-from data_processing.import_data import restore_sofa_data
-from data_processing.export_data import export_to_sofa
+from fdc_data.force_volume import ForceVolume
+from fdc_data.active_channels import channels as activeChannels
 
-from toolbar.line_plot_toolbar import LinePlotToolbar
-from toolbar.heatmap_toolbar import HeatmapToolbar
+from data_visualization.toolbar.line_plot_toolbar import LinePlotToolbar
+from data_visualization.toolbar.heatmap_toolbar import HeatmapToolbar
 
 class MainWindow(ttk.Frame):
-	"""The main window of SOFA."""
+	"""
+	The main window of SOFA.
+
+	Attributes
+	----------
+	forceVolume : ForceVolume
+
+	sourceDirectory : str
+
+	channelNames : list[str]
+	"""
 	def __init__(self, root):
+		"""
+		"""
 		super().__init__(root, padding=20)
 
 		self.pack(fill=BOTH, expand=YES)
@@ -48,7 +57,7 @@ class MainWindow(ttk.Frame):
 		# Set tkinter dialog language to english.
 		self.tk.eval('::msgcat::mclocale en')
 		self.sourceDirectory = os.path.abspath(os.path.dirname(__file__))
-		self.dataHandler = DataHandler()
+		self.forceVolume = ForceVolume()
 
 		self.channelNames = [
 			self._camel_case_to_text(channelName)
@@ -56,33 +65,37 @@ class MainWindow(ttk.Frame):
 		]
 
 		self.colorPlot = "#e6f7f4"
-		'''
-		root.protocol(
-			"WM_DELETE_WINDOW", 
-			self._close_main_window
-		)
-		'''
 		
 		self._create_main_window()
 		self._set_plot_parameters_in_data_handler()
 
 	def _create_main_window(self) -> None:
-		"""Define all elements within the main window."""
+		"""
+		Define all elements within the main window.
+		"""
 		self._create_first_row()
 		self._create_second_row()
 
 	def _create_first_row(self) -> None: 
-		""""""
+		"""
+		Define all frames in the first row, consisting of
+		the data import and export, information about the 
+		imported data, the control of the linked plot and 
+		the control.
+		"""
 		frameFirstRow = ttk.Frame(self)
 		frameFirstRow.pack(fill=X, expand=YES, pady=(0, 20))
 
 		self._create_frame_files(frameFirstRow)
 		self._create_frame_active_data(frameFirstRow)
-		self._create_frame_interactive_plots(frameFirstRow)
+		self._create_frame_control_linked_plots(frameFirstRow)
 		self._create_frame_control(frameFirstRow)
 
 	def _create_second_row(self) -> None:
-		""""""
+		"""
+		Define all figures in the second row, consisting of 
+		the line plot, the heamtap and histogram. 
+		"""
 		frameSecondRow = ttk.Frame(self)
 		frameSecondRow.pack(fill=X, expand=YES)
 
@@ -90,8 +103,18 @@ class MainWindow(ttk.Frame):
 		self._create_heatmap_frame(frameSecondRow)
 		self._create_histogram_frame(frameSecondRow)
 
-	def _create_frame_files(self, frameParent) -> None: 
-		"""Define all elements within the files frame."""
+	def _create_frame_files(
+		self, 
+		frameParent: ttk.Frame
+	) -> None: 
+		"""
+		Define a button to import and export data.
+
+		Parameters
+		----------
+		frameParent : ttk.Frame
+			Corresponding row of the main window.
+		"""
 		frameFiles = ttk.Labelframe(frameParent, text="File", padding=15)
 		frameFiles.pack(side=LEFT, fill=BOTH, expand=YES, padx=(0, 15))
 
@@ -107,8 +130,19 @@ class MainWindow(ttk.Frame):
 		)
 		buttonExport.grid(row=1, column=0, padx=10, pady=10, sticky=W)
 
-	def _create_frame_active_data(self, frameParent) -> None: 
-		""""""
+	def _create_frame_active_data(
+		self, 
+		frameParent: ttk.Frame
+	) -> None: 
+		"""
+		Define labels to display general information about
+		the imported measurement data.
+
+		Parameters
+		----------
+		frameParent : ttk.Frame
+			Corresponding row of the main window.
+		"""
 		frameActiveData = ttk.Labelframe(frameParent, text="Imported Data", padding=15)
 		frameActiveData.pack(side=LEFT, fill=BOTH, expand=YES, padx=(0, 15))
 
@@ -152,8 +186,19 @@ class MainWindow(ttk.Frame):
 		)
 		valueActiveDataSize.grid(row=2, column=1, padx=10, sticky=W)
 
-	def _create_frame_interactive_plots(self, frameParent) -> None:
-		"""Define all elements within the interactive plots frame."""
+	def _create_frame_control_linked_plots(
+		self, 
+		frameParent: ttk.Frame
+	) -> None:
+		"""
+		Define checkboxes to toggle the connection between the 
+		different plots.
+		
+		Parameters
+		----------
+		frameParent : ttk.Frame
+			Corresponding row of the main window.
+		"""
 		frameInteractivePlots = ttk.Labelframe(frameParent, text="Interactive Plots", padding=15)
 		frameInteractivePlots.pack(side=LEFT, fill=BOTH, expand=YES, padx=(0, 15))
 
@@ -196,8 +241,19 @@ class MainWindow(ttk.Frame):
 		frameInteractivePlots.columnconfigure(1, weight=1)
 		frameInteractivePlots.columnconfigure(2, weight=1)
 
-	def _create_frame_control(self, frameParent) -> None:
-		"""Define all the elements within the control frame."""
+	def _create_frame_control(
+		self, 
+		frameParent: ttk.Frame
+	) -> None:
+		"""
+		Define a progressbar to provide user feedback 
+		about possible running processes.
+
+		Parameters
+		----------
+		frameParent : ttk.Frame
+			Corresponding row of the main window.
+		"""
 		frameControl = ttk.Labelframe(frameParent, text="Control", padding=15)
 		frameControl.pack(side=LEFT, fill=BOTH, expand=YES)
 
@@ -213,8 +269,18 @@ class MainWindow(ttk.Frame):
 		)
 		self.progressbar.grid(row=1, column=0, padx=10)
 		
-	def _create_line_plot_frame(self, frameParent) -> None:
-		"""Define all the elements within the line plot frame."""
+	def _create_line_plot_frame(
+		self, 
+		frameParent: ttk.Frame
+	) -> None:
+		"""
+		Define the figure for the line plot.
+
+		Parameters
+		----------
+		frameParent : ttk.Frame
+			Corresponding row of the main window.
+		"""
 		frameLinePlot = ttk.Labelframe(frameParent, text="Line Plot", padding=10)
 		frameLinePlot.pack(side=LEFT, fill=BOTH, expand=YES, padx=(0, 15))
 
@@ -226,13 +292,24 @@ class MainWindow(ttk.Frame):
 		frameToolbarLineplot = ttk.Frame(frameLinePlot)
 		toolbarLineplot = LinePlotToolbar(
 			self.holderFigureLineplot, frameToolbarLineplot, 
-			self.dataHandler
+			self.forceVolume
 		)
 		self.holderFigureLineplot.get_tk_widget().grid(row=1, column=0)
 		frameToolbarLineplot.grid(row=2, column=0)
 
-	def _create_heatmap_frame(self, frameParent) -> None:
-		"""Define all the elements within the heatmap frame."""
+	def _create_heatmap_frame(
+		self, 
+		frameParent: ttk.Frame
+	) -> None:
+		"""
+		Define the figure for the heatmap and a dropdown 
+		menu to select the displayed channel.
+
+		Parameters
+		----------
+		frameParent : ttk.Frame
+			Corresponding row of the main window.
+		"""
 		frameHeatmap= ttk.Labelframe(frameParent, text="Heatmap", padding=10)
 		frameHeatmap.pack(side=LEFT, fill=BOTH, expand=YES, padx=(0, 15))
 
@@ -253,13 +330,24 @@ class MainWindow(ttk.Frame):
 		frameToolbarHeatmap = ttk.Frame(frameHeatmap)
 		toolbarHeatmap = HeatmapToolbar(
 			self.holderFigureHeatmap, frameToolbarHeatmap, 
-			self.dataHandler
+			self.forceVolume
 		)
 		self.holderFigureHeatmap.get_tk_widget().grid(row=1, column=0)
 		frameToolbarHeatmap.grid(row=2, column=0)
 
-	def _create_histogram_frame(self, frameParent) -> None:
-		"""Define all the elements within the histogram frame."""
+	def _create_histogram_frame(self, frameParent: ttk.Frame) -> None:
+		"""
+		Define the figure for the histogram, a dropdown 
+		menu to select the displayed channel, an entry
+		to set the number of bins for the histogram
+		and some buttons to change the minimum and 
+		maximum value of the displayed channel.
+
+		Parameters
+		----------
+		frameParent : ttk.Frame
+			Corresponding row of the main window.
+		"""
 		frameHistogram = ttk.Labelframe(frameParent, text="Histogram", padding=10)
 		frameHistogram.pack(side=LEFT, fill=BOTH, expand=YES)
 
@@ -339,7 +427,9 @@ class MainWindow(ttk.Frame):
 		frameHistogram.columnconfigure(3, weight=1)
 
 	def _set_plot_parameters_in_data_handler(self) -> None:
-		"""Give the datahandler all relevant parameters to handle the plots."""
+		"""
+		Give the forceVolume all relevant parameters to handle the plots.
+		"""
 		plotParameters = {
 			"holderLinePlot": self.holderFigureLineplot,
 			"holderHeatmap": self.holderFigureHeatmap,
@@ -353,38 +443,44 @@ class MainWindow(ttk.Frame):
 			"numberOfBins": self.numberOfBins
 		}
 
-		self.dataHandler.set_plot_parameters(plotParameters)
+		self.forceVolume.set_plot_parameters(plotParameters)
 
 	def _create_import_window(self) -> None:
-		"""Open the window to import data."""
+		"""
+		Create a subwindow to import data.
+		"""
 		toplevelImport = ttk.Toplevel("Import Data")
 		ImportWindow(
 			toplevelImport,
-			self.dataHandler, 
-			self.set_filename
+			self.forceVolume, 
+			self.set_
 		)
 
-	def set_filename(self, filename) -> None:
-		"""Display the name of the current data files."""
-		self.frameDiagrams.configure(text=filename)
+	def set_(
+		self,
+		name: str,
+		size: Tuple[int],
+		location: str
+	) -> None:
+		"""
+		"""
+		self.stringVarActiveData.set(name)
+		self.stringVarActiveDataSize.set(str(size))
+		self.stringVarActiveDataLocation.set(location)
 
 	def _create_export_window(self) -> None:
-		"""Open the window to export data."""
+		"""Create a subwindow to export data."""
 		toplevelExport = ttk.Toplevel("Export Data")
 		ExportWindow(
 			toplevelExport,
-			self.dataHandler
+			self.forceVolume
 		)
-
-	def _create_info_window(self) -> None:
-		"""Open the info window."""
-		InfoWindow(self.versionNumber)
 
 	def _update_plots(self) -> None:
 		"""Update the inactive data points in every plot."""
 		# use decorator with args to start/end progressbar
 		self.start_progressbar()
-		self.dataHandler.update_plots()
+		self.forceVolume.update_plots()
 		self.stop_progressbar()
 
 	def _update_heatmap(self, newHeatmapChannel) -> None:
@@ -393,7 +489,7 @@ class MainWindow(ttk.Frame):
 		Parameters:
 			newHeatmapChannel(str): Name of the new channel.
 		"""
-		self.dataHandler.update_heatmap()
+		self.forceVolume.update_heatmap()
 
 	def _update_histogram(self, newHistogramChannel) -> None:
 		"""Update the displayed channel in the histogram.
@@ -401,7 +497,7 @@ class MainWindow(ttk.Frame):
 		Parameters:
 			newHeatmapChannel(str): Name of the new channel.
 		"""
-		self.dataHandler.update_histogram()
+		self.forceVolume.update_histogram()
 
 	def _restrict_histogram(self, direction) -> None:
 		"""Change the minimum or maximum border for the histogram values.
@@ -410,12 +506,12 @@ class MainWindow(ttk.Frame):
 			direction(str): .
 		"""
 		self.start_progressbar()
-		self.dataHandler.restrict_histogram(direction)
+		self.forceVolume.restrict_histogram(direction)
 
 		if self.interactiveHistogram.get():
-			self.dataHandler.update_plots()
+			self.forceVolume.update_plots()
 		else:
-			self.dataHandler.update_histogram()
+			self.forceVolume.update_histogram()
 
 		self.stop_progressbar()
 
@@ -461,7 +557,7 @@ class MainWindow(ttk.Frame):
 		
 		if saveSession:
 			export_to_sofa(
-				self.dataHandler, 
+				self.forceVolume, 
 				self.sourceDirectory,
 				".sofaSession",
 				hidden=True
@@ -491,8 +587,8 @@ class MainWindow(ttk.Frame):
 			)
 			backupData = restore_sofa_data(filePath)
 			self.set_filename_in_labeled_frame(backupData["generalData"]["filename"])
-			self.dataHandler.restore_session_data(backupData)
-			self.dataHandler.display_imported_data()
+			self.forceVolume.restore_session_data(backupData)
+			self.forceVolume.display_imported_data()
 		except FileNotFoundError:
 			messagebox.showerror(
 				"Error", 

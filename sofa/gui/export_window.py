@@ -14,9 +14,7 @@ You should have received a copy of the GNU General Public License
 along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from collections import namedtuple
 import os
-from typing import NamedTuple
 
 import tkinter as tk
 from tkinter import filedialog as fd
@@ -24,21 +22,36 @@ from tkinter import messagebox
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
+import data_processing.named_tuples as nt
 import data_processing.export_data as exp_data
 
 class ExportWindow(ttk.Frame):
-	"""A subwindow to handle the data export."""
-	def __init__(self, root, dataHandler):
+	"""
+	A subwindow to export data.
+
+	Attributes
+	----------
+	forceVolume : ForceVolume
+	"""
+	def __init__(
+		self, 
+		root, 
+		forceVolume
+	):
+		"""
+		"""
 		super().__init__(root)
 		
 		self.pack(fill=BOTH, expand=YES)
 
-		self.dataHandler = dataHandler
+		self.forceVolume = forceVolume
 
 		self._create_window()
 
 	def _create_window(self) -> None:
-		"""Define all elements within the export window."""
+		"""
+		Define all elements within the export window.
+		"""
 		self._create_frame_data_location()
 		self._create_frame_data_types()
 		self._create_export_button()
@@ -211,8 +224,10 @@ class ExportWindow(ttk.Frame):
 	def _export_data(self) -> messagebox:
 		"""Export the current state of the data with the selected options.
 
-		Returns:
-			userFeedback(messagebox): Informs the user whether the data could be saved or not.
+		Returns
+		-------
+		userFeedback : messagebox
+			Informs the user whether the data could be saved or not.
 		"""
 		# Check if a folder name is selected.
 		if not self.folderName.get():
@@ -233,7 +248,7 @@ class ExportWindow(ttk.Frame):
 		selectedExportParameters = self._create_selected_export_parameters()
 
 		exp_data.export_data(
-			self.dataHandler,
+			self.forceVolume,
 			selectedExportParameters,
 			self.progressbar,
 			self.progressbarCurrentLabel
@@ -243,27 +258,16 @@ class ExportWindow(ttk.Frame):
 
 		return messagebox.showinfo("Success", "Data is saved.")
 
-	def _create_selected_export_parameters(self) -> NamedTuple:
-		"""Summarize the selected export options for easier use.
-
-		Returns:
-			ExportOptions(namedtuple): Contains the selected export opotions.
+	def _create_selected_export_parameters(self) -> nt.ExportParameter:
 		"""
-		ExportOptions = namedtuple(
-			"ExportOptions",
-			[
-				"folderName",
-				"folderPath",
-				"exportToSofa",
-				"exportToTex",
-				"exportToTxt",
-				"exportToHdf5",
-				"exportToExcel",
-				"exportPlots",
-			]	
-		)
+		Summarize the selected export parameter.
 
-		return ExportOptions(
+		Returns
+		-------
+		ExportParameter : nt.ExportParameter
+			Contains the selected export opotions.
+		"""
+		return nt.ExportParameter(
 			folderName=self.folderName.get(),
 			folderPath=self.folderPath.get(),
 			exportToSofa=self.exportToSofa.get(),

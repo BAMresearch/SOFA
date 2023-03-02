@@ -14,9 +14,7 @@ You should have received a copy of the GNU General Public License
 along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from collections import namedtuple
 import os
-from typing import NamedTuple
 
 import tkinter as tk
 from tkinter import filedialog as fd
@@ -24,20 +22,46 @@ from tkinter import messagebox
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
-import data_processing.import_data as impd
-import data_processing.process_data as pd
-import data_processing.active_channels as ac
+import data_processing.named_tuples as nt
+import data_processing.import_data as imp_data
+
+def decorator_check_required_folder_path(function):
+	"""
+	Check if the required path for the measurement
+	folder is set.
+	"""
+	@functools.wraps(function)
+	def wrapper_check_required_folder_path(self):
+		if not os.path.isdir(self.filePathData.get()):
+			return messagebox.showerror(
+				"Error", 
+				"A data dictionary is required!", 
+				parent=self
+			)
+		else:
+			function(self)
+
+	return wrapper_check_required_folder_path
 
 class ImportWindow(ttk.Frame):
-	"""A subwindow to handle the data import."""
-	def __init__(self, root, dataHandler, set_filename):
+	"""
+	A subwindow to import data.
+
+	Attributes
+	----------
+	forceVolume : ForceVolume
+
+	"""
+	def __init__(self, root, forceVolume, set_filename):
+		"""
+		"""
 		super().__init__(root, padding=10)
 		
 		self.pack(fill=BOTH, expand=YES)
 
-		self.dataHandler = dataHandler
+		self.forceVolume = forceVolume
 		self.set_filename = set_filename
-		self.dataTypes = impd.importFunctions.keys()
+		self.dataTypes = imp_data.importFunctions.keys()
 
 		self._create_window()
 
@@ -146,7 +170,9 @@ class ImportWindow(ttk.Frame):
 		buttonBrowseChannel.pack(side=LEFT, padx=5)
 
 	def _create_import_button(self) -> None: 
-		"""Define the import button."""
+		"""
+		Define the import button.
+		"""
 		rowImportButton = ttk.Frame(self)
 		rowImportButton.pack(fill=X, expand=YES, pady=(20, 10))
 
@@ -158,7 +184,9 @@ class ImportWindow(ttk.Frame):
 		buttonImportData.pack(side=LEFT, padx=15)
 
 	def _create_progressbar(self) -> None:
-		"""Define the progressbar."""	
+		"""
+		Define the progressbar.
+		"""	
 		rowLabelProgressbar = ttk.Frame(self)
 		rowLabelProgressbar.pack(fill=X, expand=YES)
 
@@ -169,13 +197,16 @@ class ImportWindow(ttk.Frame):
 
 		self.progressbar = ttk.Progressbar(
 			self,
-			mode=DETERMINATE, 
+			mode=INDETERMINATE, 
             bootstyle=SUCCESS
 		)
 		self.progressbar.pack(fill=X, expand=YES, padx=15, pady=(5, 15))
 
 	def _browse_data(self) -> None:
-		"""Select the directory that contains the data."""
+		"""
+		Select the required folder that contains the 
+		measurement data.
+		"""
 		filePathData = fd.askdirectory(
 			title="Select directory",
 			parent=self
@@ -185,7 +216,9 @@ class ImportWindow(ttk.Frame):
 			self.filePathData.set(filePathData)
 
 	def _browse_image(self):
-		"""Select the image file."""
+		"""
+		Select an additional image file.
+		"""
 		filePathImage = fd.askopenfilename(
 			title="Select File",
 			parent=self
@@ -195,7 +228,9 @@ class ImportWindow(ttk.Frame):
 			self.filePathImage.set(filePathImage)
 
 	def _browse_channel(self):
-		"""Select the channel file."""
+		"""
+		Select an additional channel file.
+		"""
 		filePathChannel = fd.askopenfilename(
 			title="Select Channel",
 			parent=self
@@ -204,121 +239,89 @@ class ImportWindow(ttk.Frame):
 		if filePathChannel:
 			self.filePathChannel.set(filePathChannel)
 
+	@decorator_check_required_folder_path
 	def _import_data(self) -> messagebox:
-		"""Import and process the selected data files.
-
-		Retuns:
-			userFeedback(messagebox): Informs the user whether the data could be imported or not.
 		"""
-		# Check if required data is selected.
-		if not os.path.isdir(self.filePathData.get()):
-			self._reset_import_window()
-			return messagebox.showerror("Error", "A data dictionary is required!", parent=self)
+		Import, process and display the selected data files.
 
+		Returns
+		-------
+		userFeedback : messagebox
+			Informs the user whether the data could be imported or not.
+		"""
+		self._start_progressbar()
+
+		selected_import_function = imp_data.importFunctions[self.selectedDataType.get()][0]
 		selectedImportParameters = self._create_selected_import_parameters()
-		selected_import_function = impd.importFunctions[self.selectedDataType.get()][0]
 
-		# Try to import selected data.
+		self._update_progressbar_label("Importing data...")
 		try:
 			importedData = selected_import_function(
 				selectedImportParameters,
-				self.update_progressbar
 			)
-
-		except Exception as e:
-			self._reset_import_window()
-			print(str(e))
+		except ce.ImportError as e:
+			self._stop_progressbar()
 			return messagebox.showerror("Error", str(e), parent=self)
+		else:
+			self.forceVolume.import_data(importedData)
 
-		# Correct imported data.
-		correctedCurveData = pd.correct_approach_curves(
-			importedData["curveData"].approachCurves,
-			self.update_progressbar
-		)
+		self._update_progressbar_label("Correcting data...")
+		self.forceVolume.correct_data()
 
-		# Calculate channel data.
-		channelData = ac.calculate_channels(
-			correctedCurveData,
-			importedData["curveData"].m,
-			importedData["curveData"].n,
-			self.update_progressbar
-		)
+		self._update_progressbar_label("Calculating channel data...")
+		self.forceVolume.calculate_channel_data()
 
-		# Process imported data.
-		combinedData = pd.combine_data(
-			importedData,
-			correctedCurveData,
-			channelData,
-			self.update_progressbar
-		)
+		self._update_progressbar_label("Preparing to plot data...")
+		self.forceVolume.display_imported_data()
 
-		# Hand data to the data handler
-		self.dataHandler.set_imported_data(
-			combinedData
-		)
-		self.dataHandler.init_data()
-		self.dataHandler.init_mapped_indices()
+		# Set the name, size and location of the imported data in the main window.
+		self.set
 
-		# Set filename in main window.
-		self.set_filename(
-			combinedData["generalData"]["filename"]
-		)
-
-		# Display imported data
-		self.dataHandler.display_imported_data()
+		self._stop_progressbar()
 
 		# Close window
 		self.destroy()
 
-		return messagebox.showinfo("Success", "Data is imported.")
+		return messagebox.showinfo("Success", "Data was successfully imported.")
 
-	def _create_selected_import_parameters(self) -> NamedTuple:
-		"""Summarize the selected import parameters and options for easier use.
-
-		Returns:
-			ImportOptions(namedtuple): Contains the selected import parameters and opotions.
+	def _create_selected_import_parameters(self) -> nt.ImportParameter:
 		"""
-		ImportOptions = namedtuple(
-			"ImportOptions",
-			[
-				"filePathData",
-				"filePathImage",
-				"filePathChannel",
-				"showPoorCurves",
-			]	
-		)
+		Summarize the selected import parameters.
 
-		return ImportOptions(
+		Returns
+		-------
+		importParameter : nt.ImportParameter
+			Contains the selected import parameters and opotions.
+		"""
+		return nt.ImportParameter(
 			filePathData=self.filePathData.get(),
 			filePathImage=self.filePathImage.get(),
 			filePathChannel=self.filePathChannel.get(),
 			showPoorCurves=self.showPoorCurves.get()
 		)
 
-	def _reset_import_window(self) -> None:
-		"""Reset the user input."""
-		self.filePathData.set("")
-		self.filePathImage.set("")
-		self.filePathChannel.set("")
+	def _start_progressbar(self) -> None:
+		"""
 
-	def update_progressbar(
+		"""
+		self.progressbar.start()
+
+	def _stop_progressbar(self) -> None:
+		"""
+
+		"""
+		self.progressbar.stop()
+
+	def _update_progressbar_label(
 		self, 
-		mode="update", 
-		value=0, 
 		label=""
 	) -> None:
-		"""Reset or update the progressbar.
-
-		Parameters:
-			mode(str): Specifies whether to reset or update the progressbar.
-			value(float): The current progressvalue for each step.
-			label(str): Describes the current action.
 		"""
-		if mode == "reset":
-			self.progressbar["value"] = 0
-			self.progressbarCurrentLabel.set(label)
+		.
 
-		elif mode == "update":
-			self.progressbar["value"] += value
-
-		self.update_idletasks()
+		Parameters
+		----------
+		label : str
+			Describes the current action.
+		"""
+		self.progressbarCurrentLabel.set(label)

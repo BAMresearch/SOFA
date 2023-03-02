@@ -13,344 +13,495 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 """
-from collections import namedtuple
-from typing import List, Tuple, NamedTuple, Dict, Union, Callable
+from typing import List, Tuple, Dict
 import glob
 import os
 import re
+import functools
 
 import numpy as np
 
 from igor.binarywave import load as loadibw
 
-def import_bam_ibw_data(
-	importParameters: NamedTuple,
-	update_progressbar: Callable
-) -> Dict:
-	"""Try to import data files in bam ibw file format.
+def decorator_check_file_size_image(function):
+	"""
+	Check that the size of the measurement data 
+	matches that of the image.
+	"""
+	@functools.wraps(function)
+	def wrapper_check_file_size_image(*args, **kwargs):
+		imagedData = function(*args, **kwargs)
+		measurementDataSize = args[1]
+		if measurementDataSize != imagedData.size:
+			raise WrongImageSizeError(
+				"The image size does not match the " 
+				"size of the measurement data."
+			)
+		else:
+			return imagedData
 
-	Parameters:
-		importParameters(namedtuple): Contains the selected import parameters and options.
-		update_progressbar(function): Function to show the import progress.
+	return wrapper_check_file_size_image
 
-	Returns: 
-		importedData(dict): Contains the imoported curve data and 
-		                    if selected additional image or channel data.
+def decorator_check_file_size_channel(function):
+	"""
+	Check that the size of the measurement data 
+	matches that of the channel.
+	"""
+	@functools.wraps(function)
+	def wrapper_check_file_size_image(*args, **kwargs):
+		channelData = function(*args, **kwargs)
+		measurementDataSize = args[1]
+		if measurementDataSize != channelData.size:
+			raise WrongChannelSizeError(
+				"The channel size does not match the "
+				"size of the measurement data."
+			)
+		else:
+			return channelData
 
-	Raises:
-		Exception: Can not read the curve data files.
-		Exception: Can not read the image file.
-		Exception: Image data does not fit the curve data.
-		Exception: Can not read the channel file.
-		Exception: Channel data does not fit the curve data.
+	return wrapper_check_file_size_channel
+
+def import_ibw_data(
+	importParameter: nt.ImportParameter,
+) -> nt.ImportedData:
+	"""
+	Import data in the .ibw file format.
+
+	Parameters
+	----------
+	importParameter : nt.ImportParameter
+		Contains the path to the measurement data and 
+		if selected the paths to additional image or
+		channel files. 
+
+	Returns
+	-------
+	importedData : dict
+		Combined data of all the imported data files.
 	"""
 	importedData = {}
 
-	# Try to import measurement data.
-	try:
-		CurveData = load_bam_ibw_data_files(
-			importParameters,
-			update_progressbar
+	# Import required data.
+	importedData["measurementData"] = import_ibw_measurement(
+		importParameter.folderPathMeasurementData,
+	)
+
+	# Import optional data.
+	if importParameter.filePathImage:
+		importedData["imageData"] = import_ibw_image(
+			importParameter.filePathImage,
+			measurementData.size
 		)
-	except Exception as e:
-		raise e
 
-	importedData["curveData"] = CurveData
-
-	# Try to import image data if selected.
-	if importParameters.filePathImage:
-		try:
-			ImageData = load_bam_ibw_image_file(
-				importParameters,
-				update_progressbar
-			)
-		except Exception as e:
-			raise e
-
-		# Test whether the image fits the data.
-		if CurveData.m != ImageData.m or CurveData.n != ImageData.n:
-			update_progressbar(
-				mode="reset",
-				value=0,
-				label=""
-			)
-			raise Exception("Image does not fit the data!")
-
-		importedData["imageData"] = ImageData
-
-	# Try to import channel data if selected.
-	if importParameters.filePathChannel:
-		try:
-			ChannelData = load_bam_ibw_channel_data(
-				importParameters,
-				update_progressbar
-			)
-		except Exception as e:
-			raise e
-
-		# Test whether the channel fits the data.
-		if CurveData.m != ChannelData.m or CurveData.n != ChannelData.n:
-			update_progressbar(
-				mode="reset",
-				value=0,
-				label=""
-			)
-			raise Exception("Channel does not fit the data!")
-
-		importedData["channelData"] = ChannelData
+	if importParameter.filePathChannel:
+		importedData["channelData"] = import_channel(
+			importParameter.filePathChannel,
+			measurementData.size
+		)
 
 	return importedData
 
-def load_bam_ibw_data_files(
-	importParameters: NamedTuple,
-	update_progressbar: Callable
-) -> NamedTuple:
-	"""Try to import the .
-
-	Parameters:
-		importParameters(namedtuple): Contains the selected import parameters and options.
-		update_progressbar(function): Function to show the import progress.
-
-	Returns: 
-		CurveData(namedTuple): Contains the .
+def import_ibw_measurement(
+	folderPathMeasurementData: str
+) -> MeasurementData:
 	"""
-	update_progressbar(
-		mode="reset",
-		value=0,
-		label="Importing wave data"
+	Import measurement data in the .ibw file format.
+
+	Parameters
+	----------
+	folderPathMeasurementData : str
+		Path to the data folder.
+
+	Returns
+	-------
+	measurementData : MeasurementData
+		Cotains the name, size, approach and retract curves
+		of the measurement.
+	"""
+	folderName = get_folder_name(
+		folderPathMeasurementData
+	)
+	size = get_data_size(
+		folderPathMeasurementData
+	)
+	approachCurves, retractCurves = import_ibw_curves(
+		folderPathMeasurementData
 	)
 
-	CurveData = namedtuple(
-		"CurveData",
-		[
-			"filename",
-			"approachCurves",
-			"retractCurves",
-			"m",
-			"n"
-		]
+	return MeasurementData(
+		folderName,
+		size,
+		approachCurves,
+		retractCurves
 	)
 
-	m, n = get_data_dimensions(
-		importParameters.filePathData
+def get_folder_name(folderPathMeasurementData: str) -> str:
+	"""
+	Get the name of a folder from it's path.
+
+	Parameters
+	----------
+	folderPathMeasurementData : str
+		Path to the data folder.
+
+	Returns
+	-------
+	folderName : str
+		Basename of the folder path.
+	"""
+	return os.path.basename(folderPathMeasurementData)
+
+def get_data_size(folderPathMeasurementData: str) -> Tuple[int, int]:
+	"""
+	Get the size of the measurement grid.
+
+	Parameters
+	----------
+	folderPathMeasurementData : str
+		Path to the data folder.
+
+	Returns
+	-------
+	size : tuple
+		The number of data points as the width (fast scan size) 
+		and height (slow scan size) of the measurement grid.
+	"""
+	numberOfLines = len(
+		os.listdir(folderPathMeasurementData)
 	)
-	filename = get_filename(
-		importParameters.filePathData
+	folderPathFirstLine = os.path.join(
+		folderPathMeasurementData, 
+		os.listdir(folderPathMeasurementData)[0]
 	)
-	
-	dataFiles = sorted(glob.glob(os.path.join(importParameters.filePathData, "**/*.ibw")))
-	
-	progressValue = 100 / (len(dataFiles) / 2)
+	numberOfPoints = len(
+		os.listdir(folderPathFirstLine)
+	) / 2
+
+	return numberOfLines, numberOfPoints
+
+def import_ibw_curves(
+	folderPathMeasurementData: str
+) -> Tuple[List[nt.ForceDistanceCurve]]:
+	"""
+	Import all measurement data files from a given folder.
+
+	Parameters
+	----------
+	folderPathMeasurementData : str
+		Path to the data folder.
+
+	Returns
+	-------
+	approachCurves : list[nt.ForceDistanceCurve]
+		The approach curve of every imported measurement
+		curve.
+	retractCurves : list[nt.ForceDistanceCurve]
+		The retract curve of every imported measurement
+		curve.
+	"""
+	dataFilePathsPiezo = get_data_file_paths_in_folder(
+		folderPathMeasurementData,
+		"**/*ZSnsr.ibw"
+	)
+	dataFilePathsDeflection = get_data_file_paths_in_folder(
+		folderPathMeasurementData,
+		"**/*Defl.ibw"
+	)
 
 	approachCurves = []
 	retractCurves = []
 
-	for i in range(0, len(dataFiles), 2):
-		# Load ibw data and remove nan values.
-		curveXValues = np.asarray(loadibw(dataFiles[i+1])["wave"]["wData"])
-		curveYValues = np.asarray(loadibw(dataFiles[i])["wave"]["wData"])
-
-		# Remove nan values.
-		curveValidXValues = curveXValues[~np.isnan(curveXValues)]
-		curveValidYValues = curveYValues[~np.isnan(curveYValues)]
-
-		approachCurve, retractCurve = split_curve(
-			curveValidXValues, curveValidYValues
+	for dataFilePathPiezo, dataFilePathDeflection in zip(dataFilePathsPiezo, dataFilePathsDeflection):
+		approachCurve, retractCurve = import_ibw_curve(
+			dataFilePathPiezo,
+			dataFilePathDeflection
 		)
 		
 		approachCurves.append(approachCurve)
 		retractCurves.append(retractCurve)
-		
-		update_progressbar(
-			mode="update",
-			value=progressValue
+
+	return approachCurves, retractCurves
+
+def get_data_file_paths_in_folder(
+	folderPath: str,
+	fileType: str
+) -> List[str]:
+	"""
+	Get the file paths of all files in a given directory with the 
+	given file type and sort them alphabetically.
+
+	Parameters
+	----------
+	folderPath : str
+		Path to the data folder.
+	fileType : str
+		Type and extension 
+
+	Returns
+	-------
+	dataFilePaths : list[str]
+		Sorted file paths of all data files in the given folder
+		that matched the file type.
+	"""
+	return sorted(
+		glob.glob(
+			os.path.join(folderPath, fileType)
 		)
-		
-	return CurveData(
-		filename=filename,
-		approachCurves=approachCurves,
-		retractCurves=retractCurves,
-		m=m, 
-		n=n
 	)
 
-def get_filename(filePathData: str) -> str:
+def import_ibw_curve(
+	dataFilePathPiezo: str,
+	dataFilePathDeflection: str
+) -> Tuple[nt.ForceDistanceCurve]:
 	"""
+	Import a single measurement curve, remove invalid values
+	and split it into an approach and retract part.
 
-	Parameters:
-		filePathData(str): Filepath to the data dictionary.
+	Parameters
+	----------
+	dataFilePathPiezo : str
+		Path to the piezo data file.
+	dataFilePathDeflection : str
+		Path to the deflection data file.
 
-	Returns:
-		filename(str): Name .
+	Returns
+	-------
+	approachCurve : nt.ForceDistanceCurve
+		Approach curve of the measurement curve with
+		piezo (x) and deflection (y) values.
+	retractCurve : nt.ForceDistanceCurve
+		Retract curve of the measurement curve with
+		piezo (x) and deflection (y) values.
 	"""
-	return os.path.basename(filePathData)
-
-def get_data_dimensions(filePathData: str) -> Tuple[int, int]:
-	"""
-
-	Parameters:
-		filePathData(str):
-
-	Returns:
-		m(int): .
-		n(int): .
-	"""
-	m = len(
-		os.listdir(filePathData)
+	piezo = load_ibw_measurement_curve_file(
+		dataFilePathPiezo
 	)
-	n = len(
-		os.listdir(
-			os.path.join(
-				filePathData, 
-				os.listdir(filePathData)[0]
-			)
-		)
-	) / 2
-	return m, n
+	deflection = load_ibw_measurement_curve_file(
+		dataFilePathDeflection
+	)
 
-def split_curve(
-	xValues: np.ndarray, 
-	yValues: np.ndarray
-) -> Tuple[np.ndarray, np.ndarray]:
-	"""Split measurement curve into an approach and retract part.
+	validPiezo = remove_invalid_values(piezo)
+	validDeflection = remove_invalid_values(deflection)
 
-	Parameters:
-		xValues(np.ndarray): X values of the current curve.
-		yValues(np.ndarray): Y values of the current curve.
-
-	Returns:
-		approachCurve(list): . 
-		retractCurve(list): .
-	"""
-	# 
-	splittingPoint = np.argmax(xValues)
-	approachXValues = xValues[:splittingPoint]
-	approachYValues = yValues[:splittingPoint]
-	# 
-	retractXValues = np.flip(xValues[splittingPoint :], 0)
-	retractYValues = np.flip(yValues[splittingPoint :], 0)
-
-	approachCurve = [approachXValues, approachYValues]
-	retractCurve = [retractXValues, retractYValues]
+	approachCurve, retractCurve = split_curve(
+		validPiezo, 
+		validDeflection
+	)
 
 	return approachCurve, retractCurve
 
-def load_bam_ibw_image_file(
-	importParameters: NamedTuple,
-	update_progressbar: Callable
-) -> NamedTuple:
-	"""Try to import an optional image file.
-	
-	Parameters:
-		importParameters(namedtuple): Contains the selected import parameters and options.
-		update_progressbar(function): Function to show the import progress.
-
-	Returns:
-		ImageData(namedtuple): Contains the image data.
-
-	Raises:
-		Exception: Can not read the image file.
+def load_ibw_measurement_curve_file(
+	filePathCurveData: str
+) -> np.ndarray:
 	"""
-	ImageData = namedtuple(
-		"ImageData",
-		[
-			"filename",
-			"m",
-			"n",
-			"fss",
-			"sss",
-			"xOffset",
-			"yOffset",
-			"springConstant",
-			"height",
-			"adhesion"
-		]
-	)
 
+	
+	Parameters
+	----------
+	filePathCurveData : str
+		Path to the data file.
+
+	Returns
+	-------
+	curveData : np.ndarray
+		
+
+	Raises
+	------
+	ce.UnableToReadMeasurementFileError : ce.ImportError
+		
+	"""
 	try:
-		imageData = loadibw(importParameters.filePathImage)
-		imageDataNote = re.split(r'[\r:]', imageData['wave']['note'].decode("utf-8", errors="replace"))
-		imageChannelData = np.flip(np.rot90(np.asarray(imageData["wave"]["wData"]), 3), 1)
+		curveData = loadibw(filePathCurveData)["wave"]["wData"]
+	except ValueError as e: 
+		raise ce.UnableToReadMeasurementFileError(
+			"Unable to read measurement file, expected "
+			"'wave|wData' key does not exist. For further "
+			"information see the docs or "
+			"data_processing/import_data.py."
+		) from e
+	else:
+		return np.asarray(curveData)
 
-		return ImageData(
-			filename=importParameters.filePathImage.rsplit("/",1)[1].split(".", 1)[0],
-			m=imageData['wave']['wave_header']['nDim'][1],
-			n=imageData['wave']['wave_header']['nDim'][0],
-			fss=imageDataNote[imageDataNote.index("FastScanSize")+1],
-			sss=imageDataNote[imageDataNote.index("SlowScanSize")+1],
-			xOffset=imageDataNote[imageDataNote.index("XOffset")+1],
-			yOffset=imageDataNote[imageDataNote.index("YOffset")+1],
-			springConstant=imageDataNote[imageDataNote.index("SpringConstant")+1],
-			height=imageChannelData[:, :, 0],
-			adhesion=imageChannelData[:, :, 1]
-		)
-	except ValueError:
-		raise Exception("Cant read image data!")
-
-def load_bam_ibw_channel_data(
-	importParameters: NamedTuple,
-	update_progressbar: Callable
-) -> NamedTuple:
-	"""Try to import an addtional channel file.
-	
-	Parameters:
-		importParameters(namedtuple): Contains the selected import parameters and options.
-		update_progressbar(function): Function to show the import progress.
-
-	Returns:
-		ChannelData(namedtuple): Contains the channel data.
-
-	Raises:
-		Exception: Can not read the channel file.
+def remove_invalid_values(
+	curveData: np.ndarray
+) -> np.ndarray:
 	"""
-	ChannelData = namedtuple(
-		"ChannelData",
-		[
-			"data",
-			"m",
-			"n"
-		]
+
+
+	Parameters
+	----------
+	curveData : np.ndarry
+		
+
+	Returns
+	-------
+	validCurveData : np.ndarry
+		
+	"""
+	return curveData[~np.isnan(curveData)]
+
+def split_curve(
+	piezo: np.ndarray, 
+	deflection: np.ndarray
+) -> Tuple[ForceDistanceCurve]:
+	"""
+	Split a measurement curve into it's approach and retract part.
+
+	Parameters
+	----------
+	piezo : np.ndarray
+		X values of the measurement curve.
+	deflection : np.ndarray
+		Y values of the measuremnet curve.
+
+	Returns
+	-------
+	approachCurve : ForceDistanceCurve
+		
+	retractCurve : ForceDistanceCurve
+
+	"""
+	indexMaximumPiezo = np.argmax(piezo)
+	
+	approachPiezo = piezo[:indexMaximumPiezo]
+	approachDeflection = deflection[:indexMaximumPiezo]
+	
+	retractPiezo = np.flip(piezo[indexMaximumPiezo :], 0)
+	retractDeflection = np.flip(deflection[indexMaximumPiezo :], 0)
+
+	approachCurve = nt.ForceDistanceCurve(
+		approachPiezo, 
+		approachDeflection
+	)
+	retractCurve = nt.ForceDistanceCurve(
+		retractPiezo, 
+		retractDeflection
 	)
 
+	return approachCurve, retractCurve
 
-def import_sofa_data(
-	importParameters: NamedTuple,
-	update_progressbar: Callable
+@decorator_check_file_size_image
+def import_ibw_image(
+	filePathImage: str,
+	measurementDataSize: Tuple[int]
+) -> ImageData:
+	"""
+	Import an optional image file in the .ibw file format.
+	
+	Parameters
+	----------
+	filePathImage : str
+		.
+	measurementDataSize : tuple
+		.
+
+	Returns
+	-------
+	ImageData : ImageData
+		
+	"""
+	imageData = loadibw(importParameters.filePathImage)
+
+	imageSize = get_image_size(imageData)
+	imageDataNote = get_image_data_note(imageData)
+	imageChannelData = get_image_channel_data(imageData)
+
+	return nt.ImageData(
+		size=imageSize,
+		fss=imageDataNote[imageDataNote.index("FastScanSize")+1],
+		sss=imageDataNote[imageDataNote.index("SlowScanSize")+1],
+		xOffset=imageDataNote[imageDataNote.index("XOffset")+1],
+		yOffset=imageDataNote[imageDataNote.index("YOffset")+1],
+		springConstant=imageDataNote[imageDataNote.index("SpringConstant")+1],
+		channelHeight=imageChannelData[:, :, 0],
+		channelAdhesion=imageChannelData[:, :, 1]
+	)
+
+def get_image_size(
+	imageData
+) -> Tuple[int]:
+	"""
+	"""
+	try:
+		imageSize = (
+			imageData['wave']['wave_header']['nDim'][1],
+			imageData['wave']['wave_header']['nDim'][0]
+		)
+	except ValueError as e:
+		raise UnableToReadImageFileError(
+			"Can't read image data size. Unable to find " 
+			"'wave|wave_header' key in the image file. "
+			"For further information see the docs or "
+			"data_processing/import_data.py."
+		) from e
+	else:
+		return imageSize
+
+def get_image_data_note(
+	imageData
 ) -> None:
-	"""Try to import selected data files in sofa file format.
+	"""
+	"""
+	try:
+		imageDataNote = re.split(
+			r'[\r:]', imageData['wave']['note'].decode("utf-8", errors="replace")
+		)
+	except ValueError as e:
+		raise UnableToReadImageFileError(
+			"Can't read image data note. Unable to find " 
+			"'wave|note' key in the image file. "
+			"For further information see the docs or "
+			"data_processing/import_data.py."
+		) from e
+	else:
+		return imageDataNote
 
-	Parameters:
-		importParameters(namedtuple): Contains the selected import parameters and options.
-		update_progressbar(function): Function to show the import progress.
+def get_image_channel_data(
+	imageData
+) -> None:
+	"""
+	"""
+	try:
+		imageChannelData = np.flip(
+			np.rot90(
+				np.asarray(imageData["wave"]["wData"]), 
+				3
+			), 
+			1
+		)
+	except ValueError as e:
+		raise UnableToReadImageFileError(
+			"Can't read image channel data. Unable to find " 
+			"'wave|wData' key in the image file. "
+			"For further information see the docs or "
+			"data_processing/import_data.py."
+		) from e
+	else:
+		return imageChannelData
+
+@decorator_check_file_size_channel
+def import_ibw_channel(
+	filePathChannel: str,
+	measurementDataSize: Tuple[int]
+) -> nt.ChannelData: 
+	"""
+
+	Parameters
+	----------
+	filePathChannel : str
+
+	measurementDataSize : tuple[int]
+
+
+	Returns
+	-------
+	channelData : nt.ChannelData
 	"""
 	pass
-
-def restore_sofa_data(
-	filePath: str
-) -> Dict:
-	"""Restore the state of the last SOFA session.
-	
-	Parameters:
-		filePath(str): Path to the backup file.
-
-	Returns:
-		backupData(dict): .
-
-	Raises:
-		FileNotFoundError: Can not find a backup file.
-	"""
-	try:
-		with open(filePath, 'r+') as dataFile:
-			backupData = dataFile.read()
-
-	except FileNotFoundError:
-		raise FileNotFoundError
-
-	return json.loads(backupData)
 
 
 # Defines all available import options.
 importFunctions = {
 	"BAM_IBW": (import_bam_ibw_data, "*.ibw"),
-	"SOFA": (import_sofa_data, "*.json")
 }

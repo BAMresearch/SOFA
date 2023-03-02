@@ -31,10 +31,6 @@ class AverageForceDistanceCurve():
 		self.standardDeviationContact: np.ndarray
 		self.lineRepresentation: matplotlib.lines.Line2D
 
-	def calculate_(self) -> None:
-		""""""
-		pass
-
 	def calculate_average(self) -> None:
 		""""""
 		self.averageDataApproach = 

@@ -14,23 +14,31 @@ You should have received a copy of the GNU General Public License
 along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from typing import NamedTuple
-from numpy import ndarray
+#
+class ImportError(exception):
+	pass
 
-class ForceDistanceCurve(NamedTuple): 
-	piezo: ndarray
-	deflection: ndarray
+class UnableToReadMeasurementFileError(ImportError):
+	pass
 
-class ForceDistancePoint(NamedTuple):
-	index: int
-	piezo: float
-	deflection: float
+class UnableToReadImageFileError(ImportError):
+	pass
 
-class CoefficientsFitApproachCurve(NamedTuple):
-	slope: float
-	intercept: float
+class UnableToReadChannelFileError(ImportError):
+	pass
 
-class ChannelMetadata(NamedTuple):
-	endOfZeroline: ForceDistancePoint
-	pointOfContact: ForceDistancePoint
-	coefficientsFitApproachCurve: CoefficientsFitApproachCurve
+class WrongImageSizeError(ImportError):
+	pass
+
+class WrongChannelSizeError(ImportError):
+	pass
+
+#
+class CorrectionError(exception):
+	pass
+
+class UnableToLocateEndOfZerolineError(CorrectionError):
+	pass
+
+class UnableToLocateZeroCrossingAfterJtcError(CorrectionError):
+	pass
