@@ -23,6 +23,21 @@ import numpy as np
 
 from igor.binarywave import load as loadibw
 
+def decorator_check_for_file_path(function):
+	"""
+	Check if an optional image or channel was
+	selected.
+	"""
+	@functools.wraps(function)
+	def wrapper_check_for_file_path(*args, **kwargs):
+		filePath = args[o]
+		if filePath:
+			return function(*args, **kwargs)
+		else:
+			return None
+
+	return wrapper_check_for_file_path
+
 def decorator_check_file_size_image(function):
 	"""
 	Check that the size of the measurement data 
@@ -101,6 +116,7 @@ def import_ibw_measurement(
 	folderPathMeasurementData: str
 ) -> MeasurementData:
 	"""
+	
 	"""
 	folderName = get_folder_name(
 		folderPathMeasurementData
@@ -121,7 +137,7 @@ def import_ibw_measurement(
 
 def get_folder_name(folderPathMeasurementData: str) -> str:
 	"""
-	
+	Get the name of a folder from it's path.
 
 	Parameters
 	----------
@@ -168,24 +184,22 @@ def import_ibw_curves(
 ) -> Tuple[List[ForceDistanceCurve]]:
 	"""
 	"""
-	ibwDataFiles = get_data_file_paths_in_folder(
+	dataFilePathsPiezo = get_data_file_paths_in_folder(
 		folderPathMeasurementData,
-		"**/*.ibw"
+		"**/*ZSnsr.ibw"
+	)
+	dataFilePathsDeflection = get_data_file_paths_in_folder(
+		folderPathMeasurementData,
+		"**/*Defl.ibw"
 	)
 
 	approachCurves = []
 	retractCurves = []
 
-	for i in range(0, len(dataFiles), 2):
-		piezo = load_ibw_curve_data(dataFiles[i+1])
-		deflection = load_ibw_curve_data(dataFiles[i])
-
-		piezo = remove_invalid_values(piezo)
-		deflection = remove_invalid_values(deflection)
-
-		approachCurve, retractCurve = split_curve(
-			piezo, 
-			deflection
+	for dataFilePathPiezo, dataFilePathDeflection in zip(dataFilePathsPiezo, dataFilePathsDeflection):
+		approachCurve, retractCurve = import_ibw_curve(
+			dataFilePathPiezo,
+			dataFilePathDeflection
 		)
 		
 		approachCurves.append(approachCurve)
@@ -205,7 +219,26 @@ def get_data_file_paths_in_folder(
 		)
 	)
 
-def load_ibw_curve_data(
+def import_ibw_curve(
+	dataFilePathPiezo: str,
+	dataFilePathDeflection: str
+) -> Tuple[ForceDistanceCurve]:
+	"""
+	"""
+	piezo = load_ibw_measurement_file(dataFiles[i+1])
+	deflection = load_ibw_measurement_file(dataFiles[i])
+
+	piezo = remove_invalid_values(piezo)
+	deflection = remove_invalid_values(deflection)
+
+	approachCurve, retractCurve = split_curve(
+		piezo, 
+		deflection
+	)
+
+	return approachCurve, retractCurve
+
+def load_ibw_measurement_file(
 	filePathCurveData: str
 ) -> np.ndarray:
 	"""
@@ -228,7 +261,7 @@ def remove_invalid_values(
 def split_curve(
 	piezo: np.ndarray, 
 	deflection: np.ndarray
-) -> Tuple[ForceDistanceCurve, ForceDistanceCurve]:
+) -> Tuple[ForceDistanceCurve]:
 	"""
 	Split measurement curve into an approach and retract part.
 
