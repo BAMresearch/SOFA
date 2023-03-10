@@ -21,7 +21,6 @@ def calculate_channels(
 	correctedCurveData: NamedTuple, 
 	m: int, 
 	n: int, 
-	update_progressbar: Callable
 ) -> Dict:
 	"""Calculate every channel defined in the channels dictionary.
 
@@ -29,17 +28,10 @@ def calculate_channels(
 		correctedCurveData(namedtuple): Data created while correcting the curves.
 		m(int): The number of rows.
 		n(int): The number of columns.
-		update_progressbar(callable): Function to show the calculation progress.
 
 	Returns:
 		channelData(dict): Contains the data of every calculated channel.
 	"""
-	update_progressbar(
-		mode="reset",
-		value=0,
-		label="Calculating channel data"
-	)
-	progressValue = 100 / len(channels)
 
 	channelData = {}
 
@@ -49,12 +41,7 @@ def calculate_channels(
 		)
 		# Reshape the channel data to a 2 dimensional numpy array.
 		channelData[channelName] = np.asarray(currentChannelData).reshape((int(m), int(n))).astype(float)
-
-		update_progressbar(
-			mode="update",
-			value=progressValue
-		)
-
+		
 	return channelData
 
 def calculate_topography(correctedCurveData) -> List:

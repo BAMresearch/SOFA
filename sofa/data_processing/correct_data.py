@@ -19,8 +19,8 @@ import numpy as np
 from scipy.stats import linregress
 from scipy.ndimage import gaussian_filter1d
 
-import exceptions.custom_exceptions as ce
-import named_tuples.named_tuples_correct_data as nt_cd
+import data_processing.custom_exceptions as ce
+import data_processing.named_tuples as nt
 
 def correct_approach_curve(
 	approachCurve: nt.ForceDistanceCurve,
@@ -64,7 +64,7 @@ def correct_approach_curve(
 
 def correct_deflection_values(
 	approachCurve: nt.ForceDistanceCurve,
-) -> Tuple[np.ndarray, nt.ForceDistancePoint, nt.coefficientsFitApproachCurve]:
+) -> Tuple[np.ndarray, nt.ForceDistancePoint, nt.CoefficientsFitApproachCurve]:
 	"""
 	Correct the deflection values of an approach curve by removing the 
 	virtual deflection.
@@ -141,7 +141,7 @@ def calculate_end_of_zeroline(
 
 def calculate_linear_fit_to_approach_curve(
 	approachCurve: nt.ForceDistanceCurve
-) -> Tuple[nt.ForceDistanceCurve, nt.coefficientsFitApproachCurve]:
+) -> Tuple[nt.ForceDistanceCurve, nt.CoefficientsFitApproachCurve]:
 	"""
 	Calculate linear regression curve to a raw approach curve.
 
@@ -155,7 +155,7 @@ def calculate_linear_fit_to_approach_curve(
 	fitApproachCurve : nt.ForceDistanceCurve
 		Linear regression curve with the same piezo (x) values and
 		new calculated deflection (y) values.
-	coefficientsFitApproachCurve : nt.coefficientsFitApproachCurve
+	coefficientsFitApproachCurve : nt.CoefficientsFitApproachCurve
 		Slope (raw stiffness) and intercept (raw offset) of the fitted
 		line.
 	"""
@@ -187,7 +187,7 @@ def calculate_smoothed_derivation(
 
 	Parameters
 	----------
-	approachCurves : namedTuple
+	approachCurve : nt.ForceDistanceCurve
 		Raw approach curve with piezo (x) and deflection (y) values.
 
 	Returns
@@ -209,7 +209,7 @@ def derivate_curve(
 	
 	Parameters
 	----------
-	approachCurves : namedTuple
+	approachCurve : nt.ForceDistanceCurve
 		Raw approach curve with piezo (x) and deflection (y) values.
 
 	Returns
@@ -249,7 +249,7 @@ def smooth_derivation(
 def calculate_deflection_borders(
 	approachCurve: nt.ForceDistanceCurve,
 	fitApproachCurve: nt.ForceDistanceCurve
-) -> Tuple[int, int, nt.coefficientsFitApproachCurve]:
+) -> Tuple[int, int, nt.CoefficientsFitApproachCurve]:
 	"""
 	
 	
@@ -363,7 +363,7 @@ def locate_end_of_zeroline(
 
 	Parameters
 	----------
-	approachCurves : namedTuple
+	approachCurve : nt.ForceDistanceCurve
 		Raw approach curve with piezo (x) and deflection (y) values.
 
 	Returns
@@ -379,7 +379,7 @@ def locate_end_of_zeroline(
 	try:
 		indexEndOfZeroline = endOfZeroline[-1] + indexLeftBorder
 	except IndexError as e:
-		raise ce. from e
+		raise ce.UnableToLocateEndOfZerolineError from e
 	else:
 		return nt.ForceDistancePoint(
 			index=indexEndOfZeroline,
@@ -395,7 +395,7 @@ def calculate_linear_fit_to_zeroline(
 
 	Parameters
 	----------
-	approachCurves : namedTuple
+	approachCurve : nt.ForceDistanceCurve
 		Raw approach curve with piezo (x) and deflection (y) values.
 
 	Returns
@@ -430,7 +430,7 @@ def shif_deflection_values(
 
 	Parameters
 	----------
-	approachCurves : namedTuple
+	approachCurve : nt.ForceDistanceCurve
 		Raw approach curve with piezo (x) and deflection (y) values.
 	endOfZeroline : nt.ForceDistancePoint
 		

@@ -13,9 +13,12 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 """
+from typing import List
 
 import numpy as np
 import matplotlib as mpl
+
+import data_processing.named_tuples as nt
 
 def create_raw_line(
 	identifier: str, 

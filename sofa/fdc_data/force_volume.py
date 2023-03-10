@@ -17,6 +17,7 @@ from typing import List, Dict, Tuple
 
 import numpy as np
 
+import data_processing.named_tuples as nt
 from fdc_data.force_distance_curve import ForceDistanceCurve
 from fdc_data.average_force_distance_curve import AverageForceDistanceCurve
 from fdc_data.channel import Channel
@@ -27,7 +28,7 @@ class ForceVolume():
 
 	Attributes
 	----------
-	identifier : str
+	name : str
 		Name of the measurement data.
 	size : tuple[int]
 		Number of force distance curves as the width and height 
@@ -46,8 +47,9 @@ class ForceVolume():
 	"""
 	def __init__(self):
 		"""
+		Initialize an empty force volume.
 		"""
-		self.identifier: str
+		self.name: str
 		self.size: Tuple[int]
 		self.forceDistanceCurves: List[ForceDistanceCurve]
 		self.averageForceDistanceCurve: AverageForceDistanceCurve
@@ -56,7 +58,7 @@ class ForceVolume():
 
 		self.guiInterface: Dict
 
-	def import_data(self, importedData: Dict): -> None:
+	def import_data(self, importedData: Dict) -> None:
 		"""
 
 
@@ -65,16 +67,16 @@ class ForceVolume():
 		importedData : dict
 
 		"""
-		self.identifier = importedData.filename
-		self.size = importedData.size
+		self.name = importedData["measurementData"].filename
+		self.size = importedData["measurementData"].size
 
 		self._import_force_distance_curves(
-			importedData.approachCurves
+			importedData["measurementData"].approachCurves
 		)
 
 	def _import_force_distance_curves(
 		importedApproachCurves: List[nt.ForceDistanceCurve]
-	) -> None
+	) -> None:
 		"""
 		Create a ForceDistanceCurve object for every imported
 		approach measurement curve.
@@ -88,7 +90,7 @@ class ForceVolume():
 		for index, approachCurve in enumerate(importedApproachCurves):
 			self.forceDistanceCurves.append(
 				ForceDistanceCurve(
-					identifier="Curve_" + Index,
+					name="Curve_" + Index,
 					dataApproachRaw=approachCurve
 				)
 			)
@@ -106,12 +108,15 @@ class ForceVolume():
 		
 		"""
 		for channelName, caluclate_channel in channels.items():
+			"""
 			self.channels.append(
 				Channel(
-					identifier=channelName,
+					name=channelName,
 					data=
 				)
 			)
+			"""
+			pass
 
 	def calculate_average_data(self) -> None:
 		"""

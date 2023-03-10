@@ -14,10 +14,29 @@ You should have received a copy of the GNU General Public License
 along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from typing import NamedTuple
+from typing import NamedTuple, Tuple, List
 from numpy import ndarray
 
-#
+# Named tuples for FDC data
+class ForceDistanceCurve(NamedTuple): 
+	piezo: ndarray
+	deflection: ndarray
+
+class ForceDistancePoint(NamedTuple):
+	index: int
+	piezo: float
+	deflection: float
+
+class CoefficientsFitApproachCurve(NamedTuple):
+	slope: float
+	intercept: float
+
+class ChannelMetadata(NamedTuple):
+	endOfZeroline: ForceDistancePoint
+	pointOfContact: ForceDistancePoint
+	coefficientsFitApproachCurve: CoefficientsFitApproachCurve
+
+# Named tuples for the data import
 class ImportParameter(NamedTuple):
 	folderPathMeasurementData: str 
 	filePathImage: str 
@@ -46,29 +65,19 @@ class ImageData(NamedTuple):
 	xOffset: float
 	yOffset: float
 	springConstant: float
-	channelHeight: np.ndarray
-	channelAdhesion: np.ndarray
+	channelHeight: ndarray
+	channelAdhesion: ndarray
 
 class ChannelData(NamedTuple):
 	name: str
 	size: Tuple[int]
-	channelData: np.ndarray
+	channelData: ndarray
 
-#
-class ForceDistanceCurve(NamedTuple): 
-	piezo: ndarray
-	deflection: ndarray
-
-class ForceDistancePoint(NamedTuple):
-	index: int
-	piezo: float
-	deflection: float
-
-class CoefficientsFitApproachCurve(NamedTuple):
-	slope: float
-	intercept: float
-
-class ChannelMetadata(NamedTuple):
-	endOfZeroline: ForceDistancePoint
-	pointOfContact: ForceDistancePoint
-	coefficientsFitApproachCurve: CoefficientsFitApproachCurve
+# Named tuples for the data export
+class ExportParameter(NamedTuple):
+	folderPath: str
+	folderName: str
+	exportToTxt: bool
+	exportToCsv: bool
+	exportToExcel: bool
+	exportPlots: bool

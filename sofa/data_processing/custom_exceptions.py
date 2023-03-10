@@ -14,8 +14,8 @@ You should have received a copy of the GNU General Public License
 along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-#
-class ImportError(exception):
+# Custom import errors
+class ImportError(Exception):
 	pass
 
 class UnableToReadMeasurementFileError(ImportError):
@@ -33,8 +33,8 @@ class WrongImageSizeError(ImportError):
 class WrongChannelSizeError(ImportError):
 	pass
 
-#
-class CorrectionError(exception):
+# Custom correction errors
+class CorrectionError(Exception):
 	pass
 
 class UnableToLocateEndOfZerolineError(CorrectionError):

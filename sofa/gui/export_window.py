@@ -13,8 +13,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 """
-
 import os
+import functools
 
 import tkinter as tk
 from tkinter import filedialog as fd
@@ -24,6 +24,42 @@ from ttkbootstrap.constants import *
 
 import data_processing.named_tuples as nt
 import data_processing.export_data as exp_data
+
+def decorator_check_required_folder_path(function):
+	"""
+	Check if the required path for the measurement
+	folder is set.
+	"""
+	@functools.wraps(function)
+	def wrapper_check_required_folder_path(self):
+		if not os.path.isdir(self.folderPath.get()):
+			return messagebox.showerror(
+				"Error", 
+				"A folder for the ouput folder is required.", 
+				parent=self
+			)
+		else:
+			function(self)
+
+	return wrapper_check_required_folder_path
+
+def decorator_check_required_folder_name(function):
+	"""
+	Check if the required path for the measurement
+	folder is set.
+	"""
+	@functools.wraps(function)
+	def wrapper_check_required_folder_name(self):
+		if not self.folderName.get():
+			return messagebox.showerror(
+				"Error", 
+				"A name for the ouput folder is required.", 
+				parent=self
+			)
+		else:
+			function(self)
+
+	return wrapper_check_required_folder_name
 
 class ExportWindow(ttk.Frame):
 	"""
@@ -58,7 +94,9 @@ class ExportWindow(ttk.Frame):
 		self._create_progressbar()
 
 	def _create_frame_data_location(self) -> None:
-		"""Define all elements within the data location frame."""
+		"""
+		Define all elements within the data location frame.
+		"""
 		frameDataLocation = ttk.Labelframe(self, text="Data Location", padding=15)
 		frameDataLocation.pack(fill=X, expand=YES, anchor=N, padx=15, pady=(15, 5))
 
@@ -93,7 +131,9 @@ class ExportWindow(ttk.Frame):
 		buttonBrowseFolderPath.pack(side=LEFT, padx=5)
 
 	def _create_frame_data_types(self) -> None:
-		"""Define all elements within the data types frame."""
+		"""
+		Define all elements within the data types frame.
+		"""
 		frameDataTypes = ttk.Labelframe(self, text="Data Types", padding=15)
 		frameDataTypes.pack(fill=X, expand=YES, anchor=N, padx=15, pady=5)
 
@@ -183,7 +223,9 @@ class ExportWindow(ttk.Frame):
 		checkbuttonExportPlots.pack(side=LEFT, padx=(15, 0), pady=5)
 
 	def _create_export_button(self) -> None:
-		"""Define the export button."""
+		"""
+		Define the export button.
+		"""
 		rowExportButton = ttk.Frame(self)
 		rowExportButton.pack(fill=X, expand=YES, pady=(20, 10))
 
@@ -195,7 +237,9 @@ class ExportWindow(ttk.Frame):
 		buttonExportData.pack(side=LEFT, padx=15)
 
 	def _create_progressbar(self) -> None:
-		"""Define the progressbar."""	
+		"""
+		Define the progressbar.
+		"""	
 		rowLabelProgressbar = ttk.Frame(self)
 		rowLabelProgressbar.pack(fill=X, expand=YES)
 
@@ -212,7 +256,9 @@ class ExportWindow(ttk.Frame):
 		self.progressbar.pack(fill=X, expand=YES, padx=15, pady=(5, 15))
 
 	def _browse_folder_path(self) -> None:
-		"""Select the directory in which the data will be saved."""
+		"""
+		Select the directory in which the data will be saved.
+		"""
 		folderPath = fd.askdirectory(
 			title="Select directory",
 			parent=self
@@ -221,42 +267,50 @@ class ExportWindow(ttk.Frame):
 		if folderPath:
 			self.folderPath.set(folderPath)
 
+	@decorator_check_required_folder_path
+	@decorator_check_required_folder_name
 	def _export_data(self) -> messagebox:
-		"""Export the current state of the data with the selected options.
+		"""
+		Export the data of the force volume and if selected
+		the plots as well.
 
 		Returns
 		-------
 		userFeedback : messagebox
-			Informs the user whether the data could be saved or not.
+			Informs the user whether the data could 
+			be exported or not.
 		"""
-		# Check if a folder name is selected.
-		if not self.folderName.get():
-			return messagebox.showerror(
-				"Error", 
-				"Please specify a name for the ouput folder.", 
-				parent=self
-			)
+		self._update_progressbar_label("Exporting data...")
+		self._start_progressbar()
 
-		# Check if a output folder is selected.
-		if not os.path.isdir(self.folderPath.get()):
-			return messagebox.showerror(
-				"Error", 
-				"Please specify a location to save your data.", 
-				parent=self
-			)
+		exportParameters = self._create_selected_export_parameters()
 
-		selectedExportParameters = self._create_selected_export_parameters()
-
-		exp_data.export_data(
-			self.forceVolume,
-			selectedExportParameters,
-			self.progressbar,
-			self.progressbarCurrentLabel
+		outputFolder = exp_data.setup_output_folder(
+			exportParameters.folderPath,
+			exportParameters.folderName
 		)
-		# Close window
+
+		if exportParameters.exportToTxt:
+			self._update_progressbar_label("Exporting to txt...")
+			exp_data.export_to_txt(self.forceVolume, outputFolder)
+
+		if exportParameters.exportToCsv:
+			self._update_progressbar_label("Exporting to csv...")
+			exp_data.export_to_csv(self.forceVolume, outputFolder)
+
+		if exportParameters.exportToXlsx:
+			self._update_progressbar_label("Exporting to xlsx...")
+			exp_data.export_to_xlsx(self.forceVolume, outputFolder)
+
+		if exportParameters.exportPlots:
+			self._update_progressbar_label("Exporting plots...")
+			exp_data.export_plots(self.forceVolume, outputFolder)
+
+		self._stop_progressbar()
+
 		self.destroy()
 
-		return messagebox.showinfo("Success", "Data is saved.")
+		return messagebox.showinfo("Success", "Data is exported.")
 
 	def _create_selected_export_parameters(self) -> nt.ExportParameter:
 		"""
@@ -265,15 +319,42 @@ class ExportWindow(ttk.Frame):
 		Returns
 		-------
 		ExportParameter : nt.ExportParameter
-			Contains the selected export opotions.
+			Contains the path and name of the output
+			folder and the selected file formats for
+			the export.
 		"""
 		return nt.ExportParameter(
-			folderName=self.folderName.get(),
 			folderPath=self.folderPath.get(),
-			exportToSofa=self.exportToSofa.get(),
-			exportToTex=self.exportToTex.get(),
+			folderName=self.folderName.get(),
 			exportToTxt=self.exportToTxt.get(),
-			exportToHdf5=self.exportToHdf5.get(),
-			exportToExcel=self.exportToExcel.get(),
+			exportToCsv=self.exportToCsv.get(),
+			exportToXlsx=self.exportToXlsx.get(),
 			exportPlots=self.exportPlots.get(),
 		)
+
+	def _start_progressbar(self) -> None:
+		"""
+
+		"""
+		self.progressbar.start()
+
+	def _stop_progressbar(self) -> None:
+		"""
+
+		"""
+		self.progressbar.stop()
+		self.progressbarCurrentLabel.set("")
+
+	def _update_progressbar_label(
+		self, 
+		label=""
+	) -> None:
+		"""
+		.
+
+		Parameters
+		----------
+		label : str
+			Describes the current action.
+		"""
+		self.progressbarCurrentLabel.set(label)

@@ -13,8 +13,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 """
-
 import os
+import functools
 
 import tkinter as tk
 from tkinter import filedialog as fd
@@ -249,12 +249,12 @@ class ImportWindow(ttk.Frame):
 		userFeedback : messagebox
 			Informs the user whether the data could be imported or not.
 		"""
+		self._update_progressbar_label("Importing data...")
 		self._start_progressbar()
 
 		selected_import_function = imp_data.importFunctions[self.selectedDataType.get()][0]
 		selectedImportParameters = self._create_selected_import_parameters()
 
-		self._update_progressbar_label("Importing data...")
 		try:
 			importedData = selected_import_function(
 				selectedImportParameters,
@@ -279,7 +279,6 @@ class ImportWindow(ttk.Frame):
 
 		self._stop_progressbar()
 
-		# Close window
 		self.destroy()
 
 		return messagebox.showinfo("Success", "Data was successfully imported.")
@@ -311,6 +310,7 @@ class ImportWindow(ttk.Frame):
 
 		"""
 		self.progressbar.stop()
+		self.progressbarCurrentLabel.set("")
 
 	def _update_progressbar_label(
 		self, 

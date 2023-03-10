@@ -13,13 +13,15 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 """
-from typing import List, Dict, Tuple, NamedTuple
+from typing import List, Dict, Tuple
 
 import numpy as np
 from matplotlib.lines import Line2D
 
-from data_processing.correct_data import correct_approach_curves
+from data_processing.correct_data import correct_approach_curve
 import data_visualization.plot_data as plt_data
+
+import data_processing.named_tuples as nt
 
 class ForceDistanceCurve():
 	"""
@@ -47,7 +49,7 @@ class ForceDistanceCurve():
 		Line of the corrected data used to represent 
 		the curve in a plot.
 	"""
-	def __init__(self, identifier: str, dataApproachRaw: NamedTuple):
+	def __init__(self, identifier: str, dataApproachRaw: nt.ForceDistanceCurve):
 		"""
 		Initialize a force distance curve by setting it's identifier 
 		and raw data. 
@@ -72,16 +74,16 @@ class ForceDistanceCurve():
 
 	def correct_raw_data(self) -> None:
 		"""
-		Try to correct the raw data of the approach curve.
+		Correct the raw data of the approach curve.
 		"""
 		try:
 			self.dataApproachCorrected, self.channelMetadata = correct_approach_curve(
 				self.dataApproachRaw
 			)
-			self.couldBeCorrected = True
-
 		except CorrectionError:
-			self.couldBeCorrected = False 
+			self.couldBeCorrected = False
+		else:
+			self.couldBeCorrected = True 
 
 	def create_line_representation_raw_data(self) -> None:
 		"""
@@ -89,7 +91,7 @@ class ForceDistanceCurve():
 		distance curve.
 		"""
 		self.lineRepresentationRawData = plt_data.create_raw_line(
-			self.identifier
+			self.identifier,
 			self.dataApproachRaw
 		)
 
@@ -99,6 +101,6 @@ class ForceDistanceCurve():
 		the force distance curve.
 		"""
 		self.lineRepresentationCorrectedData = plt_data.create_corrected_line(
-			self.identifier
+			self.identifier,
 			self.dataApproachCorrected
 		)

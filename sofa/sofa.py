@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License
 along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import tkinter as tk
+#import tkinter as tk
 import ttkbootstrap as ttk
 
 from gui.main_window import MainWindow
