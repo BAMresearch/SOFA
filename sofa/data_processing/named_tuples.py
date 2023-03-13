@@ -79,5 +79,5 @@ class ExportParameter(NamedTuple):
 	folderName: str
 	exportToTxt: bool
 	exportToCsv: bool
-	exportToExcel: bool
+	exportToXlsx: bool
 	exportPlots: bool

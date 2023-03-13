@@ -87,14 +87,14 @@ def correct_deflection_values(
 	endOfZeroline, coefficientsFitApproachCurve = calculate_end_of_zeroline(
 		approachCurve
 	)
-	fitEndOfZeroline = calculate_linear_fit_to_zeroline(
+	fitZeroline = calculate_linear_fit_to_zeroline(
 		approachCurve,
 		endOfZeroline
 	)
 	correctedDeflectionValues = shif_deflection_values(
 		approachCurve,
 		endOfZeroline,
-		fitEndOfZeroline
+		fitZeroline
 	)
 
 	return correctedDeflectionValues, endOfZeroline, coefficientsFitApproachCurve
@@ -164,14 +164,14 @@ def calculate_linear_fit_to_approach_curve(
 		approachCurve.deflection
 	)
 	linearDeflectionValues = np.array(
-		[intercept + slope*approachCurve.piezo]
+		intercept + slope*approachCurve.piezo
 	)
 
 	fitApproachCurve = nt.ForceDistanceCurve(
 		piezo=approachCurve.piezo,
 		deflection=linearDeflectionValues
 	)
-	coefficientsFitApproachCurve = nt.coefficientsFitApproachCurve(
+	coefficientsFitApproachCurve = nt.CoefficientsFitApproachCurve(
 		slope=slope,
 		intercept=intercept
 	)
@@ -251,7 +251,7 @@ def calculate_deflection_borders(
 	fitApproachCurve: nt.ForceDistanceCurve
 ) -> Tuple[int, int, nt.CoefficientsFitApproachCurve]:
 	"""
-	
+	Calculte the borders 
 	
 	Parameters
 	----------
@@ -266,21 +266,23 @@ def calculate_deflection_borders(
 	indexLeftBorder : int
 		Index of the first intersection point between the approach curve
 		and it's linear fit.
-	indexRightBorder: int
-		.
+	indexMaxDeflectionDifference: int
+		Index of the point with the maximum deflection difference
+		within in area between the two intersections, slighty 
+		shifted to the right.
 	"""
 	indexFirstIntersection, indexLastIntersection = calculate_curve_intersections(
 		approachCurve, 
 		fitApproachCurve
 	)
-	indexRightBorder = adjust_intersection_border(
+	indexMaxDeflectionDifference = calculate_maximum_deflection_difference(
 		approachCurve, 
 		fitApproachCurve,
 		indexFirstIntersection,
 		indexLastIntersection
 	)
 
-	return indexFirstIntersection, indexRightBorder
+	return indexFirstIntersection, indexMaxDeflectionDifference
 
 def calculate_curve_intersections(
 	approachCurve: nt.ForceDistanceCurve,
@@ -314,30 +316,37 @@ def calculate_curve_intersections(
 	
 	return indexFirstIntersection, indexLastIntersection
 
-def adjust_intersection_border(
+def calculate_maximum_deflection_difference(
 	approachCurve: nt.ForceDistanceCurve,
 	fitApproachCurve: nt.ForceDistanceCurve,
 	indexFirstIntersection: int,
 	indexLastIntersection: int
 ) -> int:
 	"""
-	
+	Calculate the point with the maximum deflection difference
+	within the area between the two intersections and shift it
+	lightly to the right.
 
 	Parameters
 	----------
 	approachCurves : namedTuple
 		Raw approach curve with piezo (x) and deflection (y) values.
 	fitApproachCurve : nt.ForceDistanceCurve
-	
+		Linear curve fit to the approach curve with the same 
+		piezo (x) values and adjusted deflection (y) values.
 	indexFirstIntersection : int
-
+		Index of the first intersection point of the approach curve
+		and it's linear fit.
 	indexLastIntersection : int
-
+		Index of the last intersection point of the approach curve
+		and it's linear fit.
 
 	Returns
 	-------
 	adjustedIndexMaxDeflectionDifference : int
-
+		Index of the point with the maximum deflection difference
+		within in area between the two intersections, slighty 
+		shifted to the right.
 	"""
 	deflectionDifferences = np.absolute(
 		fitApproachCurve.deflection - approachCurve.deflection
@@ -346,6 +355,7 @@ def adjust_intersection_border(
 	indexMaxDeflectionDifference = np.argmax(
 		deflectionDifferences[indexFirstIntersection:indexLastIntersection]
 	) + indexFirstIntersection
+
 	adjustedIndexMaxDeflectionDifference = int(
 		indexMaxDeflectionDifference 
 		+ ((indexLastIntersection - indexMaxDeflectionDifference) * 0.05)
@@ -360,24 +370,41 @@ def locate_end_of_zeroline(
 	indexRightBorder: int
 ) -> nt.ForceDistancePoint:
 	"""
+	Locate the end of the zero line as the first point with 
+	a negative slope before the jump to contact.
 
 	Parameters
 	----------
 	approachCurve : nt.ForceDistanceCurve
 		Raw approach curve with piezo (x) and deflection (y) values.
+	smoothedDerivationDeflection : np.ndarray
+		Smoothed first derivation of the deflection (y) values
+		of the approach curve.
+	indexLeftBorder : int
+		Index of the first intersection point of the approach curve
+		and it's linear fit.
+	indexRightBorder : int
+		Index of the point with the maximum deflection difference
+		in the attractive area.
 
 	Returns
 	-------
+	endOfZeroline : nt.ForceDistancePoint
+		Index, piezo and deflection value of the end of the 
+		zero line.
 
 	Raises
 	------
+	ce.UnableToLocateEndOfZerolineError : CorrectionError
+		If there are no points with a negative slope within 
+		the area of the left and right border.
 	"""
-	endOfZeroline = np.where(
+	pointsWithDecreasingDeflection = np.where(
 		smoothedDerivationDeflection[indexLeftBorder:indexRightBorder] < 0
 	)
 
 	try:
-		indexEndOfZeroline = endOfZeroline[-1] + indexLeftBorder
+		indexEndOfZeroline = pointsWithDecreasingDeflection[0] + indexLeftBorder
 	except IndexError as e:
 		raise ce.UnableToLocateEndOfZerolineError from e
 	else:
@@ -392,16 +419,22 @@ def calculate_linear_fit_to_zeroline(
 	endOfZeroline: nt.ForceDistancePoint
 ) -> nt.ForceDistanceCurve:
 	"""
+	Calculate linear regression curve to the zeroline of the raw
+	approach curve.
 
 	Parameters
 	----------
 	approachCurve : nt.ForceDistanceCurve
 		Raw approach curve with piezo (x) and deflection (y) values.
+	endOfZeroline : nt.ForceDistancePoint
+		Index, piezo and deflection value of the end of the 
+		zero line.
 
 	Returns
 	-------
-	
-
+	fitApproachCurve : nt.ForceDistanceCurve
+		Linear regression curve to the zero line, with raw 
+		piezo (x) values and fitted deflection (y) values.
 	"""
 	slope, intercept, _, _, _ = linregress(
 		approachCurve.piezo[0:endOfZeroline.index],
@@ -422,10 +455,10 @@ def calculate_linear_fit_to_zeroline(
 def shif_deflection_values(
 	approachCurve: nt.ForceDistanceCurve,
 	endOfZeroline: nt.ForceDistancePoint,
-	fitEndOfZeroline: nt.ForceDistanceCurve
+	fitZeroline: nt.ForceDistanceCurve
 ) -> np.ndarray:
 	"""
-	Shift the deflection values a long the zero line to zero.
+	Shift the deflection values along the zero line to zero.
 	Values to the end of the zero line are smoothed.
 
 	Parameters
@@ -433,19 +466,21 @@ def shif_deflection_values(
 	approachCurve : nt.ForceDistanceCurve
 		Raw approach curve with piezo (x) and deflection (y) values.
 	endOfZeroline : nt.ForceDistancePoint
-		
-	fitEndOfZeroline : nt.ForceDistanceCurve
-		
+		Index, piezo and deflection value of the end of the 
+		zero line.
+	fitZeroline : nt.ForceDistanceCurve
+		Linear regression curve to the zero line, with raw 
+		piezo (x) values and fitted deflection (y) values.
 
 	Returns
 	-------
 	correctedDeflectionValues : np.ndarray
-		
+		Deflection values shifted to zero along the zero line.
 	"""
 	return np.concatenate(
 		[
-			approachCurve.deflection[0:endOfZeroline.index] - fitEndOfZeroline.deflection,
-			approachCurve.deflection[endOfZeroline.index:] - fitEndOfZeroline.deflection[-1]
+			approachCurve.deflection[0:endOfZeroline.index] - fitZeroline.deflection,
+			approachCurve.deflection[endOfZeroline.index:] - fitZeroline.deflection[-1]
 		]
 	)
 
@@ -476,7 +511,7 @@ def correct_piezo_values(
 		Index, piezo and deflection value from the point of contact
 		before the shift along the x axis.
 	"""
-	indexZeroCrossing = locate_zero_crossing(
+	indexZeroCrossing = locate_index_zero_crossing(
 		correctedDeflectionValues,
 		endOfZeroline
 	)
@@ -491,7 +526,7 @@ def correct_piezo_values(
 
 	return correctedPiezoValues, unshiftedPointOfContact
 
-def locate_zero_crossing(
+def locate_index_zero_crossing(
 	correctedDeflectionValues: np.ndarray,
 	endOfZeroline: nt.ForceDistancePoint
 ) -> int:
@@ -512,7 +547,8 @@ def locate_zero_crossing(
 
 	Raises
 	------
-
+	ce.UnableToLocateZeroCrossingAfterJtcError : CorrectionError
+		If 
 	"""
 	deflectionAttractionPart = np.where(
 		correctedDeflectionValues[endOfZeroline.index:] <= 0
@@ -521,7 +557,7 @@ def locate_zero_crossing(
 	try: 
 		indexZeroCrossing = deflectionAttractionPart[-1] + endOfZeroline.index
 	except IndexError as e:
-		raise NeedsNameError("") from e
+		raise ce.UnableToLocateZeroCrossingAfterJtcError from e
 	else:
 		return indexZeroCrossing
 
@@ -533,10 +569,12 @@ def interpolate_unshifted_point_of_contact(
 
 	Parameters
 	----------
+	approachCurve : nt.ForceDistanceCurve
+		Raw approach curve with piezo (x) and deflection (y) values.
 
 	Returns
 	-------
-	
+	unshiftedPointOfContact : nt.ForceDistancePoint
 
 	"""
 	piezoUnshiftedPointOfContact = np.interp(
