@@ -68,6 +68,25 @@ class ExportWindow(ttk.Frame):
 	Attributes
 	----------
 	forceVolume : ForceVolume
+		Contains the raw and calculated data from the 
+		imported measurement.
+	progressbar : ttk.Progressbar
+		Shows the user if the process of exporting 
+		the data is still running.
+	labelProgressbarVariable : tk.Stringvar
+		Indicates the current running process.
+	folderPath : tk.StringVar
+		Location where folder is created to store the data.
+	folderName : tk.StringVar
+		Name of the folder to store the data.
+	exportToCsv : tk.BooleanVar
+		Indicates whether the data should be exported 
+		to the .csv file format.
+	exportToXlsx : tk.BooleanVar
+		Indicates whether the data should be exported 
+		to the .xlsx file format.
+	exportPlots : tk.BooleanVar
+		Indicates whether the plots should be exported.
 	"""
 	def __init__(
 		self, 
@@ -95,7 +114,9 @@ class ExportWindow(ttk.Frame):
 
 	def _create_frame_data_location(self) -> None:
 		"""
-		Define all elements within the data location frame.
+		Define two entries in the data location frame
+		to specify the location and name of the output
+		folder.
 		"""
 		frameDataLocation = ttk.Labelframe(self, text="Data Location", padding=15)
 		frameDataLocation.pack(fill=X, expand=YES, anchor=N, padx=15, pady=(15, 5))
@@ -132,99 +153,68 @@ class ExportWindow(ttk.Frame):
 
 	def _create_frame_data_types(self) -> None:
 		"""
-		Define all elements within the data types frame.
+		Define a checkbutton for every available export format
+		in the data types frame.
 		"""
 		frameDataTypes = ttk.Labelframe(self, text="Data Types", padding=15)
 		frameDataTypes.pack(fill=X, expand=YES, anchor=N, padx=15, pady=5)
 
-		self.exportToSofa = tk.BooleanVar(self, value=0)
-		self.exportToTex = tk.BooleanVar(self, value=0)
-		self.exportToTxt = tk.BooleanVar(self, value=0)
-		self.exportToHdf5 = tk.BooleanVar(self, value=0)
-		self.exportToExcel = tk.BooleanVar(self, value=0)
+		self.exportToCsv = tk.BooleanVar(self, value=0)
+		self.exportToXlsx = tk.BooleanVar(self, value=0)
 		self.exportPlots = tk.BooleanVar(self, value=0)
 
-		# Export to sofa
-		rowExportToSofa = ttk.Frame(frameDataTypes)
-		rowExportToSofa.pack(fill=X, expand=YES)
+		self._create_checkbutton_data_type(
+			frameDataTypes,
+			self.exportToCsv,
+			"export to csv"
+		)
+		self._create_checkbutton_data_type(
+			frameDataTypes,
+			self.exportToXlsx,
+			"export to xlsx"
+		)
+		self._create_checkbutton_data_type(
+			frameDataTypes,
+			self.exportPlots,
+			"export plots"
+		)
 
-		checkbuttonExportToSofa = ttk.Checkbutton(
-			rowExportToSofa,
-			text="export to sofa",
-			variable=self.exportToSofa,
+	def _create_checkbutton_data_type(
+		self,
+		parentFrame: ttk.Labelframe,
+		booleanVar: tk.BooleanVar,
+		label: str
+	) -> None:
+		"""
+		Create a single chechbutton for a file type
+		to be able to select if the data should be 
+		exported in this format.
+
+		Parameters
+		----------
+		parentFrame : ttk.Labelframe
+			Labeled frame for all data type checkbuttons.
+		booleanVar : tk.BooleanVar
+			Variable to store the selection.
+		label : str
+			Label of the checkbutton with the releated
+			file type.
+		"""
+		rowCheckButton = ttk.Frame(parentFrame)
+		rowCheckButton.pack(fill=X, expand=YES)
+
+		checkbutton = ttk.Checkbutton(
+			rowCheckButton,
+			text=label,
+			variable=booleanVar,
 			onvalue=True,
 			offvalue=False
 		)
-		checkbuttonExportToSofa.pack(side=LEFT, padx=(15, 0), pady=5)
-
-		# Export to tex
-		rowExportToTex = ttk.Frame(frameDataTypes)
-		rowExportToTex.pack(fill=X, expand=YES)
-
-		checkbuttonExportToTex = ttk.Checkbutton(
-			rowExportToTex,
-			text="export to tex",
-			variable=self.exportToTex,
-			onvalue=True,
-			offvalue=False
-		)
-		checkbuttonExportToTex.pack(side=LEFT, padx=(15, 0), pady=5)
-
-		# Export to txt
-		rowExportToTxt = ttk.Frame(frameDataTypes)
-		rowExportToTxt.pack(fill=X, expand=YES)
-
-		checkbuttonExportToTxt = ttk.Checkbutton(
-			rowExportToTxt,
-			text="export to txt",
-			variable=self.exportToTxt,
-			onvalue=True,
-			offvalue=False
-		)
-		checkbuttonExportToTxt.pack(side=LEFT, padx=(15, 0), pady=5)
-
-		# Export to hdf5
-		rowExportToHdf5 = ttk.Frame(frameDataTypes)
-		rowExportToHdf5.pack(fill=X, expand=YES)
-
-		checkbuttonExportToHdf5 = ttk.Checkbutton(
-			rowExportToHdf5,
-			text="export to hdf5",
-			variable=self.exportToHdf5,
-			onvalue=True,
-			offvalue=False
-		)
-		checkbuttonExportToHdf5.pack(side=LEFT, padx=(15, 0), pady=5)
-
-		# Export to excel
-		rowExportToExcel = ttk.Frame(frameDataTypes)
-		rowExportToExcel.pack(fill=X, expand=YES)
-
-		checkbuttonExportToExcel = ttk.Checkbutton(
-			rowExportToExcel,
-			text="export to excel",
-			variable=self.exportToExcel,
-			onvalue=True,
-			offvalue=False
-		)
-		checkbuttonExportToExcel.pack(side=LEFT, padx=(15, 0), pady=5)
-
-		# Export plots
-		rowExportPlots = ttk.Frame(frameDataTypes)
-		rowExportPlots.pack(fill=X, expand=YES)
-
-		checkbuttonExportPlots = ttk.Checkbutton(
-			rowExportPlots,
-			text="export plots",
-			variable=self.exportPlots,
-			onvalue=True,
-			offvalue=False
-		)
-		checkbuttonExportPlots.pack(side=LEFT, padx=(15, 0), pady=5)
+		checkbutton.pack(side=LEFT, padx=(15, 0), pady=5)
 
 	def _create_export_button(self) -> None:
 		"""
-		Define the export button.
+		Create the export button.
 		"""
 		rowExportButton = ttk.Frame(self)
 		rowExportButton.pack(fill=X, expand=YES, pady=(20, 10))
@@ -238,7 +228,7 @@ class ExportWindow(ttk.Frame):
 
 	def _create_progressbar(self) -> None:
 		"""
-		Define the progressbar.
+		Create an indeterminate progressbar.
 		"""	
 		rowLabelProgressbar = ttk.Frame(self)
 		rowLabelProgressbar.pack(fill=X, expand=YES)
@@ -272,7 +262,7 @@ class ExportWindow(ttk.Frame):
 	def _export_data(self) -> messagebox:
 		"""
 		Export the data of the force volume and if selected
-		the plots as well.
+		the plots as well to the specified location.
 
 		Returns
 		-------
@@ -280,19 +270,14 @@ class ExportWindow(ttk.Frame):
 			Informs the user whether the data could 
 			be exported or not.
 		"""
-		self._update_progressbar_label("Exporting data...")
 		self._start_progressbar()
+		self._update_progressbar_label("Exporting data...")
 
 		exportParameters = self._create_selected_export_parameters()
-
 		outputFolder = exp_data.setup_output_folder(
 			exportParameters.folderPath,
 			exportParameters.folderName
 		)
-
-		if exportParameters.exportToTxt:
-			self._update_progressbar_label("Exporting to txt...")
-			exp_data.export_to_txt(self.forceVolume, outputFolder)
 
 		if exportParameters.exportToCsv:
 			self._update_progressbar_label("Exporting to csv...")
@@ -314,7 +299,7 @@ class ExportWindow(ttk.Frame):
 
 	def _create_selected_export_parameters(self) -> nt.ExportParameter:
 		"""
-		Summarize the selected export parameter.
+		Combine the selected export parameter.
 
 		Returns
 		-------
@@ -326,7 +311,6 @@ class ExportWindow(ttk.Frame):
 		return nt.ExportParameter(
 			folderPath=self.folderPath.get(),
 			folderName=self.folderName.get(),
-			exportToTxt=self.exportToTxt.get(),
 			exportToCsv=self.exportToCsv.get(),
 			exportToXlsx=self.exportToXlsx.get(),
 			exportPlots=self.exportPlots.get(),
@@ -334,13 +318,14 @@ class ExportWindow(ttk.Frame):
 
 	def _start_progressbar(self) -> None:
 		"""
-
+		Start the indeterminate progressbar.
 		"""
 		self.progressbar.start()
 
 	def _stop_progressbar(self) -> None:
 		"""
-
+		Stop indeterminate progressbar and reset the 
+		label of the progressbar.
 		"""
 		self.progressbar.stop()
 		self.progressbarCurrentLabel.set("")
@@ -350,11 +335,12 @@ class ExportWindow(ttk.Frame):
 		label=""
 	) -> None:
 		"""
-		.
+		Update the label of procressbar to show the
+		current process.
 
 		Parameters
 		----------
 		label : str
-			Describes the current action.
+			Description of the current process.
 		"""
 		self.progressbarCurrentLabel.set(label)

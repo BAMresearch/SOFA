@@ -45,11 +45,27 @@ def decorator_check_required_folder_path(function):
 
 class ImportWindow(ttk.Frame):
 	"""
-	A subwindow to import data.
+	A subwindow to import measurement data.
 
 	Attributes
 	----------
 	forceVolume : ForceVolume
+		Stores the data of the imported measuremnet data.
+	progressbar : ttk.Progressbar
+
+	labelProgressbarVariable : tk.Stringvar
+
+	set_filename : function
+
+	dataTypes : dict_keys
+
+	filePathData : tk.StringVar
+
+	filePathImage : tk.StringVar
+
+	filePathChannel : tk.StringVar
+
+	showPoorCurves : tk.BooleanVar
 
 	"""
 	def __init__(self, root, forceVolume, set_filename):
@@ -66,14 +82,18 @@ class ImportWindow(ttk.Frame):
 		self._create_window()
 
 	def _create_window(self) -> None:
-		"""Define all elements within the import window."""
+		"""
+		Define all elements within the import window.
+		"""
 		self._create_frame_required_data()
 		self._create_frame_optional_data()
 		self._create_import_button()
 		self._create_progressbar()
 
 	def _create_frame_required_data(self) -> None:
-		"""Define all elements within the required data frame."""
+		"""
+		Define all elements within the required data frame.
+		"""
 		frameRequiredData = ttk.Labelframe(self, text="Required Data", padding=15)
 		frameRequiredData.pack(fill=X, expand=YES, anchor=N, padx=15, pady=(15, 5))
 
@@ -112,7 +132,7 @@ class ImportWindow(ttk.Frame):
 		buttonBrowseData.pack(side=LEFT, padx=5)
 
 		# Options
-		self.showPoorCurves = tk.StringVar(self)
+		self.showPoorCurves = tk.BooleanVar(self)
 
 		rowOptions = ttk.Frame(frameRequiredData)
 		rowOptions.pack(fill=X, expand=YES)
@@ -127,7 +147,9 @@ class ImportWindow(ttk.Frame):
 		checkButtonShowPoorCurves.pack(side=LEFT, padx=(15, 0))
 
 	def _create_frame_optional_data(self) -> None:
-		"""Define all elements within the optional data frame."""	
+		"""
+		Define all elements within the optional data frame.
+		"""	
 		frameOptionalData = ttk.Labelframe(self, text="Optional Data", padding=15)
 		frameOptionalData.pack(fill=X, expand=YES, anchor=N, padx=15, pady=5)
 
@@ -171,7 +193,7 @@ class ImportWindow(ttk.Frame):
 
 	def _create_import_button(self) -> None: 
 		"""
-		Define the import button.
+		Create the import button.
 		"""
 		rowImportButton = ttk.Frame(self)
 		rowImportButton.pack(fill=X, expand=YES, pady=(20, 10))
@@ -185,7 +207,7 @@ class ImportWindow(ttk.Frame):
 
 	def _create_progressbar(self) -> None:
 		"""
-		Define the progressbar.
+		Create an indeterminate progressbar.
 		"""	
 		rowLabelProgressbar = ttk.Frame(self)
 		rowLabelProgressbar.pack(fill=X, expand=YES)
@@ -285,7 +307,7 @@ class ImportWindow(ttk.Frame):
 
 	def _create_selected_import_parameters(self) -> nt.ImportParameter:
 		"""
-		Summarize the selected import parameters.
+		Combine the selected import parameters.
 
 		Returns
 		-------
@@ -301,13 +323,14 @@ class ImportWindow(ttk.Frame):
 
 	def _start_progressbar(self) -> None:
 		"""
-
+		Start indeterminate progressbar.
 		"""
 		self.progressbar.start()
 
 	def _stop_progressbar(self) -> None:
 		"""
-
+		Stop indeterminate progressbar and reset the 
+		label of the progressbar.
 		"""
 		self.progressbar.stop()
 		self.progressbarCurrentLabel.set("")
@@ -317,11 +340,12 @@ class ImportWindow(ttk.Frame):
 		label=""
 	) -> None:
 		"""
-		.
+		Update the label of procressbar to show the
+		current process.
 
 		Parameters
 		----------
 		label : str
-			Describes the current action.
+			Description of the current process.
 		"""
 		self.progressbarCurrentLabel.set(label)

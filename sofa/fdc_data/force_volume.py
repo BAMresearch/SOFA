@@ -33,6 +33,8 @@ class ForceVolume():
 	size : tuple[int]
 		Number of force distance curves as the width and height 
 		of the measurement grid.
+	metadata : dict
+		
 	forceDistanceCurves : list[ForceDistanceCurve]
 		
 	averageForceDistanceCurve : AverageForceDistanceCurve
@@ -51,6 +53,7 @@ class ForceVolume():
 		"""
 		self.name: str
 		self.size: Tuple[int]
+		self.metadata: Dict
 		self.forceDistanceCurves: List[ForceDistanceCurve]
 		self.averageForceDistanceCurve: AverageForceDistanceCurve
 		self.channels: List[Channel]

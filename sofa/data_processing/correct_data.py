@@ -251,7 +251,8 @@ def calculate_deflection_borders(
 	fitApproachCurve: nt.ForceDistanceCurve
 ) -> Tuple[int, int, nt.CoefficientsFitApproachCurve]:
 	"""
-	Calculte the borders 
+	Calculates borders to restrict the area in which the 
+	end of the zero line is searched for.
 	
 	Parameters
 	----------
@@ -531,24 +532,27 @@ def locate_index_zero_crossing(
 	endOfZeroline: nt.ForceDistancePoint
 ) -> int:
 	"""
-
+	Locate the first zero crossing after the end of the zeroline.
 
 	Parameters
 	----------
 	correctedDeflectionValues : np.ndarray
-
+		Already corrected deflection values shifted to zero 
+		along the end of the zero line.
 	endOfZeroline : nt.ForceDistancePoint
-		
+		Index, piezo and deflection value of the end of the 
+		zero line.
 
 	Returns
 	-------
 	indexZeroCrossing : int
-	
+		Index of the last point after the end of the zeroline
+		with a deflection value samller or equal to zero.
 
 	Raises
 	------
-	ce.UnableToLocateZeroCrossingAfterJtcError : CorrectionError
-		If 
+	ce.UnableToLocateZeroCrossingAfterEozlError : CorrectionError
+		If no negative values exist after the end of the zeroline.
 	"""
 	deflectionAttractionPart = np.where(
 		correctedDeflectionValues[endOfZeroline.index:] <= 0
@@ -557,7 +561,7 @@ def locate_index_zero_crossing(
 	try: 
 		indexZeroCrossing = deflectionAttractionPart[-1] + endOfZeroline.index
 	except IndexError as e:
-		raise ce.UnableToLocateZeroCrossingAfterJtcError from e
+		raise ce.UnableToLocateZeroCrossingAfterEozlError from e
 	else:
 		return indexZeroCrossing
 
@@ -566,16 +570,21 @@ def interpolate_unshifted_point_of_contact(
 	indexZeroCrossing: int
 ) -> nt.ForceDistancePoint:
 	"""
+	Interpolate the exact piezo value at which the zero crossing occurs.
 
 	Parameters
 	----------
 	approachCurve : nt.ForceDistanceCurve
 		Raw approach curve with piezo (x) and deflection (y) values.
+	indexZeroCrossing : int
+		Index of the last point after the end of the zeroline
+		with a deflection value samller or equal to zero.
 
 	Returns
 	-------
 	unshiftedPointOfContact : nt.ForceDistancePoint
-
+		Index, piezo and deflection value of the point of contact
+		before the correction of the piezo values.
 	"""
 	piezoUnshiftedPointOfContact = np.interp(
 		0, 
@@ -594,14 +603,20 @@ def shif_piezo_values(
 	unshiftedPointOfContact: nt.ForceDistancePoint
 ) -> np.ndarray:
 	"""
+	Shift the piezo values along the point of contact to zero.
 
 	Parameters
 	----------
+	approachCurve : nt.ForceDistanceCurve
+		Raw approach curve with piezo (x) and deflection (y) values.
+	unshiftedPointOfContact : nt.ForceDistancePoint
+		Index, piezo and deflection value of the point of contact
+		before the correction of the piezo values.
 
 	Returns
 	-------
-	
-
+	correctedPiezoValues : np.ndarray
+		Piezo values shifted to zero along the point of contact.
 	"""
 	return (
 		approachCurve.piezo - unshiftedPointOfContact.piezo

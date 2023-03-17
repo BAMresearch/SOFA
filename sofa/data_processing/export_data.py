@@ -19,18 +19,22 @@ from typing import List, Tuple, Dict
 import numpy as np
 import pandas as pd
 
+import data_processing.named_tuples as nt
+
 def setup_output_folder(
 	folderPath: str,
 	folderName: str
 ) -> str:
 	"""
-	Set up a folder to store the data.
+	Set up a folder to store the data in the
+	desired location.
 	
 	Parameters
 	----------
 	folderPath : str
-		.
+		.Specified location where the folder is created.
 	folderName : str
+		Specified name of the output folder.
 
 	Returns
 	-------
@@ -45,146 +49,233 @@ def setup_output_folder(
 
 	return outputFolderPath
 
+def create_data_frame_metadata(
+	forceVolume
+) -> pd.DataFrame:
+	"""
+	Cache the general data and if imported additional
+	data from an image in a pandas dataframe.
+
+	Parameters
+	----------
+	forceVolume : ForceVolume
+		Contains the raw and calculated data from the 
+		imported measurement.
+
+	Returns
+	-------
+	dataFrameMetaData : pd.Dataframe
+		Contains the name, size and additional data from 
+		the measurement, if an image was imported
+	"""
+	pass 
+
+def create_data_frame_raw_curves(
+	forceDistanceCurves: List
+) -> pd.DataFrame:
+	"""
+	Cache the raw imported measurment data in a 
+	pandas dataframe.
+
+	Parameters
+	----------
+	forceDistanceCurves : list[ForceDistanceCurve]
+		All force distance curves in the force volume.
+
+	Returns
+	-------
+	dataFrameChannelData : pd.Dataframe
+		Contains the data of the imported
+		measuremnt curves.
+	"""
+	pass
+
+def create_data_frame_corrected_curves(
+	forceDistanceCurves: List
+) -> pd.DataFrame:
+	"""
+	Cache the corrected measurment data in a 
+	pandas dataframe.
+
+	Parameters
+	----------
+	forceDistanceCurves : list[ForceDistanceCurve]
+		All force distance curves in the force volume.
+
+	Returns
+	-------
+	dataFrameChannelData : pd.Dataframe
+		Contains the data of the corrected 
+		measurement curves.
+	"""
+	pass
+
+def create_data_frame_average_data(
+	averageForceDistanceCurve
+) -> pd.DataFrame:
+	"""
+	Cache the the calculated average data in a 
+	pandas dataframe.
+
+	Parameters
+	----------
+	averageForceDistanceCurve : AverageForceDistanceCurve
+		Average of the active force distance curve with
+		the standard deviation if selected.
+
+	Returns
+	-------
+	dataFrameChannelData : pd.Dataframe
+		Contains the data of the calculated average
+		curve.
+	"""
+	pass 
+
+def create_data_frame_channel_data(
+	channels
+) -> pd.DataFrame:
+	"""
+	Cache the calculated channels in a 
+	pandas dataframe.
+
+	Parameters
+	----------
+	channels : list[Channel]
+		All channels calculated from the corrected data. 
+
+	Returns
+	-------
+	dataFrameChannelData : pd.Dataframe
+		Contains the data of every calculated channel.
+	"""
+	pass 
+
+def get_force_volume_data(
+	forceVolume
+) -> nt.DataFramesForceVolume:
+	"""
+	Convert the data of a force volume to panda dataframes
+	to simpliy the export of the data.
+
+	Parameters
+	----------
+	forceVolume : ForceVolume
+		Contains the raw and calculated data from the 
+		imported measurement.
+
+	Returns
+	-------
+	dataFramesForceVolume : nt.DataFramesForceVolume
+		Data of the force volume cached in different
+		distinct panda data frames.
+	"""
+	dataFrameMetaData = create_data_frame_metadata(forceVolume)
+	dataFramerawCurves = create_data_frame_raw_curves(forceVolume.forceDistanceCurves)
+	dataFrameCorrectedCurves = create_data_frame_corrected_curves(forceVolume.forceDistanceCurves)
+	dataFrameAverageData = create_data_frame_average_data(forceVolume.averageForceDistanceCurve)
+	dataFrameChannelData = create_data_frame_channel_data(forceVolume.channels)
+
+	return nt.DataFramesForceVolume(
+		metaData=dataFrameMetaData,
+		rawCurves=dataFramerawCurves,
+		correctedCurves=dataFrameCorrectedCurves,
+		averageData=dataFrameAverageData,
+		channelData=dataFrameChannelData
+	)
+
 def export_to_csv(
 	forceVolume, 
 	pathOutputFolder: str, 
 ) -> None:
 	"""
+	Export the processed data of the imported 
+	force volume to the .csv file format.
 
 	Parameters
 	----------
 	forceVolume : ForceVolume
+		Contains the raw and calculated data from the 
+		imported measurement.
 	pathOutputFolder : str
+		Path to the folder in which the data will be stored.
 	"""
-	pass
+	dataFramesForceVolume = get_force_volume_data(forceVolume)
+	outPutFilePath = os.path.join(outputFolder, "data.csv")
 
 def export_to_xlsx(
 	forceVolume, 
 	pathOutputFolder: str
 ) -> None:
 	"""
+	Export the processed data of the imported 
+	force volume to the .xlsx file format.
 
 	Parameters
 	----------
 	forceVolume : ForceVolume
+		Contains the raw and calculated data from the 
+		imported measurement.
 	pathOutputFolder : str
+		Path to the folder in which the data will be stored.
 	"""
-	generalDataFrame = pd.DataFrame(
-		dataHandler.generalData.copy(),
-		index=[0]
-	)
-
-	curveXValues, curveYValues = split_corrected_curves(dataHandler.curveData["correctedCurves"])
-	curveXValuesDataframe = pd.DataFrame(
-		data=curveXValues,
-		index=np.arange(curveXValues.shape[0]).tolist(),
-		columns=np.arange(curveXValues.shape[1]).tolist()
-	)
-	curveYValuesDataframe = pd.DataFrame(
-		data=curveYValues,
-		index=np.arange(curveYValues.shape[0]).tolist(),
-		columns=np.arange(curveYValues.shape[1]).tolist()
-	)
-
-	averageDataFrames = {}
-	for name, data in dataHandler.averageData.items():
-		averageDataFrames[name] = pd.DataFrame(
-			data=data,
-			index=[i for i in range(len(data))]
-		)
-
-	channelDataFrames = {} 
-	for channelName, channelData in dataHandler.channelData.items():
-		channelDataFrames[channelName] = pd.DataFrame(
-			data= channelData["sourceData"],
-			index= np.arange(channelData["sourceData"].shape[0]).tolist(),
-			columns= np.arange(channelData["sourceData"].shape[1]).tolist()
-		)
-
+	dataFramesForceVolume = get_force_volume_data(forceVolume)
 	outPutFilePath = os.path.join(outputFolder, "data.xlsx")
+
 	with pd.ExcelWriter(outPutFilePath) as writer:  
-		generalDataFrame.to_excel(writer, sheet_name='General Data')
-
-		curveXValuesDataframe.to_excel(writer, sheet_name='Curves X Values')
-		curveYValuesDataframe.to_excel(writer, sheet_name='Curves Y Values')
-
-		for name, data in channelDataFrames.items():
-			data.to_excel(writer, sheet_name=name)
-		
-		for channelDataFrameName, channelDataFrame in channelDataFrames.items():
-			channelDataFrame.to_excel(writer, sheet_name=channelDataFrameName)
-
-def export_to_txt(
-	forceVolume, 
-	pathOutputFolder: str
-) -> None:
-	"""
-
-	Parameters
-	----------
-	forceVolume : ForceVolume
-	pathOutputFolder : str
-	"""
-	outPutFilePath = os.path.join(outputFolder, "data.txt")
-	with open(outPutFilePath, 'w', newline='') as outputDatafileTxt:
-		# Save general data.
-		outputDatafileTxt.write("General data: \n")
-		for name, data in dataHandler.generalData.items():
-			outputDatafileTxt.write(name + str(data) + "\n")
-
-		# Save channel data.
-		outputDatafileTxt.write("Channel data: \n")
-		for name, data in dataHandler.channelData.items():
-			outputDatafileTxt.write(name + ": \n")
-			np.savetxt(outputDatafileTxt, data, fmt="%1.8e")
-			outputDatafileTxt.write("\n")	
-
-		# Save curve data.
-		outputDatafileTxt.write("Curve data: \n")
-		for curve in dataHandler.curveData["correctedCurves"]:
-			np.savetxt(
-				outputDatafileTxt,
-				np.asarray(curve),
-				fmt="%1.8e"
-			)
-
-		# Save average data.
-		outputDatafileTxt.write("Channel data: \n")
-		for name, data in dataHandler.averageData.items():
-			outputDatafileTxt.write(name + ": \n")
-			np.savetxt(outputDatafileTxt, data, fmt="%1.8e")
-			outputDatafileTxt.write("\n")	
+		dataFramesForceVolume.metaData.to_excel(writer, sheet_name='Meta Data')
+		dataFramesForceVolume.rawCurves.to_excel(writer, sheet_name='Raw Curves')
+		dataFramesForceVolume.correctedCurves.to_excel(writer, sheet_name='Corrected Curves')
+		dataFramesForceVolume.averageData.to_excel(writer, sheet_name='Average Data')
+		dataFramesForceVolume.channelData.to_excel(writer, sheet_name='Channel Data')
 
 def export_plots(
-	forceVolume, 
+	plotHolders: Dict, 
 	pathOutputFolder: str
 ) -> None:
 	"""
+	Export the plots of the imported force volume.
 
 	Parameters
 	----------
-	forceVolume : ForceVolume
+	plotHolders : dict
+		Contains the holders of every figure in the main window
+		of SOFA.
 	pathOutputFolder : str
+		Path to the folder in which the plots will be stored.
 	"""
-
-	linePlotFilePath = os.path.join(outputFolder, "lineplot")
-	dataHandler.linePlotParameters["holder"].figure.savefig(
-		linePlotFilePath, dpi=300
+	save_figure(
+		plotHolders["lineplot"],
+		os.path.join(outputFolder, "lineplot")
+	)
+	save_figure(
+		plotHolders["heatmap"],
+		os.path.join(outputFolder, "heatmap")
+	)
+	save_figure(
+		plotHolders["histogram"],
+		os.path.join(outputFolder, "histogram")
 	)
 
-	heatmapFilePath = os.path.join(outputFolder, "heatmap")
-	dataHandler.heatmapParameters["holder"].figure.savefig(
-		heatmapFilePath, dpi=300
+def save_figure(
+	holder,
+	filePath: str
+) -> None: 
+	"""
+	Export a single matplotlib figure to the given location.
+
+	Parameters
+	----------
+	holder : matplotlib.backends.backend_tkagg.FigureCanvasTkAgg
+		Interface of a matplotlib figure and a tkinter window.
+	filePath : str
+		Path in which the figure will be saved.
+	"""
+	holder.figure.savefig(
+		filePath, dpi=300
 	)
 
-	histogramFilePath = os.path.join(outputFolder, "histogram")
-	dataHandler.histogramParameters["holder"].figure.savefig(
-		histogramFilePath, dpi=300
-	)
-
-# Defines all available file types to export.
-importFunctions = {
+# Defines all available file types to which the data can be exported.
+exportFormats = {
 	"csv": export_to_csv,
-	"xlsx": export_to_xlsx,
-	"txt": export_to_txt
+	"xlsx": export_to_xlsx
 }

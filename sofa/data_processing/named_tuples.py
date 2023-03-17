@@ -16,6 +16,7 @@ along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 
 from typing import NamedTuple, Tuple, List
 from numpy import ndarray
+from pandas import DataFrame
 
 # Named tuples for FDC data
 class ForceDistanceCurve(NamedTuple): 
@@ -77,7 +78,13 @@ class ChannelData(NamedTuple):
 class ExportParameter(NamedTuple):
 	folderPath: str
 	folderName: str
-	exportToTxt: bool
 	exportToCsv: bool
 	exportToXlsx: bool
 	exportPlots: bool
+
+class DataFramesForceVolume(NamedTuple):
+	metaData: DataFrame
+	rawCurves: DataFrame
+	correctedCurves: DataFrame
+	averageData: DataFrame
+	channelData: DataFrame

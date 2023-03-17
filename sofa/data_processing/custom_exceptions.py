@@ -40,5 +40,5 @@ class CorrectionError(Exception):
 class UnableToLocateEndOfZerolineError(CorrectionError):
 	pass
 
-class UnableToLocateZeroCrossingAfterJtcError(CorrectionError):
+class UnableToLocateZeroCrossingAfterEozlError(CorrectionError):
 	pass
