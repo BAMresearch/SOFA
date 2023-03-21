@@ -68,7 +68,19 @@ def create_data_frame_metadata(
 		Contains the name, size and additional data from 
 		the measurement, if an image was imported
 	"""
-	pass 
+	metaData = {
+		"name": forceVolume.name,
+		"size": forceVolume.size
+	} 
+
+	if forceVolume.metaData:
+		metaData["fss"] = forceVolume.metaData.fss
+		metaData["sss"] = forceVolume.metaData.sss
+		metaData["xOffset"] = forceVolume.metaData.xOffset
+		metaData["yOffset"] = forceVolume.metaData.yOffset
+		metaData["springConstant"] = forceVolume.metaData.springConstant
+
+	return pd.DataFrame.from_dict(metaData)
 
 def create_data_frame_raw_curves(
 	forceDistanceCurves: List
@@ -88,7 +100,22 @@ def create_data_frame_raw_curves(
 		Contains the data of the imported
 		measuremnt curves.
 	"""
-	pass
+	rawPiezo = [
+		forceDistanceCurve.dataApproachRaw.piezo
+		for forceDistanceCurve
+		in forceDistanceCurves
+	]
+	rawDeflection = [
+		forceDistanceCurve.dataApproachRaw.deflection
+		for forceDistanceCurve
+		in forceDistanceCurves
+	]
+
+	return pd.DataFrame(
+		rawPiezo,
+		rawDeflection
+		columns=["raw piezo", "raw deflection"]
+	)
 
 def create_data_frame_corrected_curves(
 	forceDistanceCurves: List
@@ -108,7 +135,22 @@ def create_data_frame_corrected_curves(
 		Contains the data of the corrected 
 		measurement curves.
 	"""
-	pass
+	correctedPiezo = [
+		forceDistanceCurve.dataApproachCorrected.piezo
+		for forceDistanceCurve
+		in forceDistanceCurves
+	]
+	correctedDeflection = [
+		forceDistanceCurve.dataApproachCorrected.deflection
+		for forceDistanceCurve
+		in forceDistanceCurves
+	]
+
+	return pd.DataFrame(
+		correctedPiezo,
+		correctedDeflection
+		columns=["corrected piezo", "corrected deflection"]
+	)
 
 def create_data_frame_average_data(
 	averageForceDistanceCurve
@@ -129,14 +171,23 @@ def create_data_frame_average_data(
 		Contains the data of the calculated average
 		curve.
 	"""
-	pass 
+	return pd.DataFrame(
+		averageForceDistanceCurve.averageData.piezo,
+		averageForceDistanceCurve.averageData.deflection,
+		averageForceDistanceCurve.standardDeviation
+		columns=[
+			"average piezo", 
+			"average deflection", 
+			"standard deviation"
+		]
+	) 
 
 def create_data_frame_channel_data(
-	channels
+	channels: List
 ) -> pd.DataFrame:
 	"""
-	Cache the calculated channels in a 
-	pandas dataframe.
+	Cache the flattended data of the calculated 
+	channels in a pandas dataframe.
 
 	Parameters
 	----------
@@ -148,7 +199,12 @@ def create_data_frame_channel_data(
 	dataFrameChannelData : pd.Dataframe
 		Contains the data of every calculated channel.
 	"""
-	pass 
+	channelData = {}
+
+	for channel in channels:
+		channelData[channel.name] = channel.rawData.flatten()
+
+	return pd.DataFrame.from_dict(channelData)
 
 def get_force_volume_data(
 	forceVolume
@@ -200,7 +256,70 @@ def export_to_csv(
 		Path to the folder in which the data will be stored.
 	"""
 	dataFramesForceVolume = get_force_volume_data(forceVolume)
-	outPutFilePath = os.path.join(outputFolder, "data.csv")
+	dataFrameCombinedCurveData = combine_data_frames(
+		[
+			dataFramesForceVolume.rawCurves,
+			dataFramesForceVolume.correctedCurves,
+			dataFramesForceVolume.averageData,
+		]
+	)
+
+	write_csv_file(
+		dataFramesForceVolume.metaData,
+		os.path.join(outputFolder, "meta_data.csv")
+	)
+	write_csv_file(
+		dataFrameCombinedCurveData,
+		os.path.join(outputFolder, "curve_data.csv")
+	)
+	write_csv_file(
+		dataFramesForceVolume.channelData,
+		os.path.join(outputFolder, "channel_data.csv")
+	)
+
+def combine_data_frames(
+	dataFrames: List[pd.DataFrame]
+) -> pd.DataFrame:
+	"""
+	Combine a list of data frames with the same
+	shape to a single dataframe, to reduce the 
+	number of files created when exporting to 
+	.csv file format.
+
+	Parameters
+	----------
+	dataFrames : list[pd.DataFrame]
+		List of data frames with similar shape
+		which are combined into one data frame.
+	
+	Returns
+	-------
+	comninedDataFrame : pd.DataFrame
+		Contains the combined data of the 
+		data frames.
+	"""
+	return pd.concat(
+		dataFrames
+	)
+
+def write_csv_file(
+	dataFrame: pd.DataFrame,
+	filePathOutput: str
+) -> None:
+	"""
+	Export the data of a pandas dataframe 
+	to the .csv file format.
+
+	Parameters
+	----------
+	dataFrame : pd.DataFrame
+		Data frame which is to be exported.
+	filePathOutput : str
+		File path where the file is to be saved.
+	"""
+	dataFrame.to_csv(
+		filePathOutput
+	)
 
 def export_to_xlsx(
 	forceVolume, 
