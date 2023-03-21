@@ -31,6 +31,8 @@ class ForceDistanceCurve():
 	----------
 	identifier : str
 		Name of the force distance curve.
+	isActive : bool
+		Indicates whether the curve is currently active or not.
 	dataApproachRaw : namedTuple
 		Raw imported approach data with piezo (x) and
 		deflection (y) values.
@@ -63,6 +65,7 @@ class ForceDistanceCurve():
 			deflection (y) values.
 		"""
 		self.identifier: str = identifier
+		self.isActive: bool = True
 		
 		self.dataApproachRaw: NamedTuple = dataApproachRaw
 		self.dataApproachCorrected: NamedTuple

@@ -76,6 +76,35 @@ def create_corrected_line(
 		zorder=5
 	)
 
+def create_average_line(
+	averageData: np.ndarray
+) -> mpl.lines.Line2D:
+	"""
+	"""
+	return mpl.lines.Line2D(
+		averageData.piezo, 
+		averageData.deflection, 
+		c="black", 
+		label="average_data",
+		zorder=6
+	)
+
+def create_average_errorbar(
+	averageData: np.ndarray,
+	standardDeviation: np.ndarray
+) -> mpl.container.ErrorbarContainer:
+	"""
+	"""
+	return mpl.container.ErrorbarContainer(
+		averageData.piezo, 
+		averageData.deflection, 
+		yerr=standardDeviation,
+		c="black",
+		ecolor="black",
+		label="average_data_with_std",
+		zorder=6
+	)
+
 def get_axes(
 	holder: mpl.backends.backend_tkagg.FigureCanvasTkAgg
 ) -> mpl.axes:
@@ -238,15 +267,24 @@ def add_average_curve_to_line_plot() -> None:
 	"""
 	pass 
 
+def add_errorbar_to_line_plot() -> None: 
+	"""
+	"""
+	pass 
+
 def remove_average_curve_from_line_plot() -> None:
+	"""
+	"""
+	pass
+
+def remove_errorbar_from_line_plot() -> None:
 	"""
 	"""
 	pass
 
 def update_line_plot(
 	holder: mpl.backends.backend_tkagg.FigureCanvasTkAgg,
-	lines: List[mpl.lines.Line2D],
-	inactiveForceDistanceCurves: List[int],
+	forceDistanceCurves: List,
 	showInactive: bool
 ) -> None:
 	"""
@@ -255,19 +293,29 @@ def update_line_plot(
 	----------
 	holder : mpl.backends.backend_tkagg.FigureCanvasTkAgg,
 	
-	lines : list
-	
-	inactiveForceDistanceCurves : list
+	forceDistanceCurves : list
 	
 	showInactive : bool
 	
 	"""
-	for index, line in enumerate(lines):
-		if index in inactiveForceDistanceCurves and showInactive:
-			self.update_line(line, "gray", -1)
-		elif index in inactiveForceDistanceCurves and not showInactive:
-			self.update_line(line, "white", -1)
+	for forceDistanceCurve in forceDistanceCurves:
+		if not forceDistanceCurve.isActive and showInactive:
+			self.update_line(
+				forceDistanceCurve.lineRepresentationCorrectedData, 
+				"gray", 
+				-1
+			)
+		elif not forceDistanceCurve.isActive and not showInactive:
+			self.update_line(
+				forceDistanceCurve.lineRepresentationCorrectedData, 
+				"white", 
+				-1
+			)
 		else:
-			self.update_line(line, "red", 1)
+			self.update_line(
+				forceDistanceCurve.lineRepresentationCorrectedData, 
+				"red", 
+				1
+			)
 	
 	holder.draw()

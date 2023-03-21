@@ -37,6 +37,12 @@ class ChannelMetadata(NamedTuple):
 	pointOfContact: ForceDistancePoint
 	coefficientsFitApproachCurve: CoefficientsFitApproachCurve
 
+class NormedCurves(NamedTuple):
+	piezoApproach: ndarray
+	deflectionApproach: ndarray
+	piezoContact: ndarray
+	deflectionContact: ndarray
+
 # Named tuples for the data import
 class ImportParameter(NamedTuple):
 	folderPathMeasurementData: str 

@@ -19,44 +19,159 @@ import numpy as np
 
 class AverageForceDistanceCurve():
 	"""
+	
+
+	Attributes
+	----------
+	averageData : np.ndarray
+
+	standardDeviation : np.ndarray
+
+	lineRepresentation : matplotlib.lines.Line2D
+
+	errorbarBar : mpl.container.ErrorbarContainer
+
 	"""
 	def __init__(self):
 		"""
 		"""
-		self.DataApproach: np.ndarray 	# need better name
-		self.DataContact: np.ndarray 	# need better name
-		self.averageDataApproach: np.ndarray
-		self.averageDataContact: np.ndarray
-		self.standardDeviationApproach: np.ndarray
-		self.standardDeviationContact: np.ndarray
+		self.averageData: np.ndarray
+		self.standardDeviation: np.ndarray
 		self.lineRepresentation: matplotlib.lines.Line2D
+		self.errorbarBar: mpl.container.ErrorbarContainer
 
-	def calculate_average(self) -> None:
-		""""""
-		self.averageDataApproach = 
-		self.averageDataContact = 
+	def calculate_average(
+		self,
+		forceDistanceCurves: List,
+	) -> None:
+		"""
+		"""
+		activeForceDistanceCurves = _get_active_force_distance_curves(
+			forceDistanceCurves,
+		)
+		normedCurves = _interpolate_normed_curves(
+			activeForceDistanceCurves
+		)
+		
+		averagedDeflectionApproach = [
+			np.mean(nthValues) 
+			for nthValues 
+			in zip(*NormedCurves.deflectionApproach)
+		]
+		averagedDeflectionContact = [
+			np.mean(nthValues) 
+			for nthValues 
+			in zip(*NormedCurves.deflectionContact)
+		]
 
-	def calculate_standard_deviation(self) -> None:
-		""""""
-		self.standardDeviationApproach = np.asarray(
-			[np.nanstd(nthValues) for nthValues in zip(*NormedCurves.yValuesLeft)]
+		standardDeviationApproach = [
+			np.std(nthValues) for nthValues in zip(*NormedCurves.deflectionApproach)
+		]
+		standardDeviationContact = [
+			np.std(nthValues) for nthValues in zip(*NormedCurves.deflectionContact)
+		]
+
+		self.averageData = nt.ForceDistanceCurve(
+			piezo=np.concatenate(normedCurves.piezoApproach , normedCurves.piezoContact),
+			deflection=np.concatenate(averagedDeflectionApproach, averagedDeflectionContact)
 		)
-		self.standardDeviationContact = np.asarray(
-			[np.nanstd(nthValues) for nthValues in zip(*NormedCurves.yValuesRight)]
+
+		self.standardDeviation = standardDeviationApproach + standardDeviationContact
+
+	@staticmethod
+	def _get_active_force_distance_curves(
+		forceDistanceCurves: List,
+	) -> List:
+		"""
+		"""
+		return [
+			forceDistanceCurve
+			for forceDistanceCurve
+			in forceDistanceCurves
+			if forceDistanceCurve.isActive
+		]
+
+	@staticmethod
+	def _interpolate_normed_curves(
+		activeForceDistanceCurves
+	) -> None:
+		"""
+		"""
+		numberOfDataPoints = 2000
+
+		minimumPizeo = _get_minimum_piezo(activeForceDistanceCurves)
+		maximumDeflection = _get_maximum_deflection(activeForceDistanceCurves)
+
+		normedPiezoApproach = np.linspace(minimumPizeo, 0, numberOfDataPoints)
+		normedDeflectionApproach = []
+		normedDeflectionContact = np.linspace(0, maximumDeflection, numberOfDataPoints)
+		normedPiezoContact = []
+
+		# Interpolate y values for the left and right part.
+		for forceDistanceCurve in activeForceDistanceCurves:
+			indexZeroCrossing = forceDistanceCurve.channelMetadata.pointOfContact.index
+
+			normedDeflectionApproach.append(
+				np.interp(
+					normedPiezoApproach, 
+					forceDistanceCurve.dataApproachCorrected.piezo[:indexZeroCrossing], 
+					forceDistanceCurve.dataApproachCorrected.deflection[:indexZeroCrossing]
+				)
+			)
+			normedPiezoContact.append(
+				np.interp(
+					normedDeflectionContact, 
+					forceDistanceCurve.dataApproachCorrected.deflection[indexZeroCrossing:], 
+					forceDistanceCurve.dataApproachCorrected.piezo[indexZeroCrossing:]
+				)
+			)
+
+		return nt.NormedCurves(
+			normedPiezoApproach, 
+			np.asarray(normedDeflectionApproach), 
+			normedDeflectionContact, 
+			np.asarray(normedPiezoContact)
 		)
+
+	@staticmethod
+	def _get_minimum_piezo(
+		activeForceDistanceCurves
+	) -> float:
+		"""
+		"""
+		piezoValues = [
+			forceDistanceCurve.dataApproachCorrected.piezo
+			for forceDistanceCurve
+			in activeForceDistanceCurves
+		]
+
+		return np.min(piezoValues)
+
+	@staticmethod
+	def _get_maximum_deflection(
+		activeForceDistanceCurves
+	) -> float:
+		"""
+		"""
+		deflectionValues = [
+			forceDistanceCurve.dataApproachCorrected.deflection
+			for forceDistanceCurve
+			in activeForceDistanceCurves
+		]
+
+		return np.max(deflectionValues)
 
 	def create_line_representation(self) -> None: 
-		""""""
-		self.lineRepresentation =  
+		"""
+		"""
+		self.lineRepresentation = plt_data.create_average_line(
+			self.averageData
+		)
 
 	def create_line_representation_as_errorbar(self) -> None:
-		""""""
-		self.lineRepresentation =  
-
-	def add_line_representation_to_plot(self) -> None:
-		""""""
-		pass 
-
-	def remove_line_representation_from_plot(self) -> None:
-		""""""
-		pass
+		"""
+		"""
+		self.errorbarBar = plt_data.create_average_errorbar(
+			self.averageData,
+			self.standardDeviation
+		) 

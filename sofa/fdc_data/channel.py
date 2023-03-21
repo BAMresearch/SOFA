@@ -20,6 +20,8 @@ import functools
 import numpy as np
 from scipy.stats import linregress
 
+import data_processing.named_tuples as nt
+
 def decorator_reshape_channel_data(function):
 	"""
 	Reshape the data of a channel to a 2 dimensional array.
@@ -64,8 +66,8 @@ class Channel(ABC):
 			size
 		)
 
-	@abstractmethod
 	@staticmethod
+	@abstractmethod
 	def _calculate_channel_data(
 		forceDistanceCurves: List, 
 		size: Tuple[int]
@@ -74,9 +76,7 @@ class Channel(ABC):
 		"""
 		pass
 
-	def get_active_data(
-		inactiveForceDistanceCurves: List[int]
-	) -> None:
+	def get_active_data() -> None:
 		""""""
 		pass
 
@@ -289,3 +289,16 @@ class Artifact(Channel):
 		return np.min(
 			np.diff(deflection[pointOfContact.index:])
 		) < 0
+
+channels = {
+	"topography": Topography,
+	"zPiezoAtMaximumDeflection": PiezoAtMaximumDeflection,
+	"stiffness": Stiffness,
+	"attractiveArea": AttractiveArea,
+	"rawOffset": RawOffset,
+	"rawStiffness": RawSlope,
+	"maxDeflection": MaximumDeflection,		
+	"zAttractive": "calculate_z_attractive",
+	"deflectionAttractive": "calculate_deflection_attractive",
+	"curvesWithArtifacts": Artifact,
+}
