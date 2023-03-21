@@ -52,69 +52,117 @@ class ImportWindow(ttk.Frame):
 	forceVolume : ForceVolume
 		Stores the data of the imported measuremnet data.
 	progressbar : ttk.Progressbar
-
+		Shows the user if the process of importing 
+		the data is still running. 
 	labelProgressbarVariable : tk.Stringvar
-
-	set_filename : function
-
+		Indicates the current running process.
+	set_imported_meta_data_in_main_window : function
+		Method of the MainWindow class to set the
+		filename, size and location of the imported
+		data in the main window of SOFA. 
 	dataTypes : dict_keys
-
+		Every available import format of SOFA.
 	filePathData : tk.StringVar
-
+		File path to the required measurement data.
 	filePathImage : tk.StringVar
-
+		File path to an optional image file.
 	filePathChannel : tk.StringVar
-
+		File path to a file with optional channel data.
 	showPoorCurves : tk.BooleanVar
-
+		Specifies whether curves that cannot be corrected 
+		are to be displayed in the line plot. 
 	"""
-	def __init__(self, root, forceVolume, set_filename):
+	def __init__(
+		self, 
+		root, 
+		forceVolume, 
+		set_imported_meta_data
+	) -> None:
 		"""
+		Create a subwindow to import measurement data.
 		"""
 		super().__init__(root, padding=10)
 		
 		self.pack(fill=BOTH, expand=YES)
 
 		self.forceVolume = forceVolume
-		self.set_filename = set_filename
+		self.set_imported_meta_data_in_main_window = set_imported_meta_data
 		self.dataTypes = imp_data.importFunctions.keys()
 
+		self._setup_input_variables()
 		self._create_window()
+
+	def _setup_input_variables(self) -> None: 
+		"""
+		Initialize all required variables for the entries,
+		checkbuttons and the progressbar.
+		"""
+		self.selectedDataType = tk.StringVar(self, value=".ibw")
+		self.showPoorCurves = tk.BooleanVar(self)
+
+		self.filePathData = tk.StringVar(self)
+
+		self.filePathImage = tk.StringVar(self)
+		self.filePathChannel = tk.StringVar(self)
+
+		self.progressbarCurrentLabel = tk.StringVar(self, value="")
 
 	def _create_window(self) -> None:
 		"""
 		Define all elements within the import window.
 		"""
+		self._create_frame_import_options()
 		self._create_frame_required_data()
 		self._create_frame_optional_data()
 		self._create_import_button()
 		self._create_progressbar()
 
+	def _create_frame_import_options(self) -> None:
+		"""
+		Define a drop down menu to select the data type
+		of the measurement data and checkbuttons to
+		specify the import options.
+		"""
+		frameImportOptions = ttk.Labelframe(self, text="Import Options", padding=15)
+		frameImportOptions.pack(fill=X, expand=YES, anchor=N, padx=15, pady=(15, 5))
+
+		# Data type
+		rowDataType = ttk.Frame(frameImportOptions)
+		rowDataType.pack(fill=X, expand=YES, pady=(0, 15))
+
+		dataTypeLabel = ttk.Label(rowDataType, text="Data Type")
+		dataTypeLabel.pack(side=LEFT, padx=(15, 0))
+		
+		dropdownDataType = ttk.OptionMenu(
+			rowDataType, 
+			self.selectedDataType, 
+			"", 
+			*self.dataTypes
+		)
+		dropdownDataType.pack(side=RIGHT, padx=5)
+
+		# Show poor curves
+		rowShowPoorCurves = ttk.Frame(frameImportOptions)
+		rowShowPoorCurves.pack(fill=X, expand=YES)
+
+		checkButtonShowPoorCurves = ttk.Checkbutton(
+			rowShowPoorCurves,
+			text="Show poor curves",
+			variable=self.showPoorCurves,
+			onvalue=True,
+			offvalue=False
+		)
+		checkButtonShowPoorCurves.pack(side=LEFT, padx=(15, 0))
+
 	def _create_frame_required_data(self) -> None:
 		"""
-		Define all elements within the required data frame.
+		Define an entry to specify the location of the 
+		measurement data.
 		"""
 		frameRequiredData = ttk.Labelframe(self, text="Required Data", padding=15)
 		frameRequiredData.pack(fill=X, expand=YES, anchor=N, padx=15, pady=(15, 5))
 
-		# Data type
-		rowDataType = ttk.Frame(frameRequiredData)
-		rowDataType.pack(fill=X, expand=YES, pady=(0, 5))
-
-		dataTypeLabel = ttk.Label(rowDataType, text="Data Type")
-		dataTypeLabel.pack(side=LEFT, padx=(15, 0))
-
-		self.selectedDataType = tk.StringVar(self, value="BAM_IBW")
-		
-		dropdownDataType = ttk.OptionMenu(
-			rowDataType, self.selectedDataType, 
-			"", *self.dataTypes
-		)
-		dropdownDataType.pack(side=RIGHT, padx=5)
-
-		# Data files
-		self.filePathData = tk.StringVar(self)
-
+		# Measurement data files
 		rowDataFiles = ttk.Frame(frameRequiredData)
 		rowDataFiles.pack(fill=X, expand=YES, pady=(10, 15))
 
@@ -131,31 +179,15 @@ class ImportWindow(ttk.Frame):
 		)
 		buttonBrowseData.pack(side=LEFT, padx=5)
 
-		# Options
-		self.showPoorCurves = tk.BooleanVar(self)
-
-		rowOptions = ttk.Frame(frameRequiredData)
-		rowOptions.pack(fill=X, expand=YES)
-
-		checkButtonShowPoorCurves = ttk.Checkbutton(
-			rowOptions,
-			text="Show poor curves",
-			variable=self.showPoorCurves,
-			onvalue=True,
-			offvalue=False
-		)
-		checkButtonShowPoorCurves.pack(side=LEFT, padx=(15, 0))
-
 	def _create_frame_optional_data(self) -> None:
 		"""
-		Define all elements within the optional data frame.
+		Define two entries to specify the location of an 
+		optional image and channel file.
 		"""	
 		frameOptionalData = ttk.Labelframe(self, text="Optional Data", padding=15)
 		frameOptionalData.pack(fill=X, expand=YES, anchor=N, padx=15, pady=5)
 
-		# Image file
-		self.filePathImage = tk.StringVar(self)
-
+		# Image file.
 		rowImageFile = ttk.Frame(frameOptionalData)
 		rowImageFile.pack(fill=X, expand=YES, pady=(0, 10))
 
@@ -172,9 +204,7 @@ class ImportWindow(ttk.Frame):
 		)
 		buttonBrowseImage.pack(side=LEFT, padx=5)
 
-		# Additional channel
-		self.filePathChannel = tk.StringVar(self)
-
+		# Additional channel.
 		rowChannelFile = ttk.Frame(frameOptionalData)
 		rowChannelFile.pack(fill=X, expand=YES)
 
@@ -211,8 +241,6 @@ class ImportWindow(ttk.Frame):
 		"""	
 		rowLabelProgressbar = ttk.Frame(self)
 		rowLabelProgressbar.pack(fill=X, expand=YES)
-
-		self.progressbarCurrentLabel = tk.StringVar(self, value="")
 
 		labelProgressbar = ttk.Label(rowLabelProgressbar, textvariable=self.progressbarCurrentLabel)
 		labelProgressbar.pack(side=RIGHT, padx=15)
@@ -285,19 +313,23 @@ class ImportWindow(ttk.Frame):
 			self._stop_progressbar()
 			return messagebox.showerror("Error", str(e), parent=self)
 		else:
-			self.forceVolume.import_data(importedData)
+			self.forceVolume.set_imported_data(importedData)
 
 		self._update_progressbar_label("Correcting data...")
-		self.forceVolume.correct_data()
+		self.forceVolume.correct_force_distance_curves()
 
 		self._update_progressbar_label("Calculating channel data...")
 		self.forceVolume.calculate_channel_data()
 
-		self._update_progressbar_label("Preparing to plot data...")
+		self._update_progressbar_label("Plotting data...")
 		self.forceVolume.display_imported_data()
 
 		# Set the name, size and location of the imported data in the main window.
-		self.set
+		self.set_imported_meta_data_in_main_window(
+			self.forceVolume.name,
+			self.forceVolume.size,
+			selectedImportParameters.filePathData
+		)
 
 		self._stop_progressbar()
 

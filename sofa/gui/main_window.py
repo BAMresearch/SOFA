@@ -14,10 +14,9 @@ You should have received a copy of the GNU General Public License
 along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 """
 import os
+from typing import Tuple
 
 import tkinter as tk
-from tkinter import filedialog as fd
-from tkinter import messagebox
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
@@ -30,7 +29,7 @@ from gui.export_window import ExportWindow
 from gui.import_window import ImportWindow
 
 from fdc_data.force_volume import ForceVolume
-from fdc_data.active_channels import channels as activeChannels
+from fdc_data.channel import channels as activeChannels
 
 from data_visualization.toolbar.line_plot_toolbar import LinePlotToolbar
 from data_visualization.toolbar.heatmap_toolbar import HeatmapToolbar
@@ -54,9 +53,6 @@ class MainWindow(ttk.Frame):
 
 		self.pack(fill=BOTH, expand=YES)
 
-		# Set tkinter dialog language to english.
-		self.tk.eval('::msgcat::mclocale en')
-		self.sourceDirectory = os.path.abspath(os.path.dirname(__file__))
 		self.forceVolume = ForceVolume()
 
 		self.channelNames = [
@@ -67,7 +63,7 @@ class MainWindow(ttk.Frame):
 		self.colorPlot = "#e6f7f4"
 		
 		self._create_main_window()
-		self._set_plot_parameters_in_data_handler()
+		#self._set_plot_parameters_in_data_handler()
 
 	def _create_main_window(self) -> None:
 		"""
@@ -162,29 +158,29 @@ class MainWindow(ttk.Frame):
 		)
 		valueActiveData.grid(row=0, column=1, padx=10, sticky=W)
 
-		labelActiveDataLocation = ttk.Label(
-			frameActiveData, 
-			text="Location:"
-		)
-		labelActiveDataLocation.grid(row=1, column=0, padx=10, sticky=W)
-
-		valueActiveDataLocation = ttk.Label(
-			frameActiveData,
-			textvariable=self.stringVarActiveDataLocation
-		)
-		valueActiveDataLocation.grid(row=1, column=1, padx=10, sticky=W)
-
 		labelActiveDataSize = ttk.Label(
 			frameActiveData, 
 			text="Size:"
 		)
-		labelActiveDataSize.grid(row=2, column=0, padx=10, sticky=W)
+		labelActiveDataSize.grid(row=1, column=0, padx=10, sticky=W)
 
 		valueActiveDataSize = ttk.Label(
 			frameActiveData,
 			textvariable=self.stringVarActiveDataSize
 		)
-		valueActiveDataSize.grid(row=2, column=1, padx=10, sticky=W)
+		valueActiveDataSize.grid(row=1, column=1, padx=10, sticky=W)
+
+		labelActiveDataLocation = ttk.Label(
+			frameActiveData, 
+			text="Location:"
+		)
+		labelActiveDataLocation.grid(row=2, column=0, padx=10, sticky=W)
+
+		valueActiveDataLocation = ttk.Label(
+			frameActiveData,
+			textvariable=self.stringVarActiveDataLocation
+		)
+		valueActiveDataLocation.grid(row=2, column=1, padx=10, sticky=W)
 
 	def _create_frame_control_linked_plots(
 		self, 
@@ -453,16 +449,25 @@ class MainWindow(ttk.Frame):
 		ImportWindow(
 			toplevelImport,
 			self.forceVolume, 
-			self.set_
+			self.set_imported_meta_data
 		)
 
-	def set_(
+	def set_imported_meta_data(
 		self,
 		name: str,
 		size: Tuple[int],
 		location: str
 	) -> None:
 		"""
+
+		Parameters
+		----------
+		name : str
+			
+		size : tuple[int]
+
+		location : str
+
 		"""
 		self.stringVarActiveData.set(name)
 		self.stringVarActiveDataSize.set(str(size))
@@ -547,51 +552,3 @@ class MainWindow(ttk.Frame):
 				for character in inputString
 			]
 		).title()
-
-	def _close_main_window(self) -> None:
-		"""Ask the user if he wants to save the session before closing sofa."""
-		saveSession = messagebox.askyesno(
-			"Save session", 
-			"Do you want to save the current session before closing SOFA?"
-		)
-		
-		if saveSession:
-			export_to_sofa(
-				self.forceVolume, 
-				self.sourceDirectory,
-				".sofaSession",
-				hidden=True
-			)
-
-		self.quit()
-		self.destroy()
-
-	def _specify_data_import(self) -> None:
-		"""Ask the user if he wants to restore the last session or import new data."""
-		loadLastSession = messagebox.askyesno(
-			"Load last session", 
-			"Do you want to load the last session?"
-		)
-		
-		if loadLastSession:
-			self._restore_session()
-		else:
-			self._create_import_window()
-
-	def _restore_session(self) -> None:
-		"""Try to restore the last session."""
-		try:
-			filePath = os.path.join(
-				self.sourceDirectory,
-				".sofaSessionBackup"
-			)
-			backupData = restore_sofa_data(filePath)
-			self.set_filename_in_labeled_frame(backupData["generalData"]["filename"])
-			self.forceVolume.restore_session_data(backupData)
-			self.forceVolume.display_imported_data()
-		except FileNotFoundError:
-			messagebox.showerror(
-				"Error", 
-				"Could not find a session file. Please import data."
-			)
-			self._create_import_window()

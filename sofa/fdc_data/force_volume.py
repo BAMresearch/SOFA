@@ -34,7 +34,7 @@ class ForceVolume():
 		Number of force distance curves as the width and height 
 		of the measurement grid.
 	metadata : dict
-		
+		Optional imported meta data from the measurement.
 	forceDistanceCurves : list[ForceDistanceCurve]
 		
 	averageForceDistanceCurve : AverageForceDistanceCurve
@@ -42,9 +42,7 @@ class ForceVolume():
 		curves.
 	channels : list[Channel]
 		
-	inactiveForceDistanceCurves : list[int]
-		
-	guiInterface : dict
+	guiParameters : dict
 
 	"""
 	def __init__(self):
@@ -57,27 +55,37 @@ class ForceVolume():
 		self.forceDistanceCurves: List[ForceDistanceCurve]
 		self.averageForceDistanceCurve: AverageForceDistanceCurve
 		self.channels: List[Channel]
-		self.inactiveForceDistanceCurves: List[int] = []
 
-		self.guiInterface: Dict
+		self.guiParameters: Dict
 
-	def import_data(self, importedData: Dict) -> None:
+	def set_gui_parameters(self, guiParameters): -> None:
 		"""
+		"""
+		pass
 
+	def set_imported_data(self, importedData: Dict) -> None:
+		"""
+		
 
 		Parameters
 		----------
 		importedData : dict
-
+			Data from the imported measurement.
 		"""
+		# Set mandatory data.
 		self.name = importedData["measurementData"].filename
 		self.size = importedData["measurementData"].size
 
-		self._import_force_distance_curves(
+		self._create_force_distance_curves(
 			importedData["measurementData"].approachCurves
 		)
+		# Set optional data if imported.
+		if "imageData" in importedData:
+			self.metadata = importedData["imageData"]
+		if "channelData" in importedData:
+			pass
 
-	def _import_force_distance_curves(
+	def _create_force_distance_curves(
 		importedApproachCurves: List[nt.ForceDistanceCurve]
 	) -> None:
 		"""
@@ -98,10 +106,10 @@ class ForceVolume():
 				)
 			)
 
-	def correct_data(self) -> None:
+	def correct_force_distance_curves(self) -> None:
 		"""
-		Correct the data of all force distance curves in the
-		force volume.
+		Correct the raw data of all force distance 
+		curves in the force volume.
 		"""
 		for forceDistanceCurve in self.forceDistanceCurves:
 			forceDistanceCurve.correct_raw_data()
@@ -110,38 +118,29 @@ class ForceVolume():
 		"""
 		
 		"""
-		for channelName, caluclate_channel in channels.items():
-			"""
-			self.channels.append(
-				Channel(
-					name=channelName,
-					data=
-				)
-			)
-			"""
-			pass
+		pass
 
 	def calculate_average_data(self) -> None:
 		"""
+		Calculate the average from the currently active 
+		force distance curves.
 		"""
 		pass
 
 	def plot_data_as_lineplot(self) -> None:
 		"""
+		Plots the force distance curves in a line plot.
 		"""
 		pass
 
 	def plot_data_as_heatmap(self) -> None:
 		"""
+		Plots the currently selected channel in a heatmap.
 		"""
 		pass
 
 	def plot_data_as_histogram(self) -> None:
 		"""
-		"""
-		pass
-
-	def export_data(self) -> None: 
-		"""
+		Plots the currently selected channel in a histogram.
 		"""
 		pass

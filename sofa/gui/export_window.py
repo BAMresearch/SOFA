@@ -94,6 +94,7 @@ class ExportWindow(ttk.Frame):
 		forceVolume
 	):
 		"""
+		Create a subwindow to export the data of the forcevolume.
 		"""
 		super().__init__(root)
 		
@@ -101,7 +102,22 @@ class ExportWindow(ttk.Frame):
 
 		self.forceVolume = forceVolume
 
+		self._setup_input_variables()
 		self._create_window()
+
+	def _setup_input_variables(self) -> None: 
+		"""
+		Initialize all required variables for the entries,
+		checkbuttons and the progressbar.
+		"""
+		self.folderName = tk.StringVar(self, value="")
+		self.folderPath = tk.StringVar(self, value="")
+
+		self.exportToCsv = tk.BooleanVar(self, value=0)
+		self.exportToXlsx = tk.BooleanVar(self, value=0)
+		self.exportPlots = tk.BooleanVar(self, value=0)
+
+		self.progressbarCurrentLabel = tk.StringVar(self, value="")
 
 	def _create_window(self) -> None:
 		"""
@@ -120,9 +136,6 @@ class ExportWindow(ttk.Frame):
 		"""
 		frameDataLocation = ttk.Labelframe(self, text="Data Location", padding=15)
 		frameDataLocation.pack(fill=X, expand=YES, anchor=N, padx=15, pady=(15, 5))
-
-		self.folderName = tk.StringVar(self, value="")
-		self.folderPath = tk.StringVar(self, value="")
 
 		# Folder name
 		rowFolderName = ttk.Frame(frameDataLocation)
@@ -158,10 +171,6 @@ class ExportWindow(ttk.Frame):
 		"""
 		frameDataTypes = ttk.Labelframe(self, text="Data Types", padding=15)
 		frameDataTypes.pack(fill=X, expand=YES, anchor=N, padx=15, pady=5)
-
-		self.exportToCsv = tk.BooleanVar(self, value=0)
-		self.exportToXlsx = tk.BooleanVar(self, value=0)
-		self.exportPlots = tk.BooleanVar(self, value=0)
 
 		self._create_checkbutton_data_type(
 			frameDataTypes,
@@ -232,8 +241,6 @@ class ExportWindow(ttk.Frame):
 		"""	
 		rowLabelProgressbar = ttk.Frame(self)
 		rowLabelProgressbar.pack(fill=X, expand=YES)
-
-		self.progressbarCurrentLabel = tk.StringVar(self, value="")
 
 		labelProgressbar = ttk.Label(rowLabelProgressbar, textvariable=self.progressbarCurrentLabel)
 		labelProgressbar.pack(side=RIGHT, padx=15)
