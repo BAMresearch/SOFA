@@ -19,9 +19,8 @@ import numpy as np
 from matplotlib.lines import Line2D
 
 from data_processing.correct_data import correct_approach_curve
-import data_visualization.plot_data as plt_data
-
 import data_processing.named_tuples as nt
+import data_visualization.plot_data as plt_data
 
 class ForceDistanceCurve():
 	"""

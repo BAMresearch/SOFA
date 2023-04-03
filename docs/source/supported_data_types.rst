@@ -1,3 +1,4 @@
+====================
 Supported Data Types
 ====================
 
@@ -12,7 +13,7 @@ In case your FSD format is accepted by SOFA, please make also sure that the data
 .. _force spectroscopy data structure:
 
 Force Spectroscopy data structure
----------------------------------
+=================================
 
 FSD contains single Force Curves (aka Force-Distance curves, FDC) which consist of two data sets of equal dimensions, the controlled variable **piezo displacement Z** and the measured variable **force F**.
 
@@ -35,3 +36,17 @@ Besides the most common ways of storing FSD in a compact form as shown above, si
 Most exported FSD formats also include notes or headers which describe the experimental set-up, i.e. time, date, temperature, calibration data, measurement rate, maximum force, dimension of FV in points, lines, x and y-range. In case this additional data is available, SOFA will import information, which is necessary for further analysis, such as the spring constant kc or the sensitivity Ω.
 
 Also included in the exported FSD are raw parameter maps, which can be also uploaded and used for further analysis in SOFA, as shown in Parameter maps.
+
+.. _import formats:
+
+Import Formats
+==============
+
+add text
+
+.. _export formats:
+
+Export Formats
+==============
+
+add text

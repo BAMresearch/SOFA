@@ -29,7 +29,7 @@ from gui.export_window import ExportWindow
 from gui.import_window import ImportWindow
 
 from fdc_data.force_volume import ForceVolume
-from fdc_data.channel import channels as activeChannels
+from data_processing.calculate_channel_data import active_channels as activeChannels
 
 from data_visualization.toolbar.line_plot_toolbar import LinePlotToolbar
 from data_visualization.toolbar.heatmap_toolbar import HeatmapToolbar

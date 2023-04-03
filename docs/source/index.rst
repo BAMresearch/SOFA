@@ -1,45 +1,45 @@
-About SOFA
-==========
-**SOFA** (**SO**\ftware for **F**\orce **A**\nalysis) is an open-source software for analyzing Atomic Force Microscopy (AFM) Force Spectroscopy data (FSD). SOFA is provided under `github <https://github.com/2Puck/sofa>`_.
+SOFA
+====
+**SOFA** (**SO**\ftware for **F**\orce **A**\nalysis) is a graphical user interface to analyze Atomic Force Microscopy Force Spectroscopy data. 
 
-We kindly ask to cite (doi:pub einfügen) if any information of this manual or data resulting from using SOFA is published.  
+We kindly ask to cite (add doi) if any information of this manual or data resulting from using SOFA is published. 
 
-Installation
-============
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
-   Installation <installation>
+   atomic_force_spectroscopy
 
-Using SOFA
-==========
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
-   Import Data <import_data>
-   SOFA workflow <sofa_workflow>
-   Export Data <export_data>
+   using_sofa
 
-SOFA Reference
-==============
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
-   Supported Data Types <supported_data_types>
-   Correction algorithm <correction_algorithm>
-   SOFA Channels <channels>
-   SOFA toolbars <sofa_toolbars>
+   supported_data_types
 
-License
-========
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
-   License <license>
+   correction_algorithm
 
-Glossary
-========
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
-   Glossary <glossary>
+   channels
+
+.. toctree::
+   :maxdepth: 2
+
+   toolbars
+
+.. toctree::
+   :maxdepth: 2
+
+   codebase
+
+.. toctree::
+   :maxdepth: 2
+
+   glossary

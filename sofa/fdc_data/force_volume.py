@@ -18,6 +18,7 @@ from typing import List, Dict, Tuple
 import numpy as np
 
 import data_processing.named_tuples as nt
+from data_processing.calculate_channel_data import calculate_channel_data
 from fdc_data.force_distance_curve import ForceDistanceCurve
 from fdc_data.average_force_distance_curve import AverageForceDistanceCurve
 from fdc_data.channel import Channel
@@ -58,7 +59,7 @@ class ForceVolume():
 
 		self.guiParameters: Dict
 
-	def set_gui_parameters(self, guiParameters): -> None:
+	def set_gui_parameters(self, guiParameters) -> None:
 		"""
 		"""
 		pass
@@ -118,7 +119,19 @@ class ForceVolume():
 		"""
 		
 		"""
-		pass
+		channels = calculate_channel_data(
+			self.forceDistanceCurves,
+			self.size
+		)
+
+		for channelName, channelData in channels.items():
+			self.channels.append(
+				Channel(
+					name=channelName,
+					data=channelData,
+					size=self.size
+				)
+			)
 
 	def calculate_average_data(self) -> None:
 		"""
@@ -126,6 +139,13 @@ class ForceVolume():
 		force distance curves.
 		"""
 		pass
+
+	def display_imported_data(self) -> None: 
+		"""
+		"""
+		self.plot_data_as_lineplot()
+		self.plot_data_as_heatmap()
+		self.plot_data_as_histogram()
 
 	def plot_data_as_lineplot(self) -> None:
 		"""

@@ -113,7 +113,7 @@ def create_data_frame_raw_curves(
 
 	return pd.DataFrame(
 		rawPiezo,
-		rawDeflection
+		rawDeflection,
 		columns=["raw piezo", "raw deflection"]
 	)
 
@@ -148,7 +148,7 @@ def create_data_frame_corrected_curves(
 
 	return pd.DataFrame(
 		correctedPiezo,
-		correctedDeflection
+		correctedDeflection,
 		columns=["corrected piezo", "corrected deflection"]
 	)
 
@@ -174,7 +174,7 @@ def create_data_frame_average_data(
 	return pd.DataFrame(
 		averageForceDistanceCurve.averageData.piezo,
 		averageForceDistanceCurve.averageData.deflection,
-		averageForceDistanceCurve.standardDeviation
+		averageForceDistanceCurve.standardDeviation,
 		columns=[
 			"average piezo", 
 			"average deflection", 

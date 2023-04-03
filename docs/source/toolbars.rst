@@ -1,12 +1,15 @@
-SOFA Toolbars
-=============
+========
+Toolbars
+========
 
-To deselect outliers or define a ROI in on of the channels, SOFA offers two custom Matplotlib Toolbars.
+To deselect outliers or define a region of interest in on of the channels, SOFA offers two custom Matplotlib Toolbars.
 
 .. _lineplot toolbar:
 
 Lineplot Toolbar
-----------------
+================
+
+
 
 :Home: reset all selections and the zoom
 :Zoom In: zoom 
@@ -21,7 +24,7 @@ Lineplot Toolbar
 .. _heatmap toolbar:
 
 Heatmap Toolbar
----------------
+===============
 
 :Home: reset all selections and restore original orientation
 :Select Area: select an area within the heatmap
