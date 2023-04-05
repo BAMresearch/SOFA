@@ -1,11 +1,10 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Codebase" href="codebase.html" /><link rel="prev" title="Channels" href="channels.html" />
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Codebase" href="codebase.html" /><link rel="prev" title="Channels" href="channels.html" />
 
-    <meta name="generator" content="sphinx-4.5.0, furo 2022.04.07"/>
+    <meta name="generator" content="sphinx-5.1.1, furo 2022.04.07"/>
         <title>Toolbars - SOFA</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=68f4518137b9aefe99b631505a2064c3c42c9852" />
@@ -164,6 +163,9 @@
 <li class="toctree-l1"><a class="reference internal" href="supported_data_types.html">Supported Data Types</a></li>
 </ul>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="correction_algorithm.html">Correction Algorithm</a></li>
+</ul>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="channels.html">Channels</a></li>
 </ul>
 <ul class="current">
@@ -206,69 +208,37 @@
           </label>
         </div>
         <article role="main">
-          <section id="toolbars">
-<h1>Toolbars<a class="headerlink" href="#toolbars" title="Permalink to this headline">#</a></h1>
-<p>To deselect outliers or define a region of interest in on of the channels, SOFA offers two custom Matplotlib Toolbars.</p>
-<section id="lineplot-toolbar">
-<span id="id1"></span><h2>Lineplot Toolbar<a class="headerlink" href="#lineplot-toolbar" title="Permalink to this headline">#</a></h2>
-<dl class="field-list simple">
-<dt class="field-odd">Home</dt>
-<dd class="field-odd"><p>reset all selections and the zoom</p>
-</dd>
-<dt class="field-even">Zoom In</dt>
-<dd class="field-even"><p>zoom</p>
-</dd>
-<dt class="field-odd">Zoom Out</dt>
-<dd class="field-odd"><p>undo last zoom</p>
-</dd>
-<dt class="field-even">Reset Zoom</dt>
-<dd class="field-even"><p>reset zoom</p>
-</dd>
-<dt class="field-odd">Select Sinlge Curve</dt>
-<dd class="field-odd"><p>select a single curve</p>
-</dd>
-<dt class="field-even">Select Visible Curves</dt>
-<dd class="field-even"><p>select all curves</p>
-</dd>
-<dt class="field-odd">Show Inactive Curves</dt>
-<dd class="field-odd"><p>show/hide the currently inactive curves</p>
-</dd>
-<dt class="field-even">Display Average Curve</dt>
-<dd class="field-even"><p>calculate and display the average of the currently active curves</p>
-</dd>
-<dt class="field-odd">Display Average As Errorbar</dt>
-<dd class="field-odd"><p>extend the average by the standard deviation</p>
-</dd>
-</dl>
-</section>
-<section id="heatmap-toolbar">
-<span id="id2"></span><h2>Heatmap Toolbar<a class="headerlink" href="#heatmap-toolbar" title="Permalink to this headline">#</a></h2>
-<dl class="field-list simple">
-<dt class="field-odd">Home</dt>
-<dd class="field-odd"><p>reset all selections and restore original orientation</p>
-</dd>
-<dt class="field-even">Select Area</dt>
-<dd class="field-even"><p>select an area within the heatmap</p>
-</dd>
-<dt class="field-odd">Select Rectangle</dt>
-<dd class="field-odd"><p>select a rectangular area within the heatmap</p>
-</dd>
-<dt class="field-even">Include Area</dt>
-<dd class="field-even"><p></p></dd>
-<dt class="field-odd">Exclude Area</dt>
-<dd class="field-odd"><p></p></dd>
-<dt class="field-even">Flip Heatmap Horizontally</dt>
-<dd class="field-even"><p>flip heatmap horizontally</p>
-</dd>
-<dt class="field-odd">Flip Heatmap Verticaly</dt>
-<dd class="field-odd"><p>flip heatmap verticaly</p>
-</dd>
-<dt class="field-even">Rotate Heatmap</dt>
-<dd class="field-even"><p>rotate heatmap counterclockwise by 90 degrees</p>
-</dd>
-</dl>
-</section>
-</section>
+          <div class="section" id="toolbars">
+<h1>Toolbars<a class="headerlink" href="#toolbars" title="Permalink to this heading">#</a></h1>
+<p>To deselect outliers or define a region of interest in on of the channels, SOFA offers two custom Matplotlib Toolbars. For more information about the implementation of these see <a class="reference internal" href="codebase.html#toolbar-implementation"><span class="std std-ref">here</span></a>.</p>
+<div class="section" id="lineplot-toolbar">
+<span id="id1"></span><h2>Lineplot Toolbar<a class="headerlink" href="#lineplot-toolbar" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Home</strong> - Reset the inactive data points and the zoom.</p></li>
+<li><p><strong>Zoom In</strong> - Toggle the zoom mode, to zoom to a rectangle drawn by the mouse.</p></li>
+<li><p><strong>Zoom Out</strong> - Undo the last zoom.</p></li>
+<li><p><strong>Reset Zoom</strong> - Reset the zoom.</p></li>
+<li><p><strong>Select Sinlge Curve</strong> - Toggle the curve selection mode, to disable or activate single curves by click.</p></li>
+<li><p><strong>Select Visible Curves</strong> - Disable all curves that have a datapoint within the current view.</p></li>
+<li><p><strong>Display Average Curve</strong> - Calculate and display the average of the currently active curves.</p></li>
+<li><p><strong>Toggle Errorbar</strong> - Display or hide the standard deviation of the average curve.</p></li>
+<li><p><strong>Toggle Inactive Curves</strong> - Show or hide the currently inactive curves.</p></li>
+</ul>
+</div>
+<div class="section" id="heatmap-toolbar">
+<span id="id2"></span><h2>Heatmap Toolbar<a class="headerlink" href="#heatmap-toolbar" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Home</strong> - Reset the inactive data points, the orientation of the channel and any selected area.</p></li>
+<li><p><strong>Select Area</strong> - Toggle the selection mode to select arbitrary area’s with the mouse.</p></li>
+<li><p><strong>Select Rectangle</strong> - Toggle the selection mode to select rectangular area’s with the mouse.</p></li>
+<li><p><strong>Include Area</strong> - Disable all data points that are not within the selected area.</p></li>
+<li><p><strong>Exclude Area</strong> - Disable all data points that are in the selected area.</p></li>
+<li><p><strong>Flip Heatmap Horizontally</strong> - Flip the channel horizontally without changing the axes.</p></li>
+<li><p><strong>Flip Heatmap Verticaly</strong> - Flip the channel vertically without changing the axes.</p></li>
+<li><p><strong>Rotate Heatmap</strong> - Rotate the channel counterclockwise by 90 degrees without changing the axes.</p></li>
+</ul>
+</div>
+</div>
 
         </article>
       </div>
@@ -349,6 +319,7 @@
 </div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="_static/scripts/furo.js"></script>
     </body>

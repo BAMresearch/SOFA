@@ -2,13 +2,11 @@
 Supported Data Types
 ====================
 
-Please make sure that the raw FSD can be exported from your AFM device. SOFA 1.0 can only import directly \*.ibw (igor binary wave, supported by oxford instrument Asylum AFM) and \*.hdf5.
+Please make sure that the raw FSD can be exported from your AFM device. SOFA 1.0 can only import *.ibw (igor binary wave) files, supported by oxford instrument Asylum AFM. In case your FSD format is accepted by SOFA, please make also sure that the data is organized as a Force Volume (FV), i.e. each FS curve is assigned to a x,y-coordinate in a spatial grid, as described in detail in :ref:`force spectroscopy data structure`. SOFA 1.0 can only handle FV with a square grid i.e., number of curves in x and y direction is identical.
 
 .. note::
 
 	We intend to make data import possible for most common FSD formats. If you wish to use SOFA for analyzing your experimental data, please contact sofa@bam.de and provide us with a small data set of exemplary FSD (2x2 curves are sufficient), model and maker of your AFM and the maker and version of the used software.
-
-In case your FSD format is accepted by SOFA, please make also sure that the data is organized as a Force Volume (FV), i.e. each FS curve is assigned to a x,y-coordinate in a spatial grid, as described in detail in :ref:`force spectroscopy data structure`. SOFA 1.0 can only handle FV with a square grid i.e., number of curves in x and y direction is identical.
 
 .. _force spectroscopy data structure:
 
