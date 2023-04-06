@@ -1,10 +1,11 @@
 <!doctype html>
-<html class="no-js" lang="en">
+<html class="no-js">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Channels" href="channels.html" /><link rel="prev" title="Supported Data Types" href="supported_data_types.html" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Channels" href="channels.html" /><link rel="prev" title="Supported Data Types" href="supported_data_types.html" />
 
-    <meta name="generator" content="sphinx-5.1.1, furo 2022.04.07"/>
+    <meta name="generator" content="sphinx-4.5.0, furo 2022.04.07"/>
         <title>Correction Algorithm - SOFA</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=68f4518137b9aefe99b631505a2064c3c42c9852" />
@@ -133,7 +134,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -202,16 +203,43 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main">
-          <div class="section" id="correction-algorithm">
-<span id="id1"></span><h1>Correction Algorithm<a class="headerlink" href="#correction-algorithm" title="Permalink to this heading">#</a></h1>
+          <section id="correction-algorithm">
+<span id="id1"></span><h1>Correction Algorithm<a class="headerlink" href="#correction-algorithm" title="Permalink to this headline">#</a></h1>
 <p>Force Curves are expected to have a certain typical shape in order to interpret the contact between probe and sample according to theories and physical models. In case a curve shows any deviation from F = 0 for Z &lt; 0 beyond certain noise (areas are shown by horizontal yellow markings), the point of contact can not be identified conclusively. These curves need to be discarded. Also, in case curves show extensive non-monotonous behavior (zigzag) for Z &gt; 0 (area also shown yellow marking), the contact between probe and sample may have been unstable and therefore these curves must be discarded as well. By using update plots, Maps on the left and histogram on the right adopt the selection.</p>
-</div>
+<section id="correction-of-the-force">
+<h2>Correction of the force<a class="headerlink" href="#correction-of-the-force" title="Permalink to this headline">#</a></h2>
+<section id="calculate-the-end-of-the-zero-line">
+<h3>Calculate the end of the zero line<a class="headerlink" href="#calculate-the-end-of-the-zero-line" title="Permalink to this headline">#</a></h3>
+<section id="narrow-search-area">
+<h4>Narrow search area<a class="headerlink" href="#narrow-search-area" title="Permalink to this headline">#</a></h4>
+</section>
+</section>
+<section id="fitt-the-zero-line">
+<h3>Fitt the zero line<a class="headerlink" href="#fitt-the-zero-line" title="Permalink to this headline">#</a></h3>
+</section>
+<section id="shift-the-force-values">
+<h3>Shift the force values<a class="headerlink" href="#shift-the-force-values" title="Permalink to this headline">#</a></h3>
+</section>
+</section>
+<section id="correction-of-the-piezo-displacement">
+<h2>Correction of the piezo displacement<a class="headerlink" href="#correction-of-the-piezo-displacement" title="Permalink to this headline">#</a></h2>
+<section id="calculate-the-zero-crossing">
+<h3>Calculate the zero crossing<a class="headerlink" href="#calculate-the-zero-crossing" title="Permalink to this headline">#</a></h3>
+</section>
+<section id="interpolate-point-of-contact">
+<h3>Interpolate point of contact<a class="headerlink" href="#interpolate-point-of-contact" title="Permalink to this headline">#</a></h3>
+</section>
+<section id="shift-piezo-displacement-values">
+<h3>Shift piezo displacement values<a class="headerlink" href="#shift-piezo-displacement-values" title="Permalink to this headline">#</a></h3>
+</section>
+</section>
+</section>
 
         </article>
       </div>
@@ -263,8 +291,41 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contents
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Correction Algorithm</a><ul>
+<li><a class="reference internal" href="#correction-of-the-force">Correction of the force</a><ul>
+<li><a class="reference internal" href="#calculate-the-end-of-the-zero-line">Calculate the end of the zero line</a><ul>
+<li><a class="reference internal" href="#narrow-search-area">Narrow search area</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#fitt-the-zero-line">Fitt the zero line</a></li>
+<li><a class="reference internal" href="#shift-the-force-values">Shift the force values</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#correction-of-the-piezo-displacement">Correction of the piezo displacement</a><ul>
+<li><a class="reference internal" href="#calculate-the-zero-crossing">Calculate the zero crossing</a></li>
+<li><a class="reference internal" href="#interpolate-point-of-contact">Interpolate point of contact</a></li>
+<li><a class="reference internal" href="#shift-piezo-displacement-values">Shift piezo displacement values</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
@@ -272,7 +333,6 @@
 </div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="_static/scripts/furo.js"></script>
     </body>

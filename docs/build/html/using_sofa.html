@@ -1,10 +1,11 @@
 <!doctype html>
-<html class="no-js" lang="en">
+<html class="no-js">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Supported Data Types" href="supported_data_types.html" /><link rel="prev" title="Atomic Force Spectroscopy" href="atomic_force_spectroscopy.html" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Supported Data Types" href="supported_data_types.html" /><link rel="prev" title="Atomic Force Spectroscopy" href="atomic_force_spectroscopy.html" />
 
-    <meta name="generator" content="sphinx-5.1.1, furo 2022.04.07"/>
+    <meta name="generator" content="sphinx-4.5.0, furo 2022.04.07"/>
         <title>Using SOFA - SOFA</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=68f4518137b9aefe99b631505a2064c3c42c9852" />
@@ -208,49 +209,49 @@
           </label>
         </div>
         <article role="main">
-          <div class="section" id="using-sofa">
-<h1>Using SOFA<a class="headerlink" href="#using-sofa" title="Permalink to this heading">#</a></h1>
+          <section id="using-sofa">
+<h1>Using SOFA<a class="headerlink" href="#using-sofa" title="Permalink to this headline">#</a></h1>
 <p>Include image of the SOFA GUI after importing some test data</p>
-<div class="section" id="import-data">
-<span id="id1"></span><h2>Import Data<a class="headerlink" href="#import-data" title="Permalink to this heading">#</a></h2>
-<p>To start working with SOFA, measurement data needs to be imported. When SOFA is started a subwindow to import data will automatically appear. To import new data, the <span class="guilabel">Import Data</span> button opens this subwindow as well. In this window the data type of the measurement data and the location of the different data files can be specified. If the <span class="guilabel">Show poor curves</span> checkbox is selected, SOFA will also plot every curve, which could not be corrected. In addition to the measurement data an optional image file, or extra channels can be imported as well.</p>
-<p>If SOFA can not read any of the selected files the import process is cancelled and a notification appears. Please see <a class="reference internal" href="supported_data_types.html#import-formats"><span class="std std-ref">import formats</span></a> for further informations about the currently supported data types. SOFA will also check if the selected files match in size. If this is not the case, the import process is also aborted.</p>
-<p>During the import process SOFA will import the data, Please see <a class="reference internal" href="correction_algorithm.html#correction-algorithm"><span class="std std-ref">correct the measurement curves</span></a>, calculate the different <a class="reference internal" href="channels.html#channels"><span class="std std-ref">channels</span></a> and plot the data in a line plot, a heatmap and a histogram. An indeterminate progress bar will run during the import process. After the data was sucessfully imported the import window will close it self and a notification will appear. The name, size and location of the imported data will be displayed in the Imported Data frame of the main window.</p>
-</div>
-<div class="section" id="selection-process">
-<span id="id2"></span><h2>Selection Process<a class="headerlink" href="#selection-process" title="Permalink to this heading">#</a></h2>
-<p>After importing force spectroscopy data to SOFA, subgroups of Force Curves can be created. This is done to get averaged Force Curves with high signal-to-noise ratio for comparison and analysis. Subgroups of Force Curves are created by selecting and rejecting single curves due to their spatial position in a <a class="reference internal" href="#parameter-maps"><span class="std std-ref">parameter map</span></a>, due to an untypical <a class="reference internal" href="#outliers"><span class="std std-ref">shape</span></a> and value ranges in <a class="reference internal" href="#histogram"><span class="std std-ref">histograms</span></a> of channel. These selection steps can be combined in any particular order, but we recommend to follow the order, in which these steps are presented here.</p>
-<p>The Interactive Plots frame contains a checkbox for the line plot, heatmap and histogram. If they are active, changes in their associated plot will automatically appear in every other plot as well. Automatically updating large measurement data with every change can slow down the responds time significantly. In this case it is recommended to use the <span class="guilabel">Update Plots</span> button instead. This will snychronize the changes in every plot.</p>
-<div class="section" id="parameter-maps">
-<span id="id3"></span><h3>Parameter maps<a class="headerlink" href="#parameter-maps" title="Permalink to this heading">#</a></h3>
-<p>Parameter maps corresponding to Channels are automatically created when force spectroscopy data is imported to SOFA. These maps are displayed in the Heatmap frame of the SOFA GUI. Any additionl imported channel will be displayed here as well. The different channels can be selected by using the dropdown menu. In these maps the topography and spatial distribution of parameters can be used as a filter criterion for subgroups. In order to define a region of interest SOFA provides a custom <a class="reference internal" href="toolbars.html#heatmap-toolbar"><span class="std std-ref">Heatmap Toolbar</span></a>. Deselected data appears white in the heatmap.</p>
-</div>
-<div class="section" id="outliers">
-<span id="id4"></span><h3>Outliers<a class="headerlink" href="#outliers" title="Permalink to this heading">#</a></h3>
+<section id="import-data">
+<span id="id1"></span><h2>Import Data<a class="headerlink" href="#import-data" title="Permalink to this headline">#</a></h2>
+<p>To start working with SOFA, measurement data needs to be imported. When SOFA is started a subwindow to import data will automatically appear. This window can also be opened by clicking the <span class="guilabel">Import Data</span> button. In this subwindow the data type of the measurement data and the location of the different data files can be specified. If the <span class="guilabel">Show poor curves</span> checkbox is selected, SOFA will also plot every curve, which could not be corrected. In addition to the measurement data an optional image file, or extra channels can be imported as well.</p>
+<p>If SOFA can not read any of the selected files the import process is cancelled and a notification appears. Please see <a class="reference internal" href="supported_data_types.html#import-formats"><span class="std std-ref">import formats</span></a> for further informations about the currently supported data types. SOFA will also check if the selected files match in size. If this is not the case, the import process is also aborted and a notification appears.</p>
+<p>During the import process SOFA will import the data, <a class="reference internal" href="correction_algorithm.html#correction-algorithm"><span class="std std-ref">corrects the measurement curves</span></a>, <a class="reference internal" href="channels.html#channels"><span class="std std-ref">calculates the different channels</span></a> and plots the data in a line plot, a heatmap and a histogram. An indeterminate progress bar will run during the import process. After the data was sucessfully imported the subwindow will close it self and a notification appears. The name, size and location of the imported data will be displayed in the Active Data frame of the main window.</p>
+</section>
+<section id="selection-process">
+<span id="id2"></span><h2>Selection Process<a class="headerlink" href="#selection-process" title="Permalink to this headline">#</a></h2>
+<p>After importing force spectroscopy data to SOFA, subgroups of Force Curves can be created. This is done to get averaged Force Curves with high signal-to-noise ratio for comparison and analysis. Subgroups of Force Curves are created by selecting and rejecting single curves due to their spatial position in a <a class="reference internal" href="#parameter-maps"><span class="std std-ref">parameter map</span></a>, an untypical <a class="reference internal" href="#outliers"><span class="std std-ref">shape</span></a> or value ranges in the <a class="reference internal" href="#histogram"><span class="std std-ref">histogram</span></a> of a channel. These selection steps can be combined in any particular order, but we recommend to follow the order, in which these steps are presented here.</p>
+<p>The Linked Plots frame contains a checkbox for the line plot, heatmap and histogram. If they are active, changes in their associated plot will automatically appear in every other plot as well. Automatically updating large measurement data with every change can slow down the responds time significantly. In this case it is recommended to use the <span class="guilabel">Update Plots</span> button instead. This will snychronize the changes in every plot on click.</p>
+<section id="parameter-maps">
+<span id="id3"></span><h3>Parameter maps<a class="headerlink" href="#parameter-maps" title="Permalink to this headline">#</a></h3>
+<p>Parameter maps corresponding to Channels are automatically created when force spectroscopy data is imported to SOFA. These maps are displayed in the Heatmap frame of the SOFA GUI. Any additional imported channels are displayed here as well. The different channels can be selected by using the dropdown menu. In these maps the topography and spatial distribution of parameters can be used as a filter criterion for subgroups. In order to define a region of interest SOFA provides a custom <a class="reference internal" href="toolbars.html#heatmap-toolbar"><span class="std std-ref">Heatmap Toolbar</span></a>. Deselected data appears white in the heatmap.</p>
+</section>
+<section id="outliers">
+<span id="id4"></span><h3>Outliers<a class="headerlink" href="#outliers" title="Permalink to this headline">#</a></h3>
 <p>One of the advantages of SOFA is that all force curves are plotted in a single plot, located in the Line Plot frame of the SOFA GUI. This allows the curves to be compared directly with each other and it becomes evident that in some cases either the experimental curve is not ideal and/or SOFA’s algorithm did not succeed to correct the curve as expected. Those curves are clearly visible as outliers. These outliers might change the outcome of average curves and their standard deviation significantly, as explained in detail in <a class="reference internal" href="#averaged-subgroups-of-force-curves"><span class="std std-ref">Averaged Subgroups of Force Curves</span></a>. To deselect such outliers, SOFA has a custom <a class="reference internal" href="toolbars.html#lineplot-toolbar"><span class="std std-ref">Lineplot Toolbar</span></a>. Deselected curves appear grey in the line plot.</p>
-</div>
-<div class="section" id="histogram">
-<span id="id5"></span><h3>Histogram<a class="headerlink" href="#histogram" title="Permalink to this heading">#</a></h3>
-<p>Every Channel can be either displayed as a map, containing the spatial information or as a histogram, containing the statistical information. The histogram is locaed in the Histogram frace of the SOFA GUI. Using the dropdown menu the different channels can be selected. The default number of bins of the histogram is 100, which can be changed by the Number of bins input field. The minimum and maximum value of the histogram can be adjusted using the <span class="guilabel">+</span> and <span class="guilabel">-</span> buttons below the histogram. To avoid distortion by extreme outliers, the zoom checkbutton can be activaed. If selected, the zoomed range equals the selected range. Within the histogram the whole data is plotted in red and the currently active data points are plotted in blue.</p>
-</div>
-<div class="section" id="averaged-subgroups-of-force-curves">
-<span id="id6"></span><h3>Averaged Subgroups of Force Curves<a class="headerlink" href="#averaged-subgroups-of-force-curves" title="Permalink to this heading">#</a></h3>
-<p>After selecting a subgroup of curves an average curve can be calculated using the <a class="reference internal" href="toolbars.html#lineplot-toolbar"><span class="std std-ref">Lineplot Toolbar</span></a>. The average curve is then plotted on top of the active Force Curves in black. Error bars representing the standard deviation can be added by using the <a class="reference internal" href="toolbars.html#lineplot-toolbar"><span class="std std-ref">Lineplot Toolbar</span></a>. Please note that due to the density of points, single error bars can only be made out when zooming into the plot. The average curve and its error are always recalculated and redrawn when the line plot is updated. Force Curves can be further deselected and reselected, while the average curve is already plotted. But this might slow down the responds time of SOFA.</p>
+</section>
+<section id="histogram">
+<span id="id5"></span><h3>Histogram<a class="headerlink" href="#histogram" title="Permalink to this headline">#</a></h3>
+<p>Every Channel can be either displayed as a map, containing the spatial information or as a histogram, containing the statistical information. The histogram is locaed in the Histogram frame of the SOFA GUI. Using the dropdown menu the different channels can be selected. The default number of bins of the histogram is 100, which can be changed by the Number of bins input field. The minimum and maximum value of the histogram can be adjusted using the <span class="guilabel">+</span> and <span class="guilabel">-</span> buttons below the histogram. To avoid distortion by extreme outliers, the zoom checkbutton can be activaed. If selected, the zoomed range equals the selected range. Within the histogram the whole data is plotted in red and the currently active data points are plotted in blue.</p>
+</section>
+<section id="averaged-subgroups-of-force-curves">
+<span id="id6"></span><h3>Averaged Subgroups of Force Curves<a class="headerlink" href="#averaged-subgroups-of-force-curves" title="Permalink to this headline">#</a></h3>
+<p>After selecting a subgroup of curves an average curve can be calculated using the <a class="reference internal" href="toolbars.html#lineplot-toolbar"><span class="std std-ref">Lineplot Toolbar</span></a>. The average curve is then plotted on top of the Force Curves in black. Error bars representing the standard deviation can be added by using the <a class="reference internal" href="toolbars.html#lineplot-toolbar"><span class="std std-ref">Lineplot Toolbar</span></a>. Please note that due to the density of points, single error bars can only be made out when zooming into the plot. The average curve and its error are always recalculated and redrawn when the line plot is updated. Force Curves can be further deselected and reselected, while the average curve is already plotted. But this might slow down the responds time of SOFA.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The average curve is on purpose divided into two parts. The contact part (Z &gt; 0 &amp; F &gt; 0) is averaged in respect to the force F (y- axis) and the non-contact part of the curve (Z ≤ 0) is averaged in respect to the piezo displacement Z (x-axis).</p>
 </div>
-</div>
-</div>
-<div class="section" id="export-data">
-<h2>Export Data<a class="headerlink" href="#export-data" title="Permalink to this heading">#</a></h2>
+</section>
+</section>
+<section id="export-data">
+<h2>Export Data<a class="headerlink" href="#export-data" title="Permalink to this headline">#</a></h2>
 <p>Once a subgroup has been defined and the selected curves have been averaged the analysis cycle of SOFA has been completed. Before selecting another subset of curves or analyzing another measurement the results can be exported. The <span class="guilabel">Export Data</span> button opens a subwindow to export the data. SOFA will create a new folder to store the data. A name for the folder and the path where the folder will be created, are required for this. Furthermore, the desired export formats can be specified. An indeterminate progress bar will run during the export process. After the data is saved the export winwow will close itself and a notification will appear.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>As of version 1.0 SOFA has no capacities to remember previous selected subsets of Force Curves or previous averaged curves. Results have to be exported to be stored.</p>
 </div>
-</div>
-</div>
+</section>
+</section>
 
         </article>
       </div>
@@ -338,7 +339,6 @@
 </div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="_static/scripts/furo.js"></script>
     </body>

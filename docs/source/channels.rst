@@ -4,7 +4,7 @@
 Channels
 ========
 
-A large number of parameters and physical values can be derived from Force Curves. These parameters/values are scalars (1D) extracted from the 2D Force Curve. Consequently, the information of a 3D FV measurement is decreased to a 2D visualization - a spatial distribution of a property associated with the parameter or physical value in question. This parameter/value map is called **channel**.
+A large number of parameters and physical values can be derived from Force Curves. These parameters or values are one dimensional scalars extracted from the two dimensional Force Curve. Consequently, the information of a three dimensional FV measurement is decreased to a two dimensional visualization - a spatial distribution of a property associated with the parameter or physical value in question. This parameter/value map is called **channel**.
 
 In general, we distinguish between **parameters** (:ref:`channels based on parameters`), which can be directly estimated from force curves and used as a quantitative measure within one experimental set-up, and **physical values** (:ref:`channels based on physical values`), such as the Young’s modulus, which result from a multivariable fit, based on general theories (e.g., Hertz, DMT or JKR) and can be used as absolute quantities. This distinction is very important for the succession of steps taken in the analysis of FSD.
 
@@ -12,7 +12,7 @@ In general, we distinguish between **parameters** (:ref:`channels based on param
 
 	Maps of physical values such as the Young’s modulus make multivariant fitting of single curves with a low signal-to-noise ratio necessary. This is only advised after subsets of curves have been averaged and investigated to narrow down the range of fit variables. This will be explained in detail in :ref:`channels based on physical values`.
 
-All parameters and physical values are explained and demonstrated in :ref:`channels based on parameters` and :ref:`channels based on physical values`. Real averaged Force Curves have been used for graphical demonstrations. The FSD Data is available in the test data folder on `github <https://github.com/2Puck/sofa>`_.
+All parameters and physical values are explained and demonstrated in :ref:`channels based on parameters` and :ref:`channels based on physical values`. Real averaged Force Curves has been used for graphical demonstrations. The FSD Data is available in the `test_data <https://github.com/2Puck/sofa/tree/development/test_data>`_ folder.
 
 .. _channels based on parameters:
 
@@ -22,9 +22,9 @@ Channels based on parameters
 Channels based on parameters have the advantage that they can be used as a quantitative measure within one experimental set-up (identical tip and calibration) and therefore can be used to evaluate and categorize Force Curves within one experiment, e.g. mechanical heterogeneities and gradients.
 There are three categories of parameters. 
 
-1. Result of SOFA’s correction algorithm (e.g., raw stiffness)
-2. Measurement parameters (e.g., fzMax)
-3. Physical properties of the sample (e.g., stiffness)
+1. Result of SOFA’s correction algorithm, e.g. raw stiffness
+2. Measurement parameters, e.g. fzMax
+3. Physical properties of the sample, e.g. stiffness
 
 Result of SOFA's correction algorithm
 -------------------------------------
@@ -165,11 +165,7 @@ Consequently, before single curves are fitted for physical values it is advisabl
 
 .. _customized channels:
 
-Customized channels
-===================
+Adding custom channels
+======================
 
-The option to create additional customized channel is not built into SOFA as of version 1.0.
-
-.. note::
-
-	Please contact us via sofa@bam.de to request additional Channels.
+To add additional channels to SOFA you can either contact us under sofa@bam.de or extend the code yourself. See :ref:`Calculate Channel Data <calculate channel data implementation>` for furhter information about the implementation of the SOFA channels.

@@ -20,17 +20,20 @@ The general aim of SOFA was to write code which is simple to read and easy to ex
 - `PEP 257 <https://peps.python.org/pep-0257/>`_ - Docstring Conventions
 - `PEP 484 <https://peps.python.org/pep-0484/>`_ - Type Hints
 
-The implementation uses a mixture of object oriented and procedural programming. 
+The implementation uses a mixture of object oriented and procedural programming, depending on which is more suitable for the different requirements at hand.
 
 .. _gui implementation:
 
 GUI
 ---
 
-The GUI of SOFA is written in Tkinter and uses the ttkbootstrap theme extension, to give it a modern look. It consists of of three windows, the main window and two subwindows for the data import and export. 
+The GUI of SOFA is written in Tkinter and uses the ttkbootstrap theme extension, to give it a modern look. It consists of of three windows, the main window and two subwindows for the data import and export. All of them are written in an object oriented approach.
 
 Main Window  `source <https://github.com/2Puck/sofa/tree/development>`_
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+wie sind plots in tkinter eingebunden
+interaktionsmöglichkeiten
 
 Import Window
 ~~~~~~~~~~~~~
@@ -40,6 +43,9 @@ Export Window
 
 Window Settings
 ~~~~~~~~~~~~~~~
+
+GUI Interface
+~~~~~~~~~~~~~
 
 .. _toolbar implementation:
 
@@ -70,14 +76,20 @@ Average Force Distance Curve
 Data Processing
 ---------------
 
+.. _import data implementation:
+
 Import Data
 ~~~~~~~~~~~
 
 Correct Data
 ~~~~~~~~~~~~
 
+.. _calculate channel data implementation:
+
 Calculate Channel Data
 ~~~~~~~~~~~~~~~~~~~~~~
+
+.. _export data implementation:
 
 Export Data
 ~~~~~~~~~~~
