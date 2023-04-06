@@ -55,14 +55,21 @@ class Channel():
 	def get_active_heatmap_data(
 		self,
 		inactiveDataPoints: List[int]
-	) -> None:
+	) -> np.ndarray:
 		""""""
 		pass
+
+	def get_histogram_data(
+		self
+	) -> np.ndarray:
+		"""
+		"""
+		return self.rawData.flatten().copy()
 
 	def get_active_histogram_data(
 		self,
 		inactiveDataPoints: List[int]
-	) -> None:
+	) -> np.ndarray:
 		""""""
 		histogramData = self.rawData.flatten().copy()
 		activeHistogramData = np.delete(histogramData, inactiveDataPoints)

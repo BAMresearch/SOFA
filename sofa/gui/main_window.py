@@ -84,7 +84,7 @@ class MainWindow(ttk.Frame):
 
 		self._create_frame_files(frameFirstRow)
 		self._create_frame_active_data(frameFirstRow)
-		self._create_frame_control_linked_plots(frameFirstRow)
+		self._create_frame_linked_plots(frameFirstRow)
 		self._create_frame_control(frameFirstRow)
 
 	def _create_second_row(self) -> None:
@@ -111,7 +111,7 @@ class MainWindow(ttk.Frame):
 		frameParent : ttk.Frame
 			Corresponding row of the main window.
 		"""
-		frameFiles = ttk.Labelframe(frameParent, text="File", padding=15)
+		frameFiles = ttk.Labelframe(frameParent, text="Files", padding=15)
 		frameFiles.pack(side=LEFT, fill=BOTH, expand=YES, padx=(0, 15))
 
 		buttonImport = ttk.Button(
@@ -139,7 +139,7 @@ class MainWindow(ttk.Frame):
 		frameParent : ttk.Frame
 			Corresponding row of the main window.
 		"""
-		frameActiveData = ttk.Labelframe(frameParent, text="Imported Data", padding=15)
+		frameActiveData = ttk.Labelframe(frameParent, text="Active Data", padding=15)
 		frameActiveData.pack(side=LEFT, fill=BOTH, expand=YES, padx=(0, 15))
 
 		self.stringVarActiveData = ttk.StringVar(self, value="")
@@ -182,7 +182,7 @@ class MainWindow(ttk.Frame):
 		)
 		valueActiveDataLocation.grid(row=2, column=1, padx=10, sticky=W)
 
-	def _create_frame_control_linked_plots(
+	def _create_frame_linked_plots(
 		self, 
 		frameParent: ttk.Frame
 	) -> None:
@@ -195,7 +195,7 @@ class MainWindow(ttk.Frame):
 		frameParent : ttk.Frame
 			Corresponding row of the main window.
 		"""
-		frameInteractivePlots = ttk.Labelframe(frameParent, text="Interactive Plots", padding=15)
+		frameInteractivePlots = ttk.Labelframe(frameParent, text="Linked Plots", padding=15)
 		frameInteractivePlots.pack(side=LEFT, fill=BOTH, expand=YES, padx=(0, 15))
 
 		self.interactiveLinePlot = tk.BooleanVar(self, value=False)
@@ -428,13 +428,13 @@ class MainWindow(ttk.Frame):
 		"""
 		plotParameters = {
 			"holderLinePlot": self.holderFigureLineplot,
+			"linkedLinePlot": self.interactiveLinePlot,
 			"holderHeatmap": self.holderFigureHeatmap,
+			"activeChannelHeatmap": self.heatmapChannel,
+			"linkedHeatmap": self.interactiveHeatmap,
 			"holderHistogram": self.holderFigureHistogram,
-			"currentChannelHeatmap": self.heatmapChannel,
-			"currentChannelHistogram": self.histogramChannel,
-			"interactiveLinePlot": self.interactiveLinePlot,
-			"interactiveHeatmap": self.interactiveHeatmap,
-			"interactiveHistogram": self.interactiveHistogram,
+			"activeChannelHistogram": self.histogramChannel,
+			"linkedHistogram": self.interactiveHistogram,
 			"zoomHistogram": self.zoomHistogram,
 			"numberOfBins": self.numberOfBins
 		}

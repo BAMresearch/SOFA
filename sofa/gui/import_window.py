@@ -326,8 +326,8 @@ class ImportWindow(ttk.Frame):
 
 		# Set the name, size and location of the imported data in the main window.
 		self.set_imported_meta_data_in_main_window(
-			self.forceVolume.name,
-			self.forceVolume.size,
+			importedData["measurementData"].folderName,
+			importedData["measurementData"].size,
 			selectedImportParameters.filePathData
 		)
 

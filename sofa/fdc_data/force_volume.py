@@ -34,16 +34,14 @@ class ForceVolume():
 	size : tuple[int]
 		Number of force distance curves as the width and height 
 		of the measurement grid.
-	metadata : dict
-		Optional imported meta data from the measurement.
+	imageData : dict
+		Optional image data.
 	forceDistanceCurves : list[ForceDistanceCurve]
 		
 	averageForceDistanceCurve : AverageForceDistanceCurve
 		The average of the currently active force distance
 		curves.
 	channels : list[Channel]
-		
-	guiParameters : dict
 
 	"""
 	def __init__(self):
@@ -52,17 +50,10 @@ class ForceVolume():
 		"""
 		self.name: str
 		self.size: Tuple[int]
-		self.metadata: Dict
+		self.imageData: Dict
 		self.forceDistanceCurves: List[ForceDistanceCurve]
 		self.averageForceDistanceCurve: AverageForceDistanceCurve
 		self.channels: List[Channel]
-
-		self.guiParameters: Dict
-
-	def set_gui_parameters(self, guiParameters) -> None:
-		"""
-		"""
-		pass
 
 	def set_imported_data(self, importedData: Dict) -> None:
 		"""
@@ -82,7 +73,7 @@ class ForceVolume():
 		)
 		# Set optional data if imported.
 		if "imageData" in importedData:
-			self.metadata = importedData["imageData"]
+			self.imageData = importedData["imageData"]
 		if "channelData" in importedData:
 			pass
 
@@ -128,8 +119,8 @@ class ForceVolume():
 			self.channels.append(
 				Channel(
 					name=channelName,
-					data=channelData,
-					size=self.size
+					size=self.size,
+					data=channelData
 				)
 			)
 
@@ -140,27 +131,37 @@ class ForceVolume():
 		"""
 		pass
 
-	def display_imported_data(self) -> None: 
+	def get_force_distance_curves_lines(
+		self
+	) -> List:
 		"""
 		"""
-		self.plot_data_as_lineplot()
-		self.plot_data_as_heatmap()
-		self.plot_data_as_histogram()
+		return [
+			forceDistanceCurve.lineRepresentationCorrectedData
+			for forceDistanceCurve
+			in self.forceDistanceCurves
+		]
 
-	def plot_data_as_lineplot(self) -> None:
+	def get_heatmap_data(
+		self,
+		activeChannel: str
+	) -> np.ndarray:
 		"""
-		Plots the force distance curves in a line plot.
 		"""
-		pass
+		return self.channels[activeChannel].get_active_heatmap_data(
+			self.inactiveDataPoints
+		)
 
-	def plot_data_as_heatmap(self) -> None:
+	def get_histogram_data(
+		self,
+		activeChannel: str,
+		active: bool = True
+	) -> np.ndarray:
 		"""
-		Plots the currently selected channel in a heatmap.
 		"""
-		pass
-
-	def plot_data_as_histogram(self) -> None:
-		"""
-		Plots the currently selected channel in a histogram.
-		"""
-		pass
+		if active:
+			return self.channels[activeChannel].get_active_histogram_data(
+				self.inactiveDataPoints
+			)
+		else:
+			return self.channels[activeChannel].get_histogram_data()

@@ -17,6 +17,32 @@ along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 from typing import NamedTuple, Tuple, List
 from numpy import ndarray
 from pandas import DataFrame
+import matplotlib as mpl
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import tkinter as tk
+import ttkbootstrap as ttk
+
+# Named tuples for 
+class LinePlotParameters(NamedTuple):
+	linked: tk.BooleanVar
+	holder: FigureCanvasTkAgg
+	showInactive: bool 
+	plotAverage: bool
+	plotErrorbar: bool
+
+class HeatmapParameters(NamedTuple): 
+	linked: tk.BooleanVar
+	holder: FigureCanvasTkAgg
+	activeChannel: tk.StringVar
+	selectedArea: List[mpl.lines.Line2D]
+	orientationIndices: List[int]
+
+class HistogramParameters(NamedTuple):  
+	linked: tk.BooleanVar
+	holder: FigureCanvasTkAgg
+	activeChannel: tk.StringVar
+	zoom: tk.BooleanVar
+	numberOfBins: ttk.Entry
 
 # Named tuples for FDC data
 class ForceDistanceCurve(NamedTuple): 
@@ -49,15 +75,6 @@ class ImportParameter(NamedTuple):
 	filePathImage: str 
 	filePathChannel: str 
 	showPoorCurves: bool
-
-class ExportParameter(NamedTuple):
-	folderName: str
-	folderPath: str 
-	exportToTex: bool
-	exportToTxt: bool
-	exportToHdf5: bool
-	exportToExcel: bool
-	exportPlots: bool
 
 class MeasurementData(NamedTuple):
 	folderName: str
