@@ -67,7 +67,7 @@ class ExportWindow(ttk.Frame):
 
 	Attributes
 	----------
-	forceVolume : ForceVolume
+	guiInterface : guiInterface
 		Contains the raw and calculated data from the 
 		imported measurement.
 	progressbar : ttk.Progressbar
@@ -91,16 +91,16 @@ class ExportWindow(ttk.Frame):
 	def __init__(
 		self, 
 		root, 
-		forceVolume
+		guiInterface
 	):
 		"""
-		Create a subwindow to export the data of the forcevolume.
+		Create a subwindow to export the data of the guiInterface.
 		"""
 		super().__init__(root)
 		
 		self.pack(fill=BOTH, expand=YES)
 
-		self.forceVolume = forceVolume
+		self.guiInterface = guiInterface
 
 		self._setup_input_variables()
 		self._create_window()
@@ -288,15 +288,15 @@ class ExportWindow(ttk.Frame):
 
 		if exportParameters.exportToCsv:
 			self._update_progressbar_label("Exporting to csv...")
-			exp_data.export_to_csv(self.forceVolume, outputFolder)
+			exp_data.export_to_csv(self.guiInterface, outputFolder)
 
 		if exportParameters.exportToXlsx:
 			self._update_progressbar_label("Exporting to xlsx...")
-			exp_data.export_to_xlsx(self.forceVolume, outputFolder)
+			exp_data.export_to_xlsx(self.guiInterface, outputFolder)
 
 		if exportParameters.exportPlots:
 			self._update_progressbar_label("Exporting plots...")
-			exp_data.export_plots(self.forceVolume, outputFolder)
+			exp_data.export_plots(self.guiInterface, outputFolder)
 
 		self._stop_progressbar()
 

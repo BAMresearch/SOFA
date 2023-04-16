@@ -27,6 +27,9 @@ class Channel():
 	----------
 	name : str
 		Name of the channel.
+	size : tuple[int]
+		Height and width of the channel corresponding to number 
+		of force distance curves.
 	rawData : np.ndarray
 		Unmodified data of the channel used to restore
 		data and orientation.
@@ -54,24 +57,59 @@ class Channel():
 
 	def get_active_heatmap_data(
 		self,
-		inactiveDataPoints: List[int]
+		inactiveDataPoints: List[int],
+		heatmapOrientaionMatrix: np.ndarray
 	) -> np.ndarray:
 		""""""
-		pass
+		flatHeatmapData = self.data.copy().flatten()
+		mappedInactiveDataPoints = self._map_heatmap_orientation_to_inactive_datapoints(
+			inactiveDataPoints,
+			heatmapOrientaionMatrix
+		)
+		activeFlatHeatmapData = np.put(
+			heatmapData, 
+			mappedInactiveDataPoints,
+			np.nan
+		)
+		activeHeatmapData = activeFlatHeatmapData.reshape(self.size)
+
+		return activeHeatmapData
+
+	def _map_heatmap_orientation_to_inactive_datapoints(
+		self,
+		inactiveDataPoints: List[int],
+		heatmapOrientaionMatrix: np.ndarray
+	) -> List[int]:
+		"""
+		"""
+		return [
+			np.where(dataPoint == heatmapOrientaionMatrix)[0][0]
+			for dataPoint in inactiveDataPoints
+		]
 
 	def get_histogram_data(
 		self
 	) -> np.ndarray:
 		"""
 		"""
-		return self.rawData.flatten().copy()
+		histogramData = self.rawData.copy().flatten()
+		validHistogramData = self._remove_nan_values(histogramData)
+
+		return validHistogramData
 
 	def get_active_histogram_data(
 		self,
 		inactiveDataPoints: List[int]
 	) -> np.ndarray:
 		""""""
-		histogramData = self.rawData.flatten().copy()
+		histogramData = self.rawData.copy().flatten()
 		activeHistogramData = np.delete(histogramData, inactiveDataPoints)
+		validActiveHistogramData = self._remove_nan_values(activeHistogramData)
 
-		return activeHistogramData
+		return validActiveHistogramData
+
+	@staticmethod
+	def _remove_nan_values(inputArray: np.ndarray) -> np.ndarray:
+		"""
+		"""
+		return inputArray[np.isfinite(inputArray)]

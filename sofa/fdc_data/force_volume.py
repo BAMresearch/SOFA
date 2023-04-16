@@ -34,48 +34,68 @@ class ForceVolume():
 	size : tuple[int]
 		Number of force distance curves as the width and height 
 		of the measurement grid.
+	inactiveDataPoints : List[int]
+
+	heatmapOrientaionMatrix : np.ndarray
+
 	imageData : dict
 		Optional image data.
 	forceDistanceCurves : list[ForceDistanceCurve]
 		
+	channels : list[Channel]
+
 	averageForceDistanceCurve : AverageForceDistanceCurve
 		The average of the currently active force distance
 		curves.
-	channels : list[Channel]
-
 	"""
-	def __init__(self):
+	def __init__(self, importedData: Dict) -> None:
 		"""
-		Initialize an empty force volume.
-		"""
-		self.name: str
-		self.size: Tuple[int]
-		self.imageData: Dict
-		self.forceDistanceCurves: List[ForceDistanceCurve]
-		self.averageForceDistanceCurve: AverageForceDistanceCurve
-		self.channels: List[Channel]
-
-	def set_imported_data(self, importedData: Dict) -> None:
-		"""
-		
+		.
 
 		Parameters
 		----------
-		importedData : dict
-			Data from the imported measurement.
-		"""
-		# Set mandatory data.
-		self.name = importedData["measurementData"].filename
-		self.size = importedData["measurementData"].size
+		importedData : Dict 
 
+		"""
+		self.name: str = importedData["measurementData"].filename
+		self.size: Tuple[int] = importedData["measurementData"].size
+
+		self.inactiveDataPoints: List = []
+		self.heatmapOrientaionMatrix: np.ndarray = self._create_heatmap_orientation_matrix()
+
+		self.imageData: Dict
+		self.forceDistanceCurves: List[ForceDistanceCurve]
+		self.channels: List[Channel]
+		self.averageForceDistanceCurve: AverageForceDistanceCurve
+
+		# Set optional data if imported.
+		if "imageData" in importedData:
+			self._set_image_data(importedData["imageData"])
+		if "channelData" in importedData:
+			self._set_channel_data(importedData["channelData"])
+		# 
 		self._create_force_distance_curves(
 			importedData["measurementData"].approachCurves
 		)
-		# Set optional data if imported.
-		if "imageData" in importedData:
-			self.imageData = importedData["imageData"]
-		if "channelData" in importedData:
-			pass
+		# 
+		self._correct_force_distance_curves()
+		# 
+		self._calculate_channel_data()
+
+	def _create_heatmap_orientation_matrix(self) -> np.ndarray:
+		"""
+		"""
+		return np.arange(self.size[0] * self.size[1]).reshape(self.size)
+
+	def _set_image_data(self, imageData) -> None: 
+		"""
+		"""
+		pass 
+
+	def _set_channel_data(self, channelData) -> None: 
+		"""
+		"""
+		pass
 
 	def _create_force_distance_curves(
 		importedApproachCurves: List[nt.ForceDistanceCurve]
@@ -98,7 +118,7 @@ class ForceVolume():
 				)
 			)
 
-	def correct_force_distance_curves(self) -> None:
+	def _correct_force_distance_curves(self) -> None:
 		"""
 		Correct the raw data of all force distance 
 		curves in the force volume.
@@ -106,7 +126,7 @@ class ForceVolume():
 		for forceDistanceCurve in self.forceDistanceCurves:
 			forceDistanceCurve.correct_raw_data()
 
-	def calculate_channel_data(self) -> None: 
+	def _calculate_channel_data(self) -> None: 
 		"""
 		
 		"""
@@ -149,7 +169,8 @@ class ForceVolume():
 		"""
 		"""
 		return self.channels[activeChannel].get_active_heatmap_data(
-			self.inactiveDataPoints
+			self.inactiveDataPoints,
+			self.heatmapOrientaionMatrix
 		)
 
 	def get_histogram_data(

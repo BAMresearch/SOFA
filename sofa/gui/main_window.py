@@ -25,10 +25,10 @@ matplotlib.use("TkAgg")
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
+from gui.gui_interface import GUIInterface
 from gui.export_window import ExportWindow
 from gui.import_window import ImportWindow
 
-from fdc_data.force_volume import ForceVolume
 from data_processing.calculate_channel_data import active_channels as activeChannels
 
 from data_visualization.toolbar.line_plot_toolbar import LinePlotToolbar
@@ -40,7 +40,7 @@ class MainWindow(ttk.Frame):
 
 	Attributes
 	----------
-	forceVolume : ForceVolume
+	guiInterface : GUIInterface
 
 	sourceDirectory : str
 
@@ -53,7 +53,7 @@ class MainWindow(ttk.Frame):
 
 		self.pack(fill=BOTH, expand=YES)
 
-		self.forceVolume = ForceVolume()
+		self.guiInterface = GUIInterface()
 
 		self.channelNames = [
 			self._camel_case_to_text(channelName)
@@ -63,7 +63,7 @@ class MainWindow(ttk.Frame):
 		self.colorPlot = "#e6f7f4"
 		
 		self._create_main_window()
-		#self._set_plot_parameters_in_data_handler()
+		self._set_gui_parameters_in_gui_interface()
 
 	def _create_main_window(self) -> None:
 		"""
@@ -288,7 +288,7 @@ class MainWindow(ttk.Frame):
 		frameToolbarLineplot = ttk.Frame(frameLinePlot)
 		toolbarLineplot = LinePlotToolbar(
 			self.holderFigureLineplot, frameToolbarLineplot, 
-			self.forceVolume
+			self.guiInterface
 		)
 		self.holderFigureLineplot.get_tk_widget().grid(row=1, column=0)
 		frameToolbarLineplot.grid(row=2, column=0)
@@ -326,7 +326,7 @@ class MainWindow(ttk.Frame):
 		frameToolbarHeatmap = ttk.Frame(frameHeatmap)
 		toolbarHeatmap = HeatmapToolbar(
 			self.holderFigureHeatmap, frameToolbarHeatmap, 
-			self.forceVolume
+			self.guiInterface
 		)
 		self.holderFigureHeatmap.get_tk_widget().grid(row=1, column=0)
 		frameToolbarHeatmap.grid(row=2, column=0)
@@ -422,11 +422,12 @@ class MainWindow(ttk.Frame):
 		frameHistogram.columnconfigure(2, weight=1)
 		frameHistogram.columnconfigure(3, weight=1)
 
-	def _set_plot_parameters_in_data_handler(self) -> None:
+	def _set_gui_parameters_in_gui_interface(self) -> None:
 		"""
-		Give the forceVolume all relevant parameters to handle the plots.
+		Give the GUIInterface all relevant parameters to handle the plots.
 		"""
-		plotParameters = {
+		guiParameters = {
+			"keyActiveForceVolume": self.,
 			"holderLinePlot": self.holderFigureLineplot,
 			"linkedLinePlot": self.interactiveLinePlot,
 			"holderHeatmap": self.holderFigureHeatmap,
@@ -439,7 +440,7 @@ class MainWindow(ttk.Frame):
 			"numberOfBins": self.numberOfBins
 		}
 
-		self.forceVolume.set_plot_parameters(plotParameters)
+		self.guiInterface.set_gui_parameters(guiParameters)
 
 	def _create_import_window(self) -> None:
 		"""
@@ -448,7 +449,7 @@ class MainWindow(ttk.Frame):
 		toplevelImport = ttk.Toplevel("Import Data")
 		ImportWindow(
 			toplevelImport,
-			self.forceVolume, 
+			self.guiInterface, 
 			self.set_imported_meta_data
 		)
 
@@ -478,14 +479,14 @@ class MainWindow(ttk.Frame):
 		toplevelExport = ttk.Toplevel("Export Data")
 		ExportWindow(
 			toplevelExport,
-			self.forceVolume
+			self.guiInterface
 		)
 
 	def _update_plots(self) -> None:
 		"""Update the inactive data points in every plot."""
 		# use decorator with args to start/end progressbar
 		self.start_progressbar()
-		self.forceVolume.update_plots()
+		self.guiInterface.update_plots()
 		self.stop_progressbar()
 
 	def _update_heatmap(self, newHeatmapChannel) -> None:
@@ -494,7 +495,7 @@ class MainWindow(ttk.Frame):
 		Parameters:
 			newHeatmapChannel(str): Name of the new channel.
 		"""
-		self.forceVolume.update_heatmap()
+		self.guiInterface.update_heatmap()
 
 	def _update_histogram(self, newHistogramChannel) -> None:
 		"""Update the displayed channel in the histogram.
@@ -502,7 +503,7 @@ class MainWindow(ttk.Frame):
 		Parameters:
 			newHeatmapChannel(str): Name of the new channel.
 		"""
-		self.forceVolume.update_histogram()
+		self.guiInterface.update_histogram()
 
 	def _restrict_histogram(self, direction) -> None:
 		"""Change the minimum or maximum border for the histogram values.
@@ -511,12 +512,12 @@ class MainWindow(ttk.Frame):
 			direction(str): .
 		"""
 		self.start_progressbar()
-		self.forceVolume.restrict_histogram(direction)
+		self.guiInterface.restrict_histogram(direction)
 
 		if self.interactiveHistogram.get():
-			self.forceVolume.update_plots()
+			self.guiInterface.update_plots()
 		else:
-			self.forceVolume.update_histogram()
+			self.guiInterface.update_histogram()
 
 		self.stop_progressbar()
 

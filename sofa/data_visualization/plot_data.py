@@ -242,49 +242,48 @@ def plot_histogram(
 
 	holder.draw()
 
-def update_line(
-	line: mpl.lines.Line2D, 
-	color: str, 
-	zorder: int
+def add_average_to_line_plot(
+	holder: mpl.backends.backend_tkagg.FigureCanvasTkAgg,
+	averageLine: mpl.lines.Line2D
+) -> None: 
+	"""
+	"""
+	ax = get_axes(holder)
+
+	ax.add_line(averageLine)
+
+	holder.draw() 
+
+def add_errorbar_to_line_plot(
+	holder: mpl.backends.backend_tkagg.FigureCanvasTkAgg,
+	errorbar: mpl.container.ErrorbarContainer
+) -> None: 
+	"""
+	"""
+	ax = get_axes(holder)
+
+	ax.add_container(errorbar)
+
+	holder.draw()
+
+def remove_average_curve_from_line_plot(
+	averageLine: mpl.lines.Line2D
 ) -> None:
 	"""
+	"""
+	averageLine.remove()
 
-
-	Parameters
-	----------
-	line : mpl.lines.Line2D
-	
-	color : str
-
-	zorder : int
-
-	"""
-	line.set_color(color)
-	line.zorder = zorder
-
-def add_average_curve_to_line_plot() -> None: 
+def remove_errorbar_from_line_plot(
+	errorbar: mpl.container.ErrorbarContainer
+) -> None:
 	"""
 	"""
-	pass 
-
-def add_errorbar_to_line_plot() -> None: 
-	"""
-	"""
-	pass 
-
-def remove_average_curve_from_line_plot() -> None:
-	"""
-	"""
-	pass
-
-def remove_errorbar_from_line_plot() -> None:
-	"""
-	"""
-	pass
+	errorbar.remove()
 
 def update_line_plot(
 	holder: mpl.backends.backend_tkagg.FigureCanvasTkAgg,
 	forceDistanceCurves: List,
+	inactiveDataPoints: List[int],
 	showInactive: bool
 ) -> None:
 	"""
@@ -298,24 +297,36 @@ def update_line_plot(
 	showInactive : bool
 	
 	"""
-	for forceDistanceCurve in forceDistanceCurves:
-		if not forceDistanceCurve.isActive and showInactive:
-			self.update_line(
+	for index, forceDistanceCurve in enumerate(forceDistanceCurves):
+		if index in inactiveDataPoints and showInactive:
+			self.deactivate_line(
 				forceDistanceCurve.lineRepresentationCorrectedData, 
-				"gray", 
-				-1
 			)
-		elif not forceDistanceCurve.isActive and not showInactive:
-			self.update_line(
+		elif index in inactiveDataPoints and not showInactive:
+			self.hide_line(
 				forceDistanceCurve.lineRepresentationCorrectedData, 
-				"white", 
-				-1
 			)
 		else:
-			self.update_line(
+			self.activate_line(
 				forceDistanceCurve.lineRepresentationCorrectedData, 
-				"red", 
-				1
 			)
 	
 	holder.draw()
+
+def deactivate_line(line: mpl.lines.Line2D) -> None: 
+	"""
+	"""
+	line.set_color("gray")
+	line.zorder = -1
+
+def hide_line(line: mpl.lines.Line2D) -> None: 
+	"""
+	"""
+	line.set_color("white")
+	line.zorder = -1
+
+def activate_line(line: mpl.lines.Line2D) -> None: 
+	"""
+	"""
+	line.set_color("red")
+	line.zorder = 1

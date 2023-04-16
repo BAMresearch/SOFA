@@ -14,109 +14,220 @@ You should have received a copy of the GNU General Public License
 along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 """
 from typing import Dict
+import functools
 
 import data_processing.named_tuples as nt
 import data_visualization.plot_data as plt_data
 from fdc_data.force_volume import ForceVolume
 
+def decorator_get_active_force_volume(function):
+	"""Get current selected force volume."""
+	@functools.wraps(function)
+	def wrapper_get_active_force_volume(self, *args, **kwargs):
+		activeForceVolume = self._get_active_force_volume()
+		function(activeForceVolume, *args, **kwargs)
+
+	return wrapper_get_active_force_volume
+
+def decorator_get_active_heatmap_channel(function):
+	"""Get name of current selected channel of heatmap."""
+	@functools.wraps(function)
+	def wrapper_get_active_force_volume(self, *args, **kwargs):
+		keyActiveHeatmapChannel = self.heatmapParameters.activeChannel.get()
+		function(keyActiveHeatmapChannel, *args, **kwargs)
+
+	return wrapper_get_active_force_volume
+
+def decorator_get_active_histogram_channel(function):
+	"""Get name of current selected channel of histogram."""
+	@functools.wraps(function)
+	def wrapper_get_active_force_volume(self, *args, **kwargs):
+		keyActiveHistogramChannel = self.histogramParameters.activeChannel.get()
+		function(keyActiveHistogramChannel, *args, **kwargs)
+
+	return wrapper_get_active_force_volume
+
 class GUIInterface():
 	"""
-	.
+	The interface between the GUI of SOFA and imported force volumes.
+	Handles the user input, from the GUI or the toolbars.
 
 	Attributes
 	----------
 	forceVolumes : Dict[ForceVolume]
+		Set of every imported force volume.
+	keyActiveForceVolume : ttk.StringVar
+		Name of active force volume.
+	linePlotParameters : nt.LinePlotParameters
+		
+	heatmapParameters : nt.HeatmapParameters
+
+	histogramParameters : nt.HistogramParameters
 
 	"""
-	def __init__(self):
+	def __init__(self) -> None:
 		"""
+		Initialize an blank interface. The attributes can only be 
+		set after 
 		"""
-		self.forceVolumes: Dict[ForceVolume] = []
-		self.activeForceVolume: 
+		self.forceVolumes: Dict[ForceVolume] = {}
+		self.keyActiveForceVolume
 		self.linePlotParameters: nt.LinePlotParameters 
 		self.heatmapParameters: nt.HeatmapParameters
 		self.histogramParameters: nt.HistogramParameters
 
-	def set_plot_parameters(self, plotParameters: Dict) -> None:
+	def set_gui_parameters(self, guiParameters: Dict) -> None:
 		"""
+
+		
+		Parameters
+		----------
+		guiParameters : dict
+
 		"""
-		self.activeForceVolume = plotParameters["activeForceVolume"]
+		self.keyActiveForceVolume = guiParameters["keyActiveForceVolume"]
+
 		self.linePlotParameters = nt.LinePlotParameters(
-			linked=plotParameters["linkedLinePlot"],
-			holder=plotParameters["holderLinePlot"],
+			linked=guiParameters["linkedLinePlot"],
+			holder=guiParameters["holderLinePlot"],
 			showInactive=False,
 			plotAverage=False,
 			plotErrorbar=False
 		)
 		self.heatmapParameters = nt.HeatmapParameters(
-			linked=plotParameters["linkedHeatmap"],
-			holder=plotParameters["holderHeatmap"],
-			activeChannel=plotParameters["activeChannelHeatmap"],
+			linked=guiParameters["linkedHeatmap"],
+			holder=guiParameters["holderHeatmap"],
+			activeChannel=guiParameters["activeChannelHeatmap"],
 			selectedArea=[],
 			orientationIndices=[]
 		)
 		self.histogramParameters = nt.HistogramParameters(
-			linked=plotParameters["linkedHistogram"],
-			holder=plotParameters["holderHistogram"],
-			activeChannel=plotParameters["activeChannelHistogram"],
-			zoom=plotParameters["zoomHistogram"],
-			numberOfBins=plotParameters["numberOfBins"]
+			linked=guiParameters["linkedHistogram"],
+			holder=guiParameters["holderHistogram"],
+			activeChannel=guiParameters["activeChannelHistogram"],
+			zoom=guiParameters["zoomHistogram"],
+			numberOfBins=guiParameters["numberOfBins"]
 		)
 
-	def import_force_volume(self, importedData) -> None: 
+	def create_force_volume(self, importedData: Dict) -> None: 
 		"""
-		"""
-		newForceVolume = ForceVolume(importedData)
-		newForceVolume.correct_force_distance_curves()
-		newForceVolume.calculate_channel_data()
 
-		self.activeForceVolume.set(newForceVolume.name)
-		self.activeForceVolume[newForceVolume.name] = newForceVolume
+
+		Parameters
+		----------
+		importedData : Dict
+		"""
+		forceVolume = ForceVolume(importedData)
+
+		self.keyActiveForceVolume.set(forceVolume.name)
+		self.forceVolumes[forceVolume.name] = forceVolume
 
 		self._plot_force_volume()
 
 	def _plot_force_volume(self) -> None:
 		"""
+		Plot the processed data of a newly imported force volume
+		as a line plot, heatmap and histogram.
 		"""
-		self.plot_line_plot()
+		self._plot_line_plot()
 		self.plot_heatmap()
 		self.plot_histogram()
 
-	def plot_line_plot(self) -> None:
+	@decorator_get_active_force_volume
+	def _plot_line_plot(
+		self, 
+		activeForceVolume: ForceVolume
+	) -> None:
 		"""
+		
 		"""
 		plt_data.plot_line_plot(
 			self.linePlotParameters.holder, 
 			activeForceVolume.get_force_distance_curves_lines()
 		)
 
-	def plot_heatmap(self) -> None: 
+	@decorator_get_active_force_volume
+	@decorator_get_active_heatmap_channel
+	def plot_heatmap(
+		self, 
+		activeForceVolume: ForceVolume,
+		keyActiveHeatmapChannel: str
+	) -> None: 
 		"""
 		"""
-		activeForceVolume = self._get_active_force_volume()
-		activeHeatmapChannel = self.heatmapParameters.activeChannel.get()
-
 		plt_data.plot_heatmap(
 			self.heatmapParameters.holder,
-			activeForceVolume.get_heatmap_data(activeHeatmapChannel),
-			self.linePlotParameters.selectedArea
+			activeForceVolume.get_heatmap_data(keyActiveHeatmapChannel),
+			self.heatmapParameters.selectedArea
 		)
 
-	def plot_histogram(self) -> None:
+	@decorator_get_active_force_volume
+	@decorator_get_active_histogram_channel
+	def plot_histogram(
+		self, 
+		activeForceVolume: ForceVolume,
+		keyActiveHistogramChannel: str
+	) -> None:
 		"""
 		"""
-		activeForceVolume = self._get_active_force_volume()
-		activeHistogramChannel = self.histogramParameters.activeChannel.get()
-
-		plt.plt_data.plot_histogram(
+		plt_data.plot_histogram(
 			self.histogramParameters.holder, 
-			activeForceVolume.get_histogram_data(activeHistogramChannel, active=False),
-			activeForceVolume.get_histogram_data(activeHistogramChannel),
+			activeForceVolume.get_histogram_data(keyActiveHistogramChannel, active=False),
+			activeForceVolume.get_histogram_data(keyActiveHistogramChannel),
 			self.histogramParameters.numberOfBins,
 			self.histogramParameters.zoom
 		)
 
+	def update_force_volume(self) -> None: 
+		"""
+		"""
+		pass
+
+	@decorator_get_active_force_volume
+	def update_line_plot(
+		self,
+		activeForceVolume: ForceVolume
+	) -> None:
+		"""
+		"""
+		plt.update_line_plot(
+			self.linePlotParameters.holder,
+			activeForceVolume.get_force_distance_curves_lines(),
+			activeForceVolume.inactiveDataPoints,
+			self.linePlotParameters.showInactive
+		)
+
+		if self.linePlotParameters.plotAverage:
+			self.update_line_plot_average(
+				activeForceVolume
+			)
+
+	def update_line_plot_average(
+		self,
+		activeForceVolume: ForceVolume
+	) -> None: 
+		"""
+		"""
+		# Remove old average
+		# Check if any points are still active
+		# Calculate average
+
+		if self.linePlotParameters.plotErrorbar:
+			plt.add_errorbar_to_line_plot(
+
+			)
+		else:
+			plt.add_average_to_line_plot(
+
+			)
+
 	def _get_active_force_volume(self) -> ForceVolume:
 		"""
+
+
+		Returns
+		-------
+		activeForceVolume : ForceVolume
+
 		"""
-		return self.forceVolumes[self.activeForceVolume.get()]
+		return self.forceVolumes[self.keyActiveForceVolume.get()]

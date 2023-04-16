@@ -29,10 +29,12 @@ class LinePlotToolbar(NavigationToolbar2Tk):
 	'''
 	A custom toolbar to process data, displayed as a lineplot.
 
-	Paramters:
-		dataHandler(object): Handles the state and different display options of the data.
+	Attributes
+	----------
+	guiInterface : GUIInterface
+		 Handles the state and different display options of the data.
 	'''
-	def __init__(self, canvas_, parent_, dataHandler):
+	def __init__(self, canvas_, parent_, guiInterface):
 		# Set path for toolbar icons.
 		iconPath = os.path.join(
 			os.path.abspath(os.path.dirname(__file__)), 
@@ -50,7 +52,7 @@ class LinePlotToolbar(NavigationToolbar2Tk):
 			("display_errorbar", "", os.path.join(iconPath, "errorbar.gif"), "_display_as_errorbar")
 		)
 
-		self.dataHandler = dataHandler
+		self.guiInterface = guiInterface
 		self.holder = canvas_
 		self.eventConnections = []
 		self.zoomHist = []

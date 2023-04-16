@@ -30,7 +30,7 @@ class HeatmapToolbar(NavigationToolbar2Tk):
 	
 	Attributes
 	----------
-	forceVolume : ForceVolume
+	guiInterface : GUIInterface
 
 	holder : 
 
@@ -38,7 +38,7 @@ class HeatmapToolbar(NavigationToolbar2Tk):
 
 	selectedArea : list[]
 	"""
-	def __init__(self, canvas_, parent_, dataHandler):
+	def __init__(self, canvas_, parent_, guiInterface):
 		# Set path for toolbar icons.
 		iconPath = os.path.join(
 			os.path.abspath(os.path.dirname(__file__)), 
@@ -54,7 +54,7 @@ class HeatmapToolbar(NavigationToolbar2Tk):
 			("flip_v", "", os.path.join(iconPath, "flip_v.gif"), "_flip_heatmap_v"),
 			("rotate", "", os.path.join(iconPath, "rotate.gif"), "_rotate_heatmap")
 		)	
-		self.dataHandler = dataHandler
+		self.guiInterface = guiInterface
 		self.holder = canvas_
 		self.eventConnections = []
 		self.selectedArea = []

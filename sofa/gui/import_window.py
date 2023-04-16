@@ -49,8 +49,8 @@ class ImportWindow(ttk.Frame):
 
 	Attributes
 	----------
-	forceVolume : ForceVolume
-		Stores the data of the imported measuremnet data.
+	guiInterface : GUIInterface
+		.
 	progressbar : ttk.Progressbar
 		Shows the user if the process of importing 
 		the data is still running. 
@@ -75,7 +75,7 @@ class ImportWindow(ttk.Frame):
 	def __init__(
 		self, 
 		root, 
-		forceVolume, 
+		guiInterface, 
 		set_imported_meta_data
 	) -> None:
 		"""
@@ -85,7 +85,7 @@ class ImportWindow(ttk.Frame):
 		
 		self.pack(fill=BOTH, expand=YES)
 
-		self.forceVolume = forceVolume
+		self.guiInterface = guiInterface
 		self.set_imported_meta_data_in_main_window = set_imported_meta_data
 		self.dataTypes = imp_data.importFunctions.keys()
 
@@ -313,16 +313,8 @@ class ImportWindow(ttk.Frame):
 			self._stop_progressbar()
 			return messagebox.showerror("Error", str(e), parent=self)
 		else:
-			self.forceVolume.set_imported_data(importedData)
-
-		self._update_progressbar_label("Correcting data...")
-		self.forceVolume.correct_force_distance_curves()
-
-		self._update_progressbar_label("Calculating channel data...")
-		self.forceVolume.calculate_channel_data()
-
-		self._update_progressbar_label("Plotting data...")
-		self.forceVolume.display_imported_data()
+			self._update_progressbar_label("Processing data...")
+			self.guiInterface.create_force_volume(importedData)
 
 		# Set the name, size and location of the imported data in the main window.
 		self.set_imported_meta_data_in_main_window(
