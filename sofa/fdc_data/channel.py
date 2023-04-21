@@ -21,7 +21,7 @@ import data_processing.named_tuples as nt
 
 class Channel():
 	"""
-	
+	A two dimensional parameter map of a force volume.
 
 	Attributes
 	----------
@@ -34,8 +34,8 @@ class Channel():
 		Unmodified data of the channel used to restore
 		data and orientation.
 	data : np.ndarray
-		Data of the channel with the current orientation,
-		can be flipped or rotated.
+		Data of the channel with the current orientation -
+		can be flipped or rotated by the toolbar.
 	"""
 	def __init__(
 		self,
@@ -44,6 +44,19 @@ class Channel():
 		data: np.ndarray
 	):
 		"""
+		Initialize a channel by setting its name, size and parameter data.
+
+		Parameters
+		----------
+		name : str
+			Name of the new channel
+		size : tuple[int]
+			Size of the force volume corresponding to the height
+			and width of the channel.
+		data : np.ndarray
+			Parameter values calculated from the meta data 
+			resulting from the correction of the force 
+			distance curves of the force volume. 
 		"""
 		self.name: str = name
 		self.size: Tuple = size
@@ -52,19 +65,36 @@ class Channel():
 
 	def reset_data(self) -> None:
 		"""
+		Reset the orientation of the data.
 		"""
 		self.data = self.rawData.copy()
 
 	def get_active_heatmap_data(
 		self,
 		inactiveDataPoints: List[int],
-		heatmapOrientaionMatrix: np.ndarray
+		heatmapOrientationMatrix: np.ndarray
 	) -> np.ndarray:
-		""""""
+		"""
+		Get the active data of the channel displayable as heatmap.
+
+		Parameters
+		----------
+		inactiveDataPoints : list[int]
+			Indices of the currently inactive force distance curves.
+		heatmapOrientationMatrix: np.ndarray
+			Matrix showing the position of the force distance curves 
+			in the channel with the current orientation.
+
+		Returns
+		-------
+		activeHeatmapData : np.ndarray
+			Channel data of the currently active force distance 
+			curves.
+		"""
 		flatHeatmapData = self.data.copy().flatten()
 		mappedInactiveDataPoints = self._map_heatmap_orientation_to_inactive_datapoints(
 			inactiveDataPoints,
-			heatmapOrientaionMatrix
+			heatmapOrientationMatrix
 		)
 		activeFlatHeatmapData = np.put(
 			heatmapData, 
@@ -75,15 +105,32 @@ class Channel():
 
 		return activeHeatmapData
 
+	@staticmethod
 	def _map_heatmap_orientation_to_inactive_datapoints(
-		self,
 		inactiveDataPoints: List[int],
-		heatmapOrientaionMatrix: np.ndarray
+		heatmapOrientationMatrix: np.ndarray
 	) -> List[int]:
 		"""
+		Map the indices of the currently inactive force distance curves
+		to the orientation of the heatmap. This is necessary because a 
+		rotation or shift of the heatmap does not change the axis.
+
+		Parameters
+		----------
+		inactiveDataPoints : list[int]
+			Indices of the currently inactive force distance curves
+		heatmapOrientationMatrix: np.ndarray
+			Matrix showing the position of the force distance curves 
+			in the channel with the current orientation.
+
+		Returns
+		-------
+		mappedInactiveDataPoints : list[int]
+			Indices of the currently inactive force distance curves
+			taking into account the orientation of the heatmap. 
 		"""
 		return [
-			np.where(dataPoint == heatmapOrientaionMatrix)[0][0]
+			np.where(dataPoint == heatmapOrientationMatrix)[0][0]
 			for dataPoint in inactiveDataPoints
 		]
 
@@ -91,6 +138,12 @@ class Channel():
 		self
 	) -> np.ndarray:
 		"""
+		Get the data of the channel displayable as histogram.
+
+		Returns
+		-------
+		validHistogramData : np.ndarray
+			One dimensional channel data without potential nan values.
 		"""
 		histogramData = self.rawData.copy().flatten()
 		validHistogramData = self._remove_nan_values(histogramData)
@@ -101,7 +154,20 @@ class Channel():
 		self,
 		inactiveDataPoints: List[int]
 	) -> np.ndarray:
-		""""""
+		"""
+		Get the active data of the channel displayable as histogram.
+
+		Parameters
+		----------
+		inactiveDataPoints : np.ndarray
+			Indices of the currently inactive force distance curves
+
+		Returns
+		-------
+		validActiveHistogramData : np.ndarray
+			One dimensional channel data of the currently active 
+			force distance curves without potential nan values.
+		"""
 		histogramData = self.rawData.copy().flatten()
 		activeHistogramData = np.delete(histogramData, inactiveDataPoints)
 		validActiveHistogramData = self._remove_nan_values(activeHistogramData)
@@ -109,7 +175,20 @@ class Channel():
 		return validActiveHistogramData
 
 	@staticmethod
-	def _remove_nan_values(inputArray: np.ndarray) -> np.ndarray:
+	def _remove_nan_values(channelData: np.ndarray) -> np.ndarray:
 		"""
+		Remove potential nan values from the channel data, to 
+		ensure the data is displayable as a histogram.
+
+		Parameters
+		----------
+		channelData : np.ndarray
+			Channel values which might contain nan values if a 
+			force curve could not be corrected.
+
+		Returns
+		-------
+		validChannelData : np.ndarray
+			Channel values with no nan values.
 		"""
-		return inputArray[np.isfinite(inputArray)]
+		return channelData[np.isfinite(channelData)]

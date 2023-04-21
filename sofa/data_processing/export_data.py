@@ -74,11 +74,11 @@ def create_data_frame_metadata(
 	} 
 
 	if forceVolume.metaData:
-		metaData["fss"] = forceVolume.metaData.fss
-		metaData["sss"] = forceVolume.metaData.sss
-		metaData["xOffset"] = forceVolume.metaData.xOffset
-		metaData["yOffset"] = forceVolume.metaData.yOffset
-		metaData["springConstant"] = forceVolume.metaData.springConstant
+		metaData["fss"] = forceVolume.imageData["fss"]
+		metaData["sss"] = forceVolume.imageData["sss"]
+		metaData["xOffset"] = forceVolume.imageData["xOffset"]
+		metaData["yOffset"] = forceVolume.imageData["yOffset"]
+		metaData["springConstant"] = forceVolume.imageData["springConstant"]
 
 	return pd.DataFrame.from_dict(metaData)
 

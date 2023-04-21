@@ -22,7 +22,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import tkinter as tk
 import ttkbootstrap as ttk
 
-# Named tuples for 
+# Named tuples for the GUI interface
 class LinePlotParameters(NamedTuple):
 	linked: tk.BooleanVar
 	holder: FigureCanvasTkAgg
@@ -92,10 +92,10 @@ class ImageData(NamedTuple):
 	channelHeight: ndarray
 	channelAdhesion: ndarray
 
-class ChannelData(NamedTuple):
+class ImportedChannelData(NamedTuple):
 	name: str
 	size: Tuple[int]
-	channelData: ndarray
+	data: ndarray
 
 # Named tuples for the data export
 class ExportParameter(NamedTuple):

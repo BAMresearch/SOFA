@@ -37,6 +37,11 @@ We kindly ask to cite (add doi) if any information of this manual or data result
 .. toctree::
    :maxdepth: 2
 
+   architecture
+
+.. toctree::
+   :maxdepth: 2
+
    codebase
 
 .. toctree::

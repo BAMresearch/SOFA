@@ -20,7 +20,6 @@ from matplotlib.lines import Line2D
 
 from data_processing.correct_data import correct_approach_curve
 import data_processing.named_tuples as nt
-import data_visualization.plot_data as plt_data
 
 class ForceDistanceCurve():
 	"""
@@ -41,12 +40,6 @@ class ForceDistanceCurve():
 	channelMetadata : namedtuple
 		Data created while correcting the curve used
 		to calculate the different channels.
-	lineRepresentationRawData : mpl.lines.Line2D
-		Line of the raw data used to represent the 
-		curve in a plot. 
-	lineRepresentationCorrectedData : mpl.lines.Line2D
-		Line of the corrected data used to represent 
-		the curve in a plot.
 	"""
 	def __init__(self, identifier: str, dataApproachRaw: nt.ForceDistanceCurve):
 		"""
@@ -68,9 +61,6 @@ class ForceDistanceCurve():
 		self.couldBeCorrected: bool
 		self.channelMetadata: NamedTuple
 
-		self.lineRepresentationRawData: matplotlib.lines.Line2D
-		self.lineRepresentationCorrectedData: matplotlib.lines.Line2D
-
 	def correct_raw_data(self) -> None:
 		"""
 		Correct the raw data of the approach curve.
@@ -83,23 +73,3 @@ class ForceDistanceCurve():
 			self.couldBeCorrected = False
 		else:
 			self.couldBeCorrected = True 
-
-	def create_line_representation_raw_data(self) -> None:
-		"""
-		Create a displayable line from the raw data of the force
-		distance curve.
-		"""
-		self.lineRepresentationRawData = plt_data.create_raw_line(
-			self.identifier,
-			self.dataApproachRaw
-		)
-
-	def create_line_representation_corrected_data(self) -> None:
-		"""
-		Create a displayable line from the corrected data of 
-		the force distance curve.
-		"""
-		self.lineRepresentationCorrectedData = plt_data.create_corrected_line(
-			self.identifier,
-			self.dataApproachCorrected
-		)

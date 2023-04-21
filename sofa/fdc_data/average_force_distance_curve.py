@@ -160,18 +160,3 @@ class AverageForceDistanceCurve():
 		]
 
 		return np.max(deflectionValues)
-
-	def create_line_representation(self) -> None: 
-		"""
-		"""
-		self.lineRepresentation = plt_data.create_average_line(
-			self.averageData
-		)
-
-	def create_line_representation_as_errorbar(self) -> None:
-		"""
-		"""
-		self.errorbarBar = plt_data.create_average_errorbar(
-			self.averageData,
-			self.standardDeviation
-		) 

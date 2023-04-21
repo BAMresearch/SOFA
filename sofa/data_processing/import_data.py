@@ -97,7 +97,7 @@ def import_ibw_data(
 		)
 
 	if importParameter.filePathChannel:
-		importedData["channelData"] = import_channel(
+		importedData["importedChannelData"] = import_channel(
 			importParameter.filePathChannel,
 			measurementData.size
 		)

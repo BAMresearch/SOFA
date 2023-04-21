@@ -49,7 +49,7 @@ def decorator_get_active_histogram_channel(function):
 
 class GUIInterface():
 	"""
-	The interface between the GUI of SOFA and imported force volumes.
+	The interface between the GUI of SOFA and the imported force volumes.
 	Handles the user input, from the GUI or the toolbars.
 
 	Attributes
@@ -67,7 +67,7 @@ class GUIInterface():
 	"""
 	def __init__(self) -> None:
 		"""
-		Initialize an blank interface. The attributes can only be 
+		Initialize a blank interface. The attributes can only be 
 		set after 
 		"""
 		self.forceVolumes: Dict[ForceVolume] = {}

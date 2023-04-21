@@ -44,8 +44,14 @@ Export Window
 Window Settings
 ~~~~~~~~~~~~~~~
 
+Interfaces
+----------
+
 GUI Interface
 ~~~~~~~~~~~~~
+
+Plot Interface
+~~~~~~~~~~~~~~
 
 .. _toolbar implementation:
 
@@ -105,6 +111,8 @@ Data Visualization
 
 Plot Data
 ~~~~~~~~~
+
+.. _tests implementation:
 
 Tests
 =====

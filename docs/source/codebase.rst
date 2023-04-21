@@ -44,8 +44,14 @@ Export Window
 Window Settings
 ~~~~~~~~~~~~~~~
 
+Interfaces
+----------
+
 GUI Interface
 ~~~~~~~~~~~~~
+
+Plot Interface
+~~~~~~~~~~~~~~
 
 .. _toolbar implementation:
 

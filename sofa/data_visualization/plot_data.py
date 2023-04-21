@@ -25,17 +25,21 @@ def create_raw_line(
 	dataRaw: nt.ForceDistanceCurve
 ) -> mpl.lines.Line2D:
 	"""
-
+	
 	
 	Parameters
 	----------
 	identifier : str
+		Name matching the corresponding force distance curve.
 	dataRaw : nt.ForceDistanceCurve
+		Raw piezo (x) and deflection (y) values of the 
+		corresponding force distance curve.
 
 	Returns
 	-------
 	rawLine : mpl.lines.Line2D
-
+		Line representation of a raw force distance curve
+		displayable in a plot.
 	"""
 	return mpl.lines.Line2D(
 		dataRaw.piezo, 
@@ -53,17 +57,21 @@ def create_corrected_line(
 	dataCorrected: nt.ForceDistanceCurve
 ) -> mpl.lines.Line2D:
 	"""
-
+	
 	
 	Parameters
 	----------
 	identifier : str
+		Name matching the corresponding force distance curve.
 	dataRaw : nt.ForceDistanceCurve
+		Corrected piezo (x) and deflection (y) values of the 
+		corresponding force distance curve.
 
 	Returns
 	-------
 	rawLine : mpl.lines.Line2D
-	
+		Line representation of a corrected force distance curve
+		displayable in a plot.
 	"""
 	return mpl.lines.Line2D(
 		dataCorrected.piezo, 
@@ -315,6 +323,11 @@ def update_line_plot(
 
 def deactivate_line(line: mpl.lines.Line2D) -> None: 
 	"""
+
+	Parameters
+	----------
+	line : mpl.lines.Line2D
+		
 	"""
 	line.set_color("gray")
 	line.zorder = -1

@@ -64,4 +64,4 @@ Once a subgroup has been defined and the selected curves have been averaged the 
 
 .. note::
 
-   As of version 1.0 SOFA has no capacities to remember previous selected subsets of Force Curves or previous averaged curves. Results have to be exported to be stored.
+   Up to version 1.0 SOFA has no capacities to remember previous selected subsets of Force Curves or previous averaged curves. Results have to be exported to be stored.
