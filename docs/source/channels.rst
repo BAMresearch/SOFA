@@ -29,6 +29,8 @@ There are three categories of parameters.
 Result of SOFA's correction algorithm
 -------------------------------------
 
+.. _raw offset stiffness:
+
 **raw offset** and **raw stiffness**
 
 .. table::
@@ -119,6 +121,8 @@ Physical properties
    |                                                 | [zitat] However, both quantities are connected by kc, and          | 
    |                                                 | therefore contain comparable information as a channel.             |
    +-------------------------------------------------+--------------------------------------------------------------------+
+
+.. _attractive area z attractive:
 
 **FAttractive, ZAttractive and AttractiveArea**
 

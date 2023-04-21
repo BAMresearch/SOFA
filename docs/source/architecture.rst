@@ -2,4 +2,4 @@
 SOFA Architecture
 =================
 
-text
+strukturdiagramm einfügen

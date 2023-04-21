@@ -123,12 +123,12 @@ def calculate_end_of_zeroline(
 	fitApproachCurve, coefficientsFitApproachCurve = calculate_linear_fit_to_approach_curve(
 		approachCurve
 	)
-	smoothedDerivationDeflection = calculate_smoothed_derivation(
-		approachCurve
-	)
 	indexLeftBorder, indexRightBorder = calculate_deflection_borders(
 		approachCurve,
 		fitApproachCurve
+	)
+	smoothedDerivationDeflection = calculate_smoothed_derivation(
+		approachCurve
 	)
 	endOfZeroline = locate_end_of_zeroline(
 		approachCurve,
