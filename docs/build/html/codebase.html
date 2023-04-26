@@ -271,11 +271,18 @@ The decorator <em>decorator_check_required_folder_path</em> and <em>decorator_ch
 </section>
 <section id="toolbar">
 <span id="toolbar-implementation"></span><h3>Toolbar<a class="headerlink" href="#toolbar" title="Permalink to this headline">#</a></h3>
+<p>The toolbar module contains the line plot and heatmap toolbars to select a certain subgroup of force curves and inspect the data more closely. Both are written as a seperate class inherted from the Matplotlib NavigationToolbar2Tk, but have custom <a class="reference internal" href="toolbars.html#toolbar-funcitionalities"><span class="std std-ref">funcitionalities</span></a>. With Matplotlib version 3.5.1 it is no longer possible to load toolbar icons from a custom location. Therefore, both toolbars have to overwrite a part of the NavigationToolbar2Tk <em>__init__</em> function. Additionally they adjust the background color of the toolbar icons to the background color of the main window.</p>
 <section id="lineplot-toolbar">
 <h4>Lineplot Toolbar<a class="headerlink" href="#lineplot-toolbar" title="Permalink to this headline">#</a></h4>
+<p>zoom ansprechen
+auswahl an kurven - einzelne kurven über pick radius - gruppe and kurven über aktuell sichtbare - dabei nur kurven getroffen die datenpunkt im aktuellen ausschnitt haben
+show inactive average errorbar alle über gui interface auf architecture verweisen</p>
 </section>
 <section id="heatmap-toolbar">
 <h4>Heatmap Toolbar<a class="headerlink" href="#heatmap-toolbar" title="Permalink to this headline">#</a></h4>
+<p>bereich auswählen - rechteck relativ selbsterklärend - freie fläche wie wird das gemacht - alles umkreisen duplikate löschen
+bereich einschliesen ausschliesen - ändert inaktive datenpunkte
+flip und rotieren ohne achsen anpassen erklären bzw auf arcitecture heatmap orientation verweisen</p>
 </section>
 </section>
 <section id="fdc-data">
@@ -309,13 +316,11 @@ The decorator <em>decorator_check_required_folder_path</em> and <em>decorator_ch
 </section>
 <section id="named-tuples">
 <h4>Named Tuples<a class="headerlink" href="#named-tuples" title="Permalink to this headline">#</a></h4>
-<p>To increase the readability of the code SOFA uses NamedTuple. These are all defined in this file. - Type hints und Aufteilung ansprechen -</p>
+<p>To increase the readability of the code SOFA uses NamedTuple, which are all defined in this file. They are divided into different categories and use type hints, to make it easier to understand the code.</p>
 </section>
 <section id="custom-exceptions">
 <h4>Custom Exceptions<a class="headerlink" href="#custom-exceptions" title="Permalink to this headline">#</a></h4>
-<ul class="simple">
-<li><p>warum eigene exceptions - for the import and correction process. Both cases have a general exception - <em>ImportError</em> and <em>CorrectionError</em> and further specific exceptions to - erklären warum die struktur gewählt wurde -</p></li>
-</ul>
+<p>To better undestand possible errors when importing and correcting the measurement data, SOFA uses some custom exceptions. Both cases have a general exception <em>ImportError</em> and <em>CorrectionError</em> and further specific exceptions. This structure allows to catch a general type of exception with a descriptive name that should make it easier to understand the problem.</p>
 </section>
 </section>
 <section id="data-visualization">
@@ -327,6 +332,15 @@ The decorator <em>decorator_check_required_folder_path</em> and <em>decorator_ch
 </section>
 <section id="tests">
 <span id="tests-implementation"></span><h2>Tests<a class="headerlink" href="#tests" title="Permalink to this headline">#</a></h2>
+<section id="data-correction">
+<h3>Data Correction<a class="headerlink" href="#data-correction" title="Permalink to this headline">#</a></h3>
+</section>
+<section id="channel-calculation">
+<h3>Channel Calculation<a class="headerlink" href="#channel-calculation" title="Permalink to this headline">#</a></h3>
+</section>
+<section id="using-syfos-data">
+<h3>Using SyFoS Data<a class="headerlink" href="#using-syfos-data" title="Permalink to this headline">#</a></h3>
+</section>
 </section>
 <section id="docs">
 <h2>Docs<a class="headerlink" href="#docs" title="Permalink to this headline">#</a></h2>
@@ -437,7 +451,12 @@ The decorator <em>decorator_check_required_folder_path</em> and <em>decorator_ch
 </li>
 </ul>
 </li>
-<li><a class="reference internal" href="#tests">Tests</a></li>
+<li><a class="reference internal" href="#tests">Tests</a><ul>
+<li><a class="reference internal" href="#data-correction">Data Correction</a></li>
+<li><a class="reference internal" href="#channel-calculation">Channel Calculation</a></li>
+<li><a class="reference internal" href="#using-syfos-data">Using SyFoS Data</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#docs">Docs</a></li>
 </ul>
 </li>

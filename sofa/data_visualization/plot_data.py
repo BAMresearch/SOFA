@@ -14,36 +14,49 @@ You should have received a copy of the GNU General Public License
 along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 """
 from typing import List
+import functools
 
 import numpy as np
 import matplotlib as mpl
 
 import data_processing.named_tuples as nt
 
+def decorator_update_plot(function):
+	"""Get axes and redraw the holder of a plot."""
+	@functools.wraps(function)
+	def wrapper_update_plot(*args, **kwargs):
+		holder = args[0]
+		axes = get_axes(holder)
+		function(axes, *args, **kwargs)
+		holder.draw()
+
+	return wrapper_update_plot
+
 def create_raw_line(
 	identifier: str, 
-	dataRaw: nt.ForceDistanceCurve
+	rawMeasurementCurve: nt.ForceDistanceCurve
 ) -> mpl.lines.Line2D:
 	"""
-	
+	Construct a displayable matplotlib line from a raw
+	measurement curve.
 	
 	Parameters
 	----------
 	identifier : str
 		Name matching the corresponding force distance curve.
-	dataRaw : nt.ForceDistanceCurve
+	rawMeasurementCurve : nt.ForceDistanceCurve
 		Raw piezo (x) and deflection (y) values of the 
 		corresponding force distance curve.
 
 	Returns
 	-------
 	rawLine : mpl.lines.Line2D
-		Line representation of a raw force distance curve
-		displayable in a plot.
+		Line representation of a raw force 
+		distance curve.
 	"""
 	return mpl.lines.Line2D(
-		dataRaw.piezo, 
-		dataRaw.deflection, 
+		rawMeasurementCurve.piezo, 
+		rawMeasurementCurve.deflection, 
 		c="darkred", 
 		label=identifier + "_raw",
 		linewidth=0.5, 
@@ -54,28 +67,29 @@ def create_raw_line(
 
 def create_corrected_line(
 	identifier: str, 
-	dataCorrected: nt.ForceDistanceCurve
+	correctedMeasurementCurve: nt.ForceDistanceCurve
 ) -> mpl.lines.Line2D:
 	"""
-	
+	Construct a displayable matplotlib line from a
+	corrected measurement curve.
 	
 	Parameters
 	----------
 	identifier : str
 		Name matching the corresponding force distance curve.
-	dataRaw : nt.ForceDistanceCurve
+	correctedMeasurementCurve : nt.ForceDistanceCurve
 		Corrected piezo (x) and deflection (y) values of the 
 		corresponding force distance curve.
 
 	Returns
 	-------
 	rawLine : mpl.lines.Line2D
-		Line representation of a corrected force distance curve
-		displayable in a plot.
+		Line representation of a corrected 
+		force distance curve.
 	"""
 	return mpl.lines.Line2D(
-		dataCorrected.piezo, 
-		dataCorrected.deflection, 
+		correctedMeasurementCurve.piezo, 
+		correctedMeasurementCurve.deflection, 
 		c="red", 
 		label=identifier + "_corrected",
 		linewidth=0.5, 
@@ -85,27 +99,60 @@ def create_corrected_line(
 	)
 
 def create_average_line(
-	averageData: np.ndarray
+	averageCurve: np.ndarray
 ) -> mpl.lines.Line2D:
 	"""
+	Construct a displayable matplotlib line for
+	the calculated average values.
+
+	Parameters
+	----------
+	averageCurve : nt.ForceDistanceCurve
+		Average Piezo (x) and deflection (y) values
+		of all active force distance curves.
+
+	Returns
+	-------
+	averageLine : mpl.lines.Line2D
+		Line representation of the average of 
+		the active force distance curves.
 	"""
 	return mpl.lines.Line2D(
-		averageData.piezo, 
-		averageData.deflection, 
+		averageCurve.piezo, 
+		averageCurve.deflection, 
 		c="black", 
 		label="average_data",
 		zorder=6
 	)
 
 def create_average_errorbar(
-	averageData: np.ndarray,
+	averageCurve: np.ndarray,
 	standardDeviation: np.ndarray
 ) -> mpl.container.ErrorbarContainer:
 	"""
+	Construct a displayable matplotlib object for
+	the calculated average values and the 
+	corresponding standard deviation.
+
+	Parameters
+	----------
+	averageCurve : nt.ForceDistanceCurve
+		Average Piezo (x) and deflection (y) values
+		of all active force distance curves.
+	standardDeviation : np.ndarray
+		Standard deviation of the calculated average
+		values.
+
+	Returns
+	-------
+	averageErrorbar : mpl.container.ErrorbarContainer
+		Line representation of the average of 
+		the active force distance curves with
+		the standard deviation as errorbars.
 	"""
 	return mpl.container.ErrorbarContainer(
-		averageData.piezo, 
-		averageData.deflection, 
+		averageCurve.piezo, 
+		averageCurve.deflection, 
 		yerr=standardDeviation,
 		c="black",
 		ecolor="black",
@@ -127,7 +174,8 @@ def get_axes(
 	Returns
 	-------
 	axes : mpl.axes
-		New or existing axes of the given holder.
+		New or existing axes of the figure of
+		the given holder.
 	"""
 	try:
 		return holder.figure.get_axes()[0]
@@ -139,14 +187,17 @@ def plot_line_plot(
 	lines: List[mpl.lines.Line2D]
 ) -> None: 
 	"""
-	
+	Plot every force distance curve of a force volume 
+	as a line plot.
 
 	Parameters
 	----------
 	holder : mpl.backends.backend_tkagg.FigureCanvasTkAgg
-
-	lines : list
-
+		Interface between the matplotlib figure and the 
+		main window in which the plot is located.
+	lines : list[mpl.lines.Line2D]
+		Line representations of all force distance curves
+		in a force volume.
 	"""
 	ax = get_axes(holder)
 	ax.cla()
@@ -166,31 +217,33 @@ def plot_line_plot(
 
 def plot_heatmap(
 	holder: mpl.backends.backend_tkagg.FigureCanvasTkAgg, 
-	data: np.ndarray,
-	markingLines: List[mpl.lines.Line2D]
+	activeData: np.ndarray,
+	linesSelectedArea: List[mpl.lines.Line2D]
 ) -> None:
 	"""
-
+	Plot the active data of a channel as a grayscale heatmap.
 
 	Parameters
 	----------
 	holder : mpl.backends.backend_tkagg.FigureCanvasTkAgg
-
-	data : np.ndarray
-
-	markingLines : list
-
+		Interface between the matplotlib figure and the 
+		main window in which the plot is located.
+	activeData : np.ndarray
+		Two dimensional data of the active data points
+		of the channel.
+	linesSelectedArea : list[mpl.lines.Line2D]
+		Lines enclosing the selected area. 
 	"""
-	m, n = np.shape(data)
+	m, n = np.shape(activeData)
 
 	ax = get_axes(holder)
 	ax.cla()
-	ax.imshow(data, cmap="gray", extent=[0, n, m, 0])
+	ax.imshow(activeData, cmap="gray", extent=[0, n, m, 0])
 	# Simplify mouse hover by removing currenet x and y coordinates.
 	ax.format_coord = lambda x, y: ""
 
 	# Plot potentional marking lines.
-	for line in markingLines:
+	for line in linesSelectedArea:
 		ax.add_line(line)
 
 	holder.draw()
@@ -203,20 +256,23 @@ def plot_histogram(
 	zoom: bool
 ) -> None:
 	"""
-
+	Plot the data versus the data of the active data 
+	points of a channel as a histogram.
 	
 	Parameters
 	----------
 	holder : mpl.backends.backend_tkagg.FigureCanvasTkAgg
-
+		Interface between the matplotlib figure and the 
+		main window in which the plot is located.
 	data : np.ndarray
-
+		One dimensional data of the channel.
 	activeData : np.ndarray
-
+		One dimensional data of the active data points
+		of the channel.
 	numberOfBins : int
-
+		
 	zoom : bool
-
+		
 	"""
 	ax = get_axes(holder)
 
@@ -290,20 +346,27 @@ def remove_errorbar_from_line_plot(
 
 def update_line_plot(
 	holder: mpl.backends.backend_tkagg.FigureCanvasTkAgg,
-	forceDistanceCurves: List,
+	forceDistanceCurves: List[mpl.lines.Line2D],
 	inactiveDataPoints: List[int],
 	showInactive: bool
 ) -> None:
 	"""
+	
 
 	Parameters
 	----------
-	holder : mpl.backends.backend_tkagg.FigureCanvasTkAgg,
-	
-	forceDistanceCurves : list
-	
+	holder : mpl.backends.backend_tkagg.FigureCanvasTkAgg
+		Interface between the matplotlib figure and the 
+		main window in which the plot is located.
+	forceDistanceCurves : list[mpl.lines.Line2D]
+		Line representations of all force distance curves
+		in a force volume.
+	inactiveDataPoints : list[int]
+		Indicis of the inactive data points/force distance
+		curves.
 	showInactive : bool
-	
+		Specifies whether inactice force distance curves
+		should be displayed as grey or hidden.
 	"""
 	for index, forceDistanceCurve in enumerate(forceDistanceCurves):
 		if index in inactiveDataPoints and showInactive:
@@ -323,23 +386,45 @@ def update_line_plot(
 
 def deactivate_line(line: mpl.lines.Line2D) -> None: 
 	"""
+	Deactivate the line representation of a inactive
+	force distance curve by setting the line color to 
+	gray and adjusting the z order so it appears
+	behind active force distance curves.
 
 	Parameters
 	----------
 	line : mpl.lines.Line2D
-		
+		Line representation of a force distance curve.
 	"""
 	line.set_color("gray")
 	line.zorder = -1
 
 def hide_line(line: mpl.lines.Line2D) -> None: 
 	"""
+	Hide the line representation of a inactive
+	force distance curve by setting the line color to 
+	white and adjusting the z order so it appears
+	behind active force distance curves.
+
+	Parameters
+	----------
+	line : mpl.lines.Line2D
+		Line representation of a force distance curve.
 	"""
 	line.set_color("white")
 	line.zorder = -1
 
 def activate_line(line: mpl.lines.Line2D) -> None: 
 	"""
+	Activate the line representation of an active
+	force distance curve by setting the line color to 
+	red and adjusting the z order so it appears
+	before inactive force distance curves.
+
+	Parameters
+	----------
+	line : mpl.lines.Line2D
+		Line representation of a force distance curve.
 	"""
 	line.set_color("red")
 	line.zorder = 1

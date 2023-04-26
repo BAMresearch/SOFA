@@ -71,7 +71,7 @@ class GUIInterface():
 		set after 
 		"""
 		self.forceVolumes: Dict[ForceVolume] = {}
-		self.keyActiveForceVolume
+		self.keyActiveForceVolume: ttk.StringVar
 		self.linePlotParameters: nt.LinePlotParameters 
 		self.heatmapParameters: nt.HeatmapParameters
 		self.histogramParameters: nt.HistogramParameters
@@ -122,9 +122,9 @@ class GUIInterface():
 		self.keyActiveForceVolume.set(forceVolume.name)
 		self.forceVolumes[forceVolume.name] = forceVolume
 
-		self._plot_force_volume()
+		self.plot_active_force_volume()
 
-	def _plot_force_volume(self) -> None:
+	def plot_active_force_volume(self) -> None:
 		"""
 		Plot the processed data of a newly imported force volume
 		as a line plot, heatmap and histogram.
@@ -133,6 +133,37 @@ class GUIInterface():
 		self.plot_heatmap()
 		self.plot_histogram()
 
+	def update_active_force_volume_plots(self) -> None: 
+		"""
+		"""
+		self.update_line_plot()
+		self.plot_heatmap()
+		self.plot_histogram()
+
+	def update_inactive_data_points_line_plot(self) -> None:
+		"""
+		"""
+		if self.linePlotParameters.linked.get():
+			self.update_active_force_volume_plots()
+		else:
+			self.update_line_plot()
+
+	def update_inactive_data_points_heatmap(self) -> None:
+		"""
+		"""
+		if self.heatmapParameters.linked.get():
+			self.update_active_force_volume_plots()
+		else:
+			self.plot_heatmap()
+
+	def update_inactive_data_points_histogram(self) -> None:
+		"""
+		"""
+		if self.histogramParameters.linked.get():
+			self.update_active_force_volume_plots()
+		else:
+			self.plot_histogram()
+		
 	@decorator_get_active_force_volume
 	def _plot_line_plot(
 		self, 
@@ -157,7 +188,9 @@ class GUIInterface():
 		"""
 		plt_data.plot_heatmap(
 			self.heatmapParameters.holder,
-			activeForceVolume.get_heatmap_data(keyActiveHeatmapChannel),
+			activeForceVolume.get_heatmap_data(
+				keyActiveHeatmapChannel
+			),
 			self.heatmapParameters.selectedArea
 		)
 
@@ -177,11 +210,6 @@ class GUIInterface():
 			self.histogramParameters.numberOfBins,
 			self.histogramParameters.zoom
 		)
-
-	def update_force_volume(self) -> None: 
-		"""
-		"""
-		pass
 
 	@decorator_get_active_force_volume
 	def update_line_plot(

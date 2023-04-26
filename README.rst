@@ -16,7 +16,7 @@ Subsets of curves are automatically averaged and can be exported for subsequent 
 
 Documentation
 =============
-For more detailed information read the documentation.
+For examples of how SOFA can be used and detailed information about the implementation of SOFA read the `documentation <https://github.com/2Puck/sofa/tree/development>`_.
 
 Examples
 ========

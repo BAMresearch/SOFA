@@ -1,3 +1,5 @@
+.. _toolbar funcitionalities:
+
 ========
 Toolbars
 ========

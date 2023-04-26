@@ -15,6 +15,7 @@ along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 """
 import os
 from typing import Tuple
+import functools
 
 import tkinter as tk
 import ttkbootstrap as ttk
@@ -25,14 +26,24 @@ matplotlib.use("TkAgg")
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-from gui.gui_interface import GUIInterface
+from interfaces.gui_interface import GUIInterface
 from gui.export_window import ExportWindow
 from gui.import_window import ImportWindow
-
 from data_processing.calculate_channel_data import active_channels as activeChannels
-
 from toolbar.line_plot_toolbar import LinePlotToolbar
 from toolbar.heatmap_toolbar import HeatmapToolbar
+
+def decorator_progressbar(function):
+	"""
+	
+	"""
+	@functools.wraps(function)
+	def wrapper_progressbar(self, *args, **kwargs):
+		self._start_progressbar()
+		function(self, *args, **kwargs)
+		self.stop_progressbar()
+
+	return wrapper_progressbar
 
 class MainWindow(ttk.Frame):
 	"""
@@ -142,45 +153,58 @@ class MainWindow(ttk.Frame):
 		frameActiveData = ttk.Labelframe(frameParent, text="Active Data", padding=15)
 		frameActiveData.pack(side=LEFT, fill=BOTH, expand=YES, padx=(0, 15))
 
+		self.forceVolumes = []
+		self.activeForceVolume = ttk.StringVar(self, value="Force Volume")
+
 		self.stringVarActiveData = ttk.StringVar(self, value="")
 		self.stringVarActiveDataLocation = ttk.StringVar(self, value="")
 		self.stringVarActiveDataSize = ttk.StringVar(self, value="")
+		
+		dropdownForceVolume = ttk.OptionMenu(
+			frameActiveData, 
+			self.activeForceVolume, 
+			"",
+			*self.forceVolumes, 
+			command=self._update_force_volume,
+			bootstyle=""
+		)
+		dropdownForceVolume.grid(row=0, column=0, padx=10, sticky=W)
 
 		labelActiveData = ttk.Label(
 			frameActiveData, 
 			text="Name:"
 		)
-		labelActiveData.grid(row=0, column=0, padx=10, sticky=W)
+		labelActiveData.grid(row=1, column=0, padx=10, sticky=W)
 
 		valueActiveData = ttk.Label(
 			frameActiveData,
 			textvariable=self.stringVarActiveData
 		)
-		valueActiveData.grid(row=0, column=1, padx=10, sticky=W)
+		valueActiveData.grid(row=1, column=1, padx=10, sticky=W)
 
 		labelActiveDataSize = ttk.Label(
 			frameActiveData, 
 			text="Size:"
 		)
-		labelActiveDataSize.grid(row=1, column=0, padx=10, sticky=W)
+		labelActiveDataSize.grid(row=2, column=0, padx=10, sticky=W)
 
 		valueActiveDataSize = ttk.Label(
 			frameActiveData,
 			textvariable=self.stringVarActiveDataSize
 		)
-		valueActiveDataSize.grid(row=1, column=1, padx=10, sticky=W)
+		valueActiveDataSize.grid(row=2, column=1, padx=10, sticky=W)
 
 		labelActiveDataLocation = ttk.Label(
 			frameActiveData, 
 			text="Location:"
 		)
-		labelActiveDataLocation.grid(row=2, column=0, padx=10, sticky=W)
+		labelActiveDataLocation.grid(row=3, column=0, padx=10, sticky=W)
 
 		valueActiveDataLocation = ttk.Label(
 			frameActiveData,
 			textvariable=self.stringVarActiveDataLocation
 		)
-		valueActiveDataLocation.grid(row=2, column=1, padx=10, sticky=W)
+		valueActiveDataLocation.grid(row=3, column=1, padx=10, sticky=W)
 
 	def _create_frame_linked_plots(
 		self, 
@@ -316,7 +340,7 @@ class MainWindow(ttk.Frame):
 			self.heatmapChannel, 
 			"",
 			*self.channelNames, 
-			command=self._update_heatmap,
+			command=self._update_heatmap_channel,
 			bootstyle=""
 		)
 		dropdownHeatmapChannel.grid(row=0, column=0, pady=10, sticky=E)
@@ -362,7 +386,7 @@ class MainWindow(ttk.Frame):
 			self.histogramChannel, 
 			"",
 			*self.channelNames, 
-			command=self._update_histogram,
+			command=self._update_histogram_channel,
 			bootstyle=""
 		)
 		dropdownHistogramChannel.grid(row=0, column=0, columnspan=4, pady=10, sticky=E)
@@ -427,7 +451,7 @@ class MainWindow(ttk.Frame):
 		Give the GUIInterface all relevant parameters to handle the plots.
 		"""
 		guiParameters = {
-			"keyActiveForceVolume": self.,
+			"keyActiveForceVolume": self.activeForceVolume,
 			"holderLinePlot": self.holderFigureLineplot,
 			"linkedLinePlot": self.interactiveLinePlot,
 			"holderHeatmap": self.holderFigureHeatmap,
@@ -439,7 +463,6 @@ class MainWindow(ttk.Frame):
 			"zoomHistogram": self.zoomHistogram,
 			"numberOfBins": self.numberOfBins
 		}
-
 		self.guiInterface.set_gui_parameters(guiParameters)
 
 	def _create_import_window(self) -> None:
@@ -450,10 +473,10 @@ class MainWindow(ttk.Frame):
 		ImportWindow(
 			toplevelImport,
 			self.guiInterface, 
-			self.set_imported_meta_data
+			self.set_data_active_force_volume
 		)
 
-	def set_imported_meta_data(
+	def set_data_active_force_volume(
 		self,
 		name: str,
 		size: Tuple[int],
@@ -470,66 +493,77 @@ class MainWindow(ttk.Frame):
 		location : str
 
 		"""
+		self.forceVolumes.append(name)
+
 		self.stringVarActiveData.set(name)
 		self.stringVarActiveDataSize.set(str(size))
 		self.stringVarActiveDataLocation.set(location)
 
 	def _create_export_window(self) -> None:
-		"""Create a subwindow to export data."""
+		"""
+		Create a subwindow to export data.
+		"""
 		toplevelExport = ttk.Toplevel("Export Data")
 		ExportWindow(
 			toplevelExport,
 			self.guiInterface
 		)
 
+	@decorator_progressbar
+	def _update_force_volume(self, _) -> None: 
+		"""
+		Update the active force volume.
+		"""
+		self.guiInterface.plot_active_force_volume()
+
+	@decorator_progressbar
 	def _update_plots(self) -> None:
-		"""Update the inactive data points in every plot."""
-		# use decorator with args to start/end progressbar
-		self.start_progressbar()
+		"""
+		Update the inactive data points in every plot.
+		"""
 		self.guiInterface.update_plots()
-		self.stop_progressbar()
 
-	def _update_heatmap(self, newHeatmapChannel) -> None:
-		"""Update the displayed channel in the heatmap.
-
-		Parameters:
-			newHeatmapChannel(str): Name of the new channel.
+	@decorator_progressbar
+	def _update_heatmap_channel(self, _) -> None:
 		"""
-		self.guiInterface.update_heatmap()
-
-	def _update_histogram(self, newHistogramChannel) -> None:
-		"""Update the displayed channel in the histogram.
-
-		Parameters:
-			newHeatmapChannel(str): Name of the new channel.
+		Update the displayed channel in the heatmap.
 		"""
-		self.guiInterface.update_histogram()
+		self.guiInterface.plot_heatmap()
 
+	@decorator_progressbar
+	def _update_histogram_channel(self, _) -> None:
+		"""
+		Update the displayed channel in the histogram.
+		"""
+		self.guiInterface.plot_histogram()
+
+	@decorator_progressbar
 	def _restrict_histogram(self, direction) -> None:
-		"""Change the minimum or maximum border for the histogram values.
-
-		Parameters:
-			direction(str): .
 		"""
-		self.start_progressbar()
+		Change the minimum or maximum border for the histogram values.
+
+		Parameters
+		----------
+		direction : str
+			Indicates whether the minimum or maximum is 
+			decreased or increased.
+		"""
 		self.guiInterface.restrict_histogram(direction)
+		self.guiInterface.update_inactive_data_points_histogram()
 
-		if self.interactiveHistogram.get():
-			self.guiInterface.update_plots()
-		else:
-			self.guiInterface.update_histogram()
-
-		self.stop_progressbar()
-
-	def start_progressbar(self) -> None:
-		"""Start the progressbar."""
+	def _start_progressbar(self) -> None:
+		"""
+		Start the progressbar.
+		"""
 		self.progressbarCurrentLabel.set("Updating data")
 		self.progressbar.start()
 
 		self.update_idletasks()
 
-	def stop_progressbar(self) -> None:
-		"""Stop the progressbar."""
+	def _stop_progressbar(self) -> None:
+		"""
+		Stop the progressbar.
+		"""
 		self.progressbar.stop()
 		self.progressbarCurrentLabel.set("")
 
@@ -537,13 +571,18 @@ class MainWindow(ttk.Frame):
 
 	@staticmethod
 	def _camel_case_to_text(inputString: str) -> str:
-		"""Converts string from lower CamelCase to a title format.
+		"""
+		Converts string from lower CamelCase to a title format.
 
-		Parameters:
-			inputString(str): String in lower CamelCase.
+		Parameters
+		----------
+		inputString : str
+			String in lower CamelCase.
 
-		Returns:
-			outputString(str): String as title text.
+		Returns
+		-------
+		outputString : str
+			String as title text.
 		"""
 		return ''.join(
 			[

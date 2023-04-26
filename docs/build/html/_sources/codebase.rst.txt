@@ -79,15 +79,21 @@ Plot Interface
 Toolbar
 -------
 
+The toolbar module contains the line plot and heatmap toolbars to select a certain subgroup of force curves and inspect the data more closely. Both are written as a seperate class inherted from the Matplotlib NavigationToolbar2Tk, but have custom :ref:`funcitionalities <toolbar funcitionalities>`. With Matplotlib version 3.5.1 it is no longer possible to load toolbar icons from a custom location. Therefore, both toolbars have to overwrite a part of the NavigationToolbar2Tk *__init__* function. Additionally they adjust the background color of the toolbar icons to the background color of the main window.
+
 Lineplot Toolbar
 ~~~~~~~~~~~~~~~~
 
-
+zoom ansprechen
+auswahl an kurven - einzelne kurven über pick radius - gruppe and kurven über aktuell sichtbare - dabei nur kurven getroffen die datenpunkt im aktuellen ausschnitt haben
+show inactive average errorbar alle über gui interface auf architecture verweisen
 
 Heatmap Toolbar
 ~~~~~~~~~~~~~~~
 
-
+bereich auswählen - rechteck relativ selbsterklärend - freie fläche wie wird das gemacht - alles umkreisen duplikate löschen
+bereich einschliesen ausschliesen - ändert inaktive datenpunkte
+flip und rotieren ohne achsen anpassen erklären bzw auf arcitecture heatmap orientation verweisen
 
 FDC Data
 --------
@@ -140,12 +146,12 @@ Export Data
 Named Tuples
 ~~~~~~~~~~~~
 
-To increase the readability of the code SOFA uses NamedTuple. These are all defined in this file. - Type hints und Aufteilung ansprechen - 
+To increase the readability of the code SOFA uses NamedTuple, which are all defined in this file. They are divided into different categories and use type hints, to make it easier to understand the code.
 
 Custom Exceptions
 ~~~~~~~~~~~~~~~~~
 
-- warum eigene exceptions - for the import and correction process. Both cases have a general exception - *ImportError* and *CorrectionError* and further specific exceptions to - erklären warum die struktur gewählt wurde -
+To better undestand possible errors when importing and correcting the measurement data, SOFA uses some custom exceptions. Both cases have a general exception *ImportError* and *CorrectionError* and further specific exceptions. This structure allows to catch a general type of exception with a descriptive name that should make it easier to understand the problem.
 
 Data Visualization
 ------------------
@@ -160,7 +166,14 @@ Plot Data
 Tests
 =====
 
+Data Correction
+---------------
 
+Channel Calculation
+-------------------
+
+Using SyFoS Data
+----------------
 
 Docs
 ====

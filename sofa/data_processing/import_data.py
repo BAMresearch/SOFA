@@ -571,7 +571,7 @@ def adjust_image_channel_data(
 def import_channel(
 	filePathChannel: str,
 	measurementDataSize: Tuple[int]
-) -> nt.ChannelData: 
+) -> nt.ImportedChannelData: 
 	"""
 	Import an additional pre processed channel.
 
@@ -585,7 +585,7 @@ def import_channel(
 
 	Returns
 	-------
-	channelData : nt.ChannelData
+	channelData : nt.ImportedChannelData
 		Name, size and data of the imported channel.
 	"""
 	pass

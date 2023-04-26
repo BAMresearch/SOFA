@@ -56,7 +56,7 @@ class ImportWindow(ttk.Frame):
 		the data is still running. 
 	labelProgressbarVariable : tk.Stringvar
 		Indicates the current running process.
-	set_imported_meta_data_in_main_window : function
+	update_main_window_active_data : function
 		Method of the MainWindow class to set the
 		filename, size and location of the imported
 		data in the main window of SOFA. 
@@ -76,7 +76,7 @@ class ImportWindow(ttk.Frame):
 		self, 
 		root, 
 		guiInterface, 
-		set_imported_meta_data
+		set_data_active_force_volume
 	) -> None:
 		"""
 		Create a subwindow to import measurement data.
@@ -86,7 +86,7 @@ class ImportWindow(ttk.Frame):
 		self.pack(fill=BOTH, expand=YES)
 
 		self.guiInterface = guiInterface
-		self.set_imported_meta_data_in_main_window = set_imported_meta_data
+		self.update_main_window_active_data = set_data_active_force_volume
 		self.dataTypes = imp_data.importFunctions.keys()
 
 		self._setup_input_variables()
@@ -317,7 +317,7 @@ class ImportWindow(ttk.Frame):
 			self.guiInterface.create_force_volume(importedData)
 
 		# Set the name, size and location of the imported data in the main window.
-		self.set_imported_meta_data_in_main_window(
+		self.update_main_window_active_data(
 			importedData["measurementData"].folderName,
 			importedData["measurementData"].size,
 			selectedImportParameters.filePathData
