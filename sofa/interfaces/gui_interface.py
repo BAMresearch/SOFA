@@ -18,7 +18,7 @@ import functools
 
 import data_processing.named_tuples as nt
 import data_visualization.plot_data as plt_data
-from fdc_data.force_volume import ForceVolume
+from force_spectroscopy_data.force_volume import ForceVolume
 
 def decorator_get_active_force_volume(function):
 	"""Get current selected force volume."""
@@ -90,7 +90,7 @@ class GUIInterface():
 		self.linePlotParameters = nt.LinePlotParameters(
 			linked=guiParameters["linkedLinePlot"],
 			holder=guiParameters["holderLinePlot"],
-			showInactive=False,
+			plotInactive=False,
 			plotAverage=False,
 			plotErrorbar=False
 		)
@@ -259,3 +259,19 @@ class GUIInterface():
 
 		"""
 		return self.forceVolumes[self.keyActiveForceVolume.get()]
+
+	def toggle_plot_inactive(self) -> None: 
+		"""
+		"""
+		self.linePlotParameters.plotInactive = not self.linePlotParameters.plotInactive
+
+	def toggle_plot_average(self) -> None: 
+		"""
+		"""
+		self.linePlotParameters.plotAverage = not self.linePlotParameters.plotAverage
+
+	def toggle_plot_errorbar(self) -> None: 
+		"""
+		"""
+		if self.linePlotParameters.plotAverage:
+			self.linePlotParameters.plotErrorbar = not self.linePlotParameters.plotErrorbar

@@ -19,9 +19,9 @@ import numpy as np
 
 import data_processing.named_tuples as nt
 from data_processing.calculate_channel_data import calculate_channel_data
-from fdc_data.force_distance_curve import ForceDistanceCurve
-from fdc_data.average_force_distance_curve import AverageForceDistanceCurve
-from fdc_data.channel import Channel
+from force_spectroscopy_data.force_distance_curve import ForceDistanceCurve
+from force_spectroscopy_data.average_force_distance_curve import AverageForceDistanceCurve
+from force_spectroscopy_data.channel import Channel
 
 class ForceVolume():
 	"""

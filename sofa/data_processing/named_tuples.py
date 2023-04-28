@@ -22,11 +22,11 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import tkinter as tk
 import ttkbootstrap as ttk
 
-# Named tuples for the GUI interface
+# GUI interface
 class LinePlotParameters(NamedTuple):
 	linked: tk.BooleanVar
 	holder: FigureCanvasTkAgg
-	showInactive: bool 
+	plotInactive: bool 
 	plotAverage: bool
 	plotErrorbar: bool
 
@@ -44,7 +44,7 @@ class HistogramParameters(NamedTuple):
 	zoom: tk.BooleanVar
 	numberOfBins: ttk.Entry
 
-# Named tuples for FDC data
+# FDC data
 class ForceDistanceCurve(NamedTuple): 
 	piezo: ndarray
 	deflection: ndarray
@@ -69,7 +69,7 @@ class NormedCurves(NamedTuple):
 	piezoContact: ndarray
 	deflectionContact: ndarray
 
-# Named tuples for the data import
+# Data import
 class ImportParameter(NamedTuple):
 	folderPathMeasurementData: str 
 	filePathImage: str 
@@ -97,7 +97,7 @@ class ImportedChannelData(NamedTuple):
 	size: Tuple[int]
 	data: ndarray
 
-# Named tuples for the data export
+# Data export
 class ExportParameter(NamedTuple):
 	folderPath: str
 	folderName: str
@@ -111,3 +111,10 @@ class DataFramesForceVolume(NamedTuple):
 	correctedCurves: DataFrame
 	averageData: DataFrame
 	channelData: DataFrame
+
+# Lineplot toolbar
+class ViewLimits(NamedTuple):
+	xMin: int
+	xMax: int
+	yMin: int
+	yMax: int

@@ -37,6 +37,7 @@ class PlotInterface():
 
 		self.linePlotForceDistanceLines: List = []
 		self.linePlotAverageLines: List = []
+		self.linePlotZoomHistory: List = []
 
 		self.heatmapOrientationMatrix: np.ndarray = self._create_heatmap_orientation_matrix()
 		self.heatmapSelectedArea: List = []  

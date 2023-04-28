@@ -4,17 +4,17 @@ Codebase
 
 SOFA is written in Python (should require Python 3.6.1 at minimum) and uses the following external modules and libraries:
 
-- **NumPy** - for basic mathematical computations
-- **SciPy** - for some specific mathematical computations
-- **Matplotlib** - to plot the data and create the custom toolbars
-- **pandas** - to export the data to the different ouput file formats 
-- **igor** - to read files in the .ibw (igor binary wave) file format
-- **ttkbootstrap** - to give the Tkinter GUI a modern look
+- **NumPy** - for basic mathematical computations (tested with NumPy version 1.22.1)
+- **SciPy** - for some specific mathematical computations (tested with SciPy version 1.8.0)
+- **Matplotlib** - to plot the data and create the custom toolbars (tested with Matplotlib version 3.5.1)
+- **pandas** - to export the data to the different ouput file formats (tested with pandas version 1.4.1)
+- **igor** - to read files in the .ibw (igor binary wave) file format (tested with igor version 0.3)
+- **ttkbootstrap** - to give the Tkinter GUI a modern look (tested with ttkbootstrap version 1.5.1)
 
-SOFA Modules
-============
+SOFA Packages
+=============
 
-The general aim of SOFA was to write code which is simple to read and easy to extend. The implementation followed the principle of separation of concerns. Therefore SOFA is comprised of multiple distinct modules. On the code level functions are keept short and only take responsibility for one single functionality. To increase the readability of the code, SOFA tries to implement the following PEP's:
+The general aim of SOFA was to write code which is simple to read and easy to extend. The implementation followed the principle of separation of concerns. Therefore SOFA is comprised of multiple distinct packages. On the code level functions are keept short and only take responsibility for one single functionality. To increase the readability of the code, SOFA tries to implement the following PEP's:
 
 - `PEP 8 <https://peps.python.org/pep-0008/>`_ - The Style Guide for Python Code
 - `PEP 257 <https://peps.python.org/pep-0257/>`_ - Docstring Conventions
@@ -79,12 +79,18 @@ Plot Interface
 Toolbar
 -------
 
-The toolbar module contains the line plot and heatmap toolbars to select a certain subgroup of force curves and inspect the data more closely. Both are written as a seperate class inherted from the Matplotlib NavigationToolbar2Tk, but have custom :ref:`funcitionalities <toolbar funcitionalities>`. With Matplotlib version 3.5.1 it is no longer possible to load toolbar icons from a custom location. Therefore, both toolbars have to overwrite a part of the NavigationToolbar2Tk *__init__* function. Additionally they adjust the background color of the toolbar icons to the background color of the main window.
+The toolbar package contains the line plot and heatmap toolbars to select a certain subgroup of force curves and inspect the data more closely. Both are written as a seperate class inherted from the Matplotlib NavigationToolbar2Tk, but have custom :ref:`funcitionalities <toolbar funcitionalities>`. With Matplotlib version 3.5.1 it is no longer possible to load toolbar icons from a custom location. Therefore, both toolbars have to overwrite a part of the NavigationToolbar2Tk *__init__* function. Additionally they adjust the background color of the toolbar icons to the background color of the main window.
+
+SOFA Toolbar
+~~~~~~~~~~~~
 
 Lineplot Toolbar
 ~~~~~~~~~~~~~~~~
 
-zoom ansprechen
+The lineplot toolbar allows the selection of single or multiple force distance curves. In addition it is possible to zoom in and out of the lineplot and toggle the different display options, like displaying the average curve.  
+
+hat mode und setzt aktiven button state
+zoom ansprechen - speichert immer nur letzen zoom dadurch muss nicht init werden
 auswahl an kurven - einzelne kurven über pick radius - gruppe and kurven über aktuell sichtbare - dabei nur kurven getroffen die datenpunkt im aktuellen ausschnitt haben
 show inactive average errorbar alle über gui interface auf architecture verweisen
 
@@ -95,8 +101,10 @@ bereich auswählen - rechteck relativ selbsterklärend - freie fläche wie wird 
 bereich einschliesen ausschliesen - ändert inaktive datenpunkte
 flip und rotieren ohne achsen anpassen erklären bzw auf arcitecture heatmap orientation verweisen
 
-FDC Data
---------
+Force Spectroscopy Data
+-----------------------
+
+
 
 Force Volume
 ~~~~~~~~~~~~
@@ -121,27 +129,51 @@ Average Force Distance Curve
 Data Processing
 ---------------
 
+This package is responsible for the processing of the force spectroscopy data. This includes the import and correction of the measurement data, the calulation of the different channels and the export of the data from SOFA. These modules use a procedural approach 
+- warum procedural einfacher zu testen und eigenständiger
+- named tuples und custom exception
+
 .. _import data implementation:
 
 Import Data
 ~~~~~~~~~~~
 
-
+modul zuständig für den import von messdaten 
+enthält sämtliche verfügbaren import optionen bzw datenformate
+weitere hinzufügen benötigt funktion zum import und erweitern von *importFunctions* wird automatisch übernommen
+muss importiert werden - messdaten
+kann importiert werden - image und channel
+decortator to check if size matches
 
 Correct Data
 ~~~~~~~~~~~~
 
-
+corrects the approch part of a single force distance curve
+wie wird mit möglichen fehlern error umgegangen
+vorgehen verweiß correction algorithm
+verweiß zu test
 
 .. _calculate channel data implementation:
 
 Calculate Channel Data
 ~~~~~~~~~~~~~~~~~~~~~~
 
+enthält funktionen um die einzelnen channel zu berechen
+weitere channel braucht funktion die bestimmte argumente bekommt und folgendes zurück liefert
+erweiterung in *active_channels*
+decorator konvertiert daten in two dimensional np array
+verweiß zu test
+
 .. _export data implementation:
 
 Export Data
 ~~~~~~~~~~~
+
+exportiert daten eines force volumes aus SOFA 
+erstellt dafür ordner
+konvertiert dann daten zunächst in pandas dataframes - einfacher zu exportieren
+*exportFormats* enthält alle verfügbaren export formate mit dazugehörigen export funktionen
+warum die beiden
 
 Named Tuples
 ~~~~~~~~~~~~
@@ -171,6 +203,9 @@ Data Correction
 
 Channel Calculation
 -------------------
+
+Average
+-------
 
 Using SyFoS Data
 ----------------

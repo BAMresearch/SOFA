@@ -18,13 +18,10 @@ import os
 from typing import List, Tuple, Optional
 
 import numpy as np 
-from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk
-from matplotlib.backend_bases import NavigationToolbar2
-from matplotlib.lines import Line2D
-import tkinter as tk
-import tkinter.font
 
-class HeatmapToolbar(NavigationToolbar2Tk):
+from toolbars.sofa_toolbar import SofaToolbar
+
+class HeatmapToolbar(SofaToolbar):
 	"""
 	A custom toolbar to process data, displayed as a heatmap.
 	
@@ -34,17 +31,19 @@ class HeatmapToolbar(NavigationToolbar2Tk):
 
 	holder : 
 
+	mode : 
+
 	eventConnections : list[]
 
-	selectedArea : list[]
 	"""
 	def __init__(self, canvas_, parent_, guiInterface):
 		# Set path for toolbar icons.
 		iconPath = os.path.join(
 			os.path.abspath(os.path.dirname(__file__)), 
-			"icons", "heatmap_toolbar"
+			"icons", 
+			"heatmap_toolbar"
 		)
-		self.toolitems = (
+		toolItems = (
 			("reset", "", os.path.join(iconPath, "reset.gif"), "_reset_heatmap"),
 			("select_area", "", os.path.join(iconPath, "select_area.gif"), "_toggle_select_area"),
 			("select_rectangle", "", os.path.join(iconPath, "select_rectangle.gif"), "_toggle_select_rect"),
@@ -55,51 +54,8 @@ class HeatmapToolbar(NavigationToolbar2Tk):
 			("rotate", "", os.path.join(iconPath, "rotate.gif"), "_rotate_heatmap")
 		)	
 		self.guiInterface = guiInterface
-		self.holder = canvas_
-		self.eventConnections = []
-		self.selectedArea = []
-		self.activeButtonColor = "#999999"
-		self.inactiveButtonColor = "#ffffff"
 
-		# Overwrite Matplotlib NavigationToolbar2Tk init to load toolbar icons from a custom location.
-		self.window = parent_
-		
-		tk.Frame.__init__(
-			self, master=parent_, borderwidth=2,
-			width=int(canvas_.figure.bbox.width), height=50
-		)
-
-		self._buttons = {}
-		# Changed file path to load SOFA toolbar icons.
-		for text, tooltip_text, image_file, callback in self.toolitems:
-			self._buttons[text] = super()._Button(
-				text, 
-				image_file,
-				toggle=False, 
-				command=getattr(self, callback)
-			)
-
-		self._label_font = tk.font.Font(root=parent_, size=10)
-
-		label = tk.Label(
-			master=self, font=self._label_font,
-			text='\N{NO-BREAK SPACE}\n\N{NO-BREAK SPACE}'
-		)
-		label.pack(side=tk.RIGHT)
-
-		self.message = tk.StringVar(master=self)
-		self._message_label = tk.Label(
-			master=self, font=self._label_font,
-			textvariable=self.message
-		)
-		self._message_label.pack(side=tk.RIGHT)
-
-		NavigationToolbar2.__init__(self, canvas_)
-		
-		self.pack(side=tk.BOTTOM, fill=tk.X)
-
-		for button in self._buttons.values():
-			button.configure(bg="#ffffff")
+		super().__init__(canvas_, parent_, toolItems)
 
 	def _reset_heatmap(self) -> None:
 		"""Reset the selected area, the orientation 
@@ -444,88 +400,8 @@ class HeatmapToolbar(NavigationToolbar2Tk):
 			)[0]
 		)
 
-	def _update_mode(self, newMode: str) -> None:
-		"""Update the mode of the toolbar.
-
-		Parameters:
-			newMode(str): The new active toolbar mode.
-		"""
-		if self.mode == newMode:
-			self.mode = ""
-		else:
-			self.mode = newMode
-
-	def _update_event_connections(self) -> None:
-		"""Update event connections in dependace of the current mode."""
-		self._delete_all_event_connections()
-
-		if self.mode == "select area":
-			self.eventConnections.extend(
-				(
-					self.holder.figure.canvas.mpl_connect("button_press_event", self._select_area_on_click),
-					self.holder.figure.canvas.mpl_connect("button_release_event", self._select_area_on_release)
-				)
-			)
-		elif self.mode == "select rect":
-			self.eventConnections.extend(
-				(
-					self.holder.figure.canvas.mpl_connect("button_press_event", self._select_rect_on_click),
-					self.holder.figure.canvas.mpl_connect("button_release_event", self._select_rect_on_release)
-				)
-			)
-
-	def _delete_all_event_connections(self) -> None:
-		"""Disconnect and delete all event connections."""
-		for connection in self.eventConnections:
-			self.holder.figure.canvas.mpl_disconnect(connection)
-
-		self.eventConnections = []
-
-	def _update_toolbar_buttons(self) -> None:
-		"""Update the state of the toolbar buttons."""
-		if self.mode == "":
-			inactiveButtons = [
-				self._buttons["select_area"],
-				self._buttons["select_rectangle"]
-			]
-			self._set_toolbar_button_state(inactiveButtons)
-		elif self.mode == "select area":
-			inactiveButtons = [self._buttons["select_rectangle"]]
-			self._set_toolbar_button_state(
-				inactiveButtons, self._buttons["select_area"]
-			)
-		elif self.mode == "select rect":
-			inactiveButtons = [self._buttons["select_area"]]
-			self._set_toolbar_button_state(
-				inactiveButtons, self._buttons["select_rectangle"]
-			)
-
-	def _set_toolbar_button_state(
-		self, 
-		inactiveButtons: List[tk.Button], 
-		activeButton: Optional[tk.Button] = None
-	) -> None:
-		"""Mark buttons as either active or inactive.
-
-		Parameters:
-			inactiveButtons(list): List with the new inactive buttons. 
-			activeButton(tk.Button): Potential new active button.
-		"""
-		for button in inactiveButtons:
-			button.configure(bg=self.inactiveButtonColor)
-
-		if activeButton:
-			activeButton.configure(bg=self.activeButtonColor)
-
 	def _delete_selected_area_lines(self) -> None:
 		"""Delete existing marks."""
 		for line in self.dataHandler.heatmapParameters["selectedArea"]:
 			line.remove()
 		self.dataHandler.heatmapParameters["selectedArea"] = []
-
-	def _check_interactive_plot(self) -> None:
-		"""Check if all plots or only the heatmap are updated."""
-		if self.dataHandler.heatmapParameters["interactive"].get():
-			self.dataHandler.update_plots()
-		else:
-			self.dataHandler.update_heatmap()

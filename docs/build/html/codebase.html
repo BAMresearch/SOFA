@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Glossary" href="glossary.html" /><link rel="prev" title="SOFA Architecture" href="architecture.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Glossary" href="glossary.html" /><link rel="prev" title="Software Architecture" href="architecture.html" />
 
     <meta name="generator" content="sphinx-4.5.0, furo 2022.04.07"/>
         <title>Codebase - SOFA</title>
@@ -173,7 +173,7 @@
 <li class="toctree-l1"><a class="reference internal" href="toolbars.html">Toolbars</a></li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="architecture.html">SOFA Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Software Architecture</a></li>
 </ul>
 <ul class="current">
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Codebase</a></li>
@@ -216,16 +216,16 @@
 <h1>Codebase<a class="headerlink" href="#codebase" title="Permalink to this headline">#</a></h1>
 <p>SOFA is written in Python (should require Python 3.6.1 at minimum) and uses the following external modules and libraries:</p>
 <ul class="simple">
-<li><p><strong>NumPy</strong> - for basic mathematical computations</p></li>
-<li><p><strong>SciPy</strong> - for some specific mathematical computations</p></li>
-<li><p><strong>Matplotlib</strong> - to plot the data and create the custom toolbars</p></li>
-<li><p><strong>pandas</strong> - to export the data to the different ouput file formats</p></li>
-<li><p><strong>igor</strong> - to read files in the .ibw (igor binary wave) file format</p></li>
-<li><p><strong>ttkbootstrap</strong> - to give the Tkinter GUI a modern look</p></li>
+<li><p><strong>NumPy</strong> - for basic mathematical computations (tested with NumPy version 1.22.1)</p></li>
+<li><p><strong>SciPy</strong> - for some specific mathematical computations (tested with SciPy version 1.8.0)</p></li>
+<li><p><strong>Matplotlib</strong> - to plot the data and create the custom toolbars (tested with Matplotlib version 3.5.1)</p></li>
+<li><p><strong>pandas</strong> - to export the data to the different ouput file formats (tested with pandas version 1.4.1)</p></li>
+<li><p><strong>igor</strong> - to read files in the .ibw (igor binary wave) file format (tested with igor version 0.3)</p></li>
+<li><p><strong>ttkbootstrap</strong> - to give the Tkinter GUI a modern look (tested with ttkbootstrap version 1.5.1)</p></li>
 </ul>
-<section id="sofa-modules">
-<h2>SOFA Modules<a class="headerlink" href="#sofa-modules" title="Permalink to this headline">#</a></h2>
-<p>The general aim of SOFA was to write code which is simple to read and easy to extend. The implementation followed the principle of separation of concerns. Therefore SOFA is comprised of multiple distinct modules. On the code level functions are keept short and only take responsibility for one single functionality. To increase the readability of the code, SOFA tries to implement the following PEP’s:</p>
+<section id="sofa-packages">
+<h2>SOFA Packages<a class="headerlink" href="#sofa-packages" title="Permalink to this headline">#</a></h2>
+<p>The general aim of SOFA was to write code which is simple to read and easy to extend. The implementation followed the principle of separation of concerns. Therefore SOFA is comprised of multiple distinct packages. On the code level functions are keept short and only take responsibility for one single functionality. To increase the readability of the code, SOFA tries to implement the following PEP’s:</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://peps.python.org/pep-0008/">PEP 8</a> - The Style Guide for Python Code</p></li>
 <li><p><a class="reference external" href="https://peps.python.org/pep-0257/">PEP 257</a> - Docstring Conventions</p></li>
@@ -271,10 +271,15 @@ The decorator <em>decorator_check_required_folder_path</em> and <em>decorator_ch
 </section>
 <section id="toolbar">
 <span id="toolbar-implementation"></span><h3>Toolbar<a class="headerlink" href="#toolbar" title="Permalink to this headline">#</a></h3>
-<p>The toolbar module contains the line plot and heatmap toolbars to select a certain subgroup of force curves and inspect the data more closely. Both are written as a seperate class inherted from the Matplotlib NavigationToolbar2Tk, but have custom <a class="reference internal" href="toolbars.html#toolbar-funcitionalities"><span class="std std-ref">funcitionalities</span></a>. With Matplotlib version 3.5.1 it is no longer possible to load toolbar icons from a custom location. Therefore, both toolbars have to overwrite a part of the NavigationToolbar2Tk <em>__init__</em> function. Additionally they adjust the background color of the toolbar icons to the background color of the main window.</p>
+<p>The toolbar package contains the line plot and heatmap toolbars to select a certain subgroup of force curves and inspect the data more closely. Both are written as a seperate class inherted from the Matplotlib NavigationToolbar2Tk, but have custom <a class="reference internal" href="toolbars.html#toolbar-funcitionalities"><span class="std std-ref">funcitionalities</span></a>. With Matplotlib version 3.5.1 it is no longer possible to load toolbar icons from a custom location. Therefore, both toolbars have to overwrite a part of the NavigationToolbar2Tk <em>__init__</em> function. Additionally they adjust the background color of the toolbar icons to the background color of the main window.</p>
+<section id="sofa-toolbar">
+<h4>SOFA Toolbar<a class="headerlink" href="#sofa-toolbar" title="Permalink to this headline">#</a></h4>
+</section>
 <section id="lineplot-toolbar">
 <h4>Lineplot Toolbar<a class="headerlink" href="#lineplot-toolbar" title="Permalink to this headline">#</a></h4>
-<p>zoom ansprechen
+<p>The lineplot toolbar allows the selection of single or multiple force distance curves. In addition it is possible to zoom in and out of the lineplot and toggle the different display options, like displaying the average curve.</p>
+<p>hat mode und setzt aktiven button state
+zoom ansprechen - speichert immer nur letzen zoom dadurch muss nicht init werden
 auswahl an kurven - einzelne kurven über pick radius - gruppe and kurven über aktuell sichtbare - dabei nur kurven getroffen die datenpunkt im aktuellen ausschnitt haben
 show inactive average errorbar alle über gui interface auf architecture verweisen</p>
 </section>
@@ -285,8 +290,8 @@ bereich einschliesen ausschliesen - ändert inaktive datenpunkte
 flip und rotieren ohne achsen anpassen erklären bzw auf arcitecture heatmap orientation verweisen</p>
 </section>
 </section>
-<section id="fdc-data">
-<h3>FDC Data<a class="headerlink" href="#fdc-data" title="Permalink to this headline">#</a></h3>
+<section id="force-spectroscopy-data">
+<h3>Force Spectroscopy Data<a class="headerlink" href="#force-spectroscopy-data" title="Permalink to this headline">#</a></h3>
 <section id="force-volume">
 <h4>Force Volume<a class="headerlink" href="#force-volume" title="Permalink to this headline">#</a></h4>
 </section>
@@ -302,17 +307,40 @@ flip und rotieren ohne achsen anpassen erklären bzw auf arcitecture heatmap ori
 </section>
 <section id="data-processing">
 <h3>Data Processing<a class="headerlink" href="#data-processing" title="Permalink to this headline">#</a></h3>
+<p>This package is responsible for the processing of the force spectroscopy data. This includes the import and correction of the measurement data, the calulation of the different channels and the export of the data from SOFA. These modules use a procedural approach
+- warum procedural einfacher zu testen und eigenständiger
+- named tuples und custom exception</p>
 <section id="import-data">
 <span id="import-data-implementation"></span><h4>Import Data<a class="headerlink" href="#import-data" title="Permalink to this headline">#</a></h4>
+<p>modul zuständig für den import von messdaten
+enthält sämtliche verfügbaren import optionen bzw datenformate
+weitere hinzufügen benötigt funktion zum import und erweitern von <em>importFunctions</em> wird automatisch übernommen
+muss importiert werden - messdaten
+kann importiert werden - image und channel
+decortator to check if size matches</p>
 </section>
 <section id="correct-data">
 <h4>Correct Data<a class="headerlink" href="#correct-data" title="Permalink to this headline">#</a></h4>
+<p>corrects the approch part of a single force distance curve
+wie wird mit möglichen fehlern error umgegangen
+vorgehen verweiß correction algorithm
+verweiß zu test</p>
 </section>
 <section id="calculate-channel-data">
 <span id="calculate-channel-data-implementation"></span><h4>Calculate Channel Data<a class="headerlink" href="#calculate-channel-data" title="Permalink to this headline">#</a></h4>
+<p>enthält funktionen um die einzelnen channel zu berechen
+weitere channel braucht funktion die bestimmte argumente bekommt und folgendes zurück liefert
+erweiterung in <em>active_channels</em>
+decorator konvertiert daten in two dimensional np array
+verweiß zu test</p>
 </section>
 <section id="export-data">
 <span id="export-data-implementation"></span><h4>Export Data<a class="headerlink" href="#export-data" title="Permalink to this headline">#</a></h4>
+<p>exportiert daten eines force volumes aus SOFA
+erstellt dafür ordner
+konvertiert dann daten zunächst in pandas dataframes - einfacher zu exportieren
+<em>exportFormats</em> enthält alle verfügbaren export formate mit dazugehörigen export funktionen
+warum die beiden</p>
 </section>
 <section id="named-tuples">
 <h4>Named Tuples<a class="headerlink" href="#named-tuples" title="Permalink to this headline">#</a></h4>
@@ -337,6 +365,9 @@ flip und rotieren ohne achsen anpassen erklären bzw auf arcitecture heatmap ori
 </section>
 <section id="channel-calculation">
 <h3>Channel Calculation<a class="headerlink" href="#channel-calculation" title="Permalink to this headline">#</a></h3>
+</section>
+<section id="average">
+<h3>Average<a class="headerlink" href="#average" title="Permalink to this headline">#</a></h3>
 </section>
 <section id="using-syfos-data">
 <h3>Using SyFoS Data<a class="headerlink" href="#using-syfos-data" title="Permalink to this headline">#</a></h3>
@@ -369,7 +400,7 @@ flip und rotieren ohne achsen anpassen erklären bzw auf arcitecture heatmap ori
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">SOFA Architecture</div>
+                <div class="title">Software Architecture</div>
                 
               </div>
             </a>
@@ -411,7 +442,7 @@ flip und rotieren ohne achsen anpassen erklären bzw auf arcitecture heatmap ori
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Codebase</a><ul>
-<li><a class="reference internal" href="#sofa-modules">SOFA Modules</a><ul>
+<li><a class="reference internal" href="#sofa-packages">SOFA Packages</a><ul>
 <li><a class="reference internal" href="#gui">GUI</a><ul>
 <li><a class="reference internal" href="#main-window-source">Main Window  source</a></li>
 <li><a class="reference internal" href="#import-window">Import Window</a></li>
@@ -425,11 +456,12 @@ flip und rotieren ohne achsen anpassen erklären bzw auf arcitecture heatmap ori
 </ul>
 </li>
 <li><a class="reference internal" href="#toolbar">Toolbar</a><ul>
+<li><a class="reference internal" href="#sofa-toolbar">SOFA Toolbar</a></li>
 <li><a class="reference internal" href="#lineplot-toolbar">Lineplot Toolbar</a></li>
 <li><a class="reference internal" href="#heatmap-toolbar">Heatmap Toolbar</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#fdc-data">FDC Data</a><ul>
+<li><a class="reference internal" href="#force-spectroscopy-data">Force Spectroscopy Data</a><ul>
 <li><a class="reference internal" href="#force-volume">Force Volume</a></li>
 <li><a class="reference internal" href="#force-distance-curve">Force Distance Curve</a></li>
 <li><a class="reference internal" href="#channel">Channel</a></li>
@@ -454,6 +486,7 @@ flip und rotieren ohne achsen anpassen erklären bzw auf arcitecture heatmap ori
 <li><a class="reference internal" href="#tests">Tests</a><ul>
 <li><a class="reference internal" href="#data-correction">Data Correction</a></li>
 <li><a class="reference internal" href="#channel-calculation">Channel Calculation</a></li>
+<li><a class="reference internal" href="#average">Average</a></li>
 <li><a class="reference internal" href="#using-syfos-data">Using SyFoS Data</a></li>
 </ul>
 </li>

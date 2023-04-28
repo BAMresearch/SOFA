@@ -30,8 +30,8 @@ from interfaces.gui_interface import GUIInterface
 from gui.export_window import ExportWindow
 from gui.import_window import ImportWindow
 from data_processing.calculate_channel_data import active_channels as activeChannels
-from toolbar.line_plot_toolbar import LinePlotToolbar
-from toolbar.heatmap_toolbar import HeatmapToolbar
+from toolbars.line_plot_toolbar import LinePlotToolbar
+from toolbars.heatmap_toolbar import HeatmapToolbar
 
 def decorator_progressbar(function):
 	"""
