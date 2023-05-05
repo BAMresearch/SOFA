@@ -2,7 +2,17 @@
 Software Architecture
 =====================
 
-strukturdiagramm einfügen
+Repository
+==========
+
+.. figure:: images/sofa_file_structure.svg
+	:alt: image of the sofa file structure
+
+	SOFA file structure.
+
+strukturdiagramm einfügen ordnerstruktur
+
+klassendiagramm force volume
 
 genereller Überblick über SOFA module
 

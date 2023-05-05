@@ -4,7 +4,7 @@
 Toolbars
 ========
 
-To deselect outliers or define a region of interest in on of the channels, SOFA offers two custom Matplotlib Toolbars. For more information about the implementation of these see :ref:`here <toolbar implementation>`. 
+To deselect outliers or define a region of interest in on of the channels, SOFA offers two custom Matplotlib Toolbars. For more information about the implementation of these see the :ref:`codebase <toolbar implementation>` section. 
 
 .. _lineplot toolbar:
 
