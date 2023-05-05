@@ -1,11 +1,10 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Toolbars" href="toolbars.html" /><link rel="prev" title="Correction Algorithm" href="correction_algorithm.html" />
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Toolbars" href="toolbars.html" /><link rel="prev" title="Correction Algorithm" href="correction_algorithm.html" />
 
-    <meta name="generator" content="sphinx-4.5.0, furo 2022.04.07"/>
+    <meta name="generator" content="sphinx-5.1.1, furo 2022.04.07"/>
         <title>Channels - SOFA</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=68f4518137b9aefe99b631505a2064c3c42c9852" />
@@ -173,7 +172,7 @@
 <li class="toctree-l1"><a class="reference internal" href="toolbars.html">Toolbars</a></li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="architecture.html">SOFA Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Software Architecture</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="codebase.html">Codebase</a></li>
@@ -212,8 +211,8 @@
           </label>
         </div>
         <article role="main">
-          <section id="channels">
-<span id="id1"></span><h1>Channels<a class="headerlink" href="#channels" title="Permalink to this headline">#</a></h1>
+          <div class="section" id="channels">
+<span id="id1"></span><h1>Channels<a class="headerlink" href="#channels" title="Permalink to this heading">#</a></h1>
 <p>A large number of parameters and physical values can be derived from Force Curves. These parameters or values are one dimensional scalars extracted from the two dimensional Force Curve. Consequently, the information of a three dimensional FV measurement is decreased to a two dimensional visualization - a spatial distribution of a property associated with the parameter or physical value in question. This parameter/value map is called <strong>channel</strong>.</p>
 <p>In general, we distinguish between <strong>parameters</strong> (<a class="reference internal" href="#channels-based-on-parameters"><span class="std std-ref">Channels based on parameters</span></a>), which can be directly estimated from force curves and used as a quantitative measure within one experimental set-up, and <strong>physical values</strong> (<a class="reference internal" href="#channels-based-on-physical-values"><span class="std std-ref">Channels based on physical values</span></a>), such as the Young’s modulus, which result from a multivariable fit, based on general theories (e.g., Hertz, DMT or JKR) and can be used as absolute quantities. This distinction is very important for the succession of steps taken in the analysis of FSD.</p>
 <div class="admonition note">
@@ -221,8 +220,8 @@
 <p>Maps of physical values such as the Young’s modulus make multivariant fitting of single curves with a low signal-to-noise ratio necessary. This is only advised after subsets of curves have been averaged and investigated to narrow down the range of fit variables. This will be explained in detail in <a class="reference internal" href="#channels-based-on-physical-values"><span class="std std-ref">Channels based on physical values</span></a>.</p>
 </div>
 <p>All parameters and physical values are explained and demonstrated in <a class="reference internal" href="#channels-based-on-parameters"><span class="std std-ref">Channels based on parameters</span></a> and <a class="reference internal" href="#channels-based-on-physical-values"><span class="std std-ref">Channels based on physical values</span></a>. Real averaged Force Curves has been used for graphical demonstrations. The FSD Data is available in the <a class="reference external" href="https://github.com/2Puck/sofa/tree/development/test_data">test_data</a> folder.</p>
-<section id="channels-based-on-parameters">
-<span id="id2"></span><h2>Channels based on parameters<a class="headerlink" href="#channels-based-on-parameters" title="Permalink to this headline">#</a></h2>
+<div class="section" id="channels-based-on-parameters">
+<span id="id2"></span><h2>Channels based on parameters<a class="headerlink" href="#channels-based-on-parameters" title="Permalink to this heading">#</a></h2>
 <p>Channels based on parameters have the advantage that they can be used as a quantitative measure within one experimental set-up (identical tip and calibration) and therefore can be used to evaluate and categorize Force Curves within one experiment, e.g. mechanical heterogeneities and gradients.
 There are three categories of parameters.</p>
 <ol class="arabic simple">
@@ -230,8 +229,8 @@ There are three categories of parameters.</p>
 <li><p>Measurement parameters, e.g. fzMax</p></li>
 <li><p>Physical properties of the sample, e.g. stiffness</p></li>
 </ol>
-<section id="result-of-sofa-s-correction-algorithm">
-<h3>Result of SOFA’s correction algorithm<a class="headerlink" href="#result-of-sofa-s-correction-algorithm" title="Permalink to this headline">#</a></h3>
+<div class="section" id="result-of-sofa-s-correction-algorithm">
+<h3>Result of SOFA’s correction algorithm<a class="headerlink" href="#result-of-sofa-s-correction-algorithm" title="Permalink to this heading">#</a></h3>
 <p id="raw-offset-stiffness"><strong>raw offset</strong> and <strong>raw stiffness</strong></p>
 <div class="table-wrapper"><table class="docutils align-left">
 <colgroup>
@@ -277,9 +276,9 @@ compensates for the topography and is also called
 </tr>
 </tbody>
 </table></div>
-</section>
-<section id="measurement-parameters">
-<h3>Measurement parameters<a class="headerlink" href="#measurement-parameters" title="Permalink to this headline">#</a></h3>
+</div>
+<div class="section" id="measurement-parameters">
+<h3>Measurement parameters<a class="headerlink" href="#measurement-parameters" title="Permalink to this heading">#</a></h3>
 <p><strong>fzMax</strong> (Error Channel)</p>
 <div class="table-wrapper"><table class="docutils align-left">
 <colgroup>
@@ -303,9 +302,9 @@ scattering around the given control value <strong>fzMax</strong>.</p></td>
 </tr>
 </tbody>
 </table></div>
-</section>
-<section id="physical-properties">
-<h3>Physical properties<a class="headerlink" href="#physical-properties" title="Permalink to this headline">#</a></h3>
+</div>
+<div class="section" id="physical-properties">
+<h3>Physical properties<a class="headerlink" href="#physical-properties" title="Permalink to this heading">#</a></h3>
 <p><strong>zMax</strong></p>
 <div class="table-wrapper"><table class="docutils align-left">
 <colgroup>
@@ -384,19 +383,19 @@ identifies those curves in a separate channel
 </tr>
 </tbody>
 </table></div>
-</section>
-</section>
-<section id="channels-based-on-physical-values">
-<span id="id3"></span><h2>Channels based on physical values<a class="headerlink" href="#channels-based-on-physical-values" title="Permalink to this headline">#</a></h2>
+</div>
+</div>
+<div class="section" id="channels-based-on-physical-values">
+<span id="id3"></span><h2>Channels based on physical values<a class="headerlink" href="#channels-based-on-physical-values" title="Permalink to this heading">#</a></h2>
 <p>Physical values, such as Young’s modulus are independent from the experimental set-up and can be directly compared to literature values. In order to evaluate experimental force spectroscopy data for physical values, one must apply a general theory, such as the Hertz Theory, DMT or JKR.
 Unfortunately, an indiscriminate and automated application of such fits on single curves can lead to rather large systematic and statistic errors. First, the exact geometry and mechanical properties of the AFM probe has to be established (tip shape and tip radius R, cantilever spring constant kc, the tip’s Young’s modulus Etip and poisson ratio νtip). Getting any of those parameters wrong leads to a systematic error affecting all subsequent analysis. Second, the proper theory which fits the conditions of the measurement needs to be chosen. Within one heterogeneous sample the applicability of a theory may change from one measured point to another, leading to a systematic error which affects the analysis only partially. For example, composite behavior (a mixture of more than one material in the measured volume cannot be described completely by any of the above theories. Third, individual force curves have a very low signal-to-noise ratio, resulting in a large statistical error.</p>
 <p>Consequently, before single curves are fitted for physical values it is advisable to start the analysis with parameters and averaged curves as described in the workflow in chapter <a class="reference internal" href="using_sofa.html#selection-process"><span class="std std-ref">Selection Process</span></a> and <a class="reference internal" href="using_sofa.html#averaged-subgroups-of-force-curves"><span class="std std-ref">Averaged Subgroups of Force Curves</span></a>.</p>
-</section>
-<section id="adding-custom-channels">
-<span id="customized-channels"></span><h2>Adding custom channels<a class="headerlink" href="#adding-custom-channels" title="Permalink to this headline">#</a></h2>
+</div>
+<div class="section" id="adding-custom-channels">
+<span id="customized-channels"></span><h2>Adding custom channels<a class="headerlink" href="#adding-custom-channels" title="Permalink to this heading">#</a></h2>
 <p>To add additional channels to SOFA you can either contact us under <a class="reference external" href="mailto:sofa%40bam.de">sofa<span>@</span>bam<span>.</span>de</a> or extend the code yourself. See <a class="reference internal" href="codebase.html#calculate-channel-data-implementation"><span class="std std-ref">Calculate Channel Data</span></a> for furhter information about the implementation of the SOFA channels.</p>
-</section>
-</section>
+</div>
+</div>
 
         </article>
       </div>
@@ -483,6 +482,7 @@ Unfortunately, an indiscriminate and automated application of such fits on singl
 </div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="_static/scripts/furo.js"></script>
     </body>

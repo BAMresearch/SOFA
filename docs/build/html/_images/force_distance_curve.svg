@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 1300 709" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;">
+    <g id="force_distance_curve" transform="matrix(3.38887,0,0,3.38887,-4143.1,-1955.44)">
+        <g id="approach_part_background" transform="matrix(2.34017,0,0,1.07483,-2143.76,-58.83)">
+            <rect x="1438.49" y="591.38" width="163.824" height="194.753" style="fill:rgb(237,242,251);"/>
+        </g>
+        <g id="repulsive_area" transform="matrix(1,0,0,1,0.364799,2.91839)">
+            <rect x="1438.13" y="573.887" width="167.443" height="209.327" style="fill:rgb(202,218,250);"/>
+        </g>
+        <g id="attractive_area" transform="matrix(1,0,0,1,0.364799,2.91839)">
+            <rect x="1363.86" y="573.887" width="74.272" height="209.327" style="fill:rgb(226,234,252);"/>
+        </g>
+        <g id="zeroline_area" transform="matrix(0.873834,0,0,1.07483,-34.4443,-58.83)">
+            <rect x="1438.49" y="591.38" width="163.824" height="194.753" style="fill:rgb(237,242,251);"/>
+        </g>
+        <g id="y_axis">
+            <g id="y_axis1" serif:id="y_axis" transform="matrix(1,-6.1375e-17,-3.67603e-17,0.614939,-56.7086,258.073)">
+                <path d="M1495.2,528.389L1495.2,858.72" style="fill:none;stroke:black;stroke-width:0.36px;"/>
+            </g>
+            <g id="y_axis_head" transform="matrix(1,2.77556e-17,-2.77556e-17,1,-108.685,-104.688)">
+                <path d="M1547.18,681.494L1549.91,687.688L1544.44,687.688L1547.18,681.494Z" style="fill:rgb(2,2,2);"/>
+            </g>
+            <g id="y_axis_label" transform="matrix(0.525064,0,0,0.525064,647.429,204.766)">
+                <text x="1515.56px" y="721.792px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:13.734px;">Force [nm]</text>
+            </g>
+        </g>
+        <g id="x_axis" transform="matrix(0.996447,0,0,1,5.68785,0)">
+            <g id="x_axis1" serif:id="x_axis" transform="matrix(1.45472,0,0,1,-734.209,10.6746)">
+                <path d="M1345.09,693.554L1604.17,693.554" style="fill:none;stroke:black;stroke-width:0.24px;"/>
+            </g>
+            <g id="x_axis_head" transform="matrix(6.245e-17,1,-1,6.245e-17,2287.11,-842.949)">
+                <path d="M1547.18,681.494L1549.91,687.688L1544.44,687.688L1547.18,681.494Z" style="fill:rgb(2,2,2);"/>
+            </g>
+            <g id="x_axis_label" transform="matrix(0.525064,0,0,0.525064,769.164,319.82)">
+                <text x="1515.56px" y="721.792px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:13.734px;">Piezo [nm]</text>
+            </g>
+        </g>
+        <g id="force_distance_curve1" serif:id="force_distance_curve" transform="matrix(1.28624,0,0,1.28624,-643.183,-132.584)">
+            <path d="M1453.17,649.542C1466.28,648.446 1478.4,649.876 1491.44,650.034C1495.9,650.088 1500.18,648.83 1504.65,648.99C1511.35,649.231 1517.93,650.778 1524.68,650.815C1536.77,650.883 1549.29,646.41 1561.37,650.317C1565.37,651.611 1567.7,655.974 1569.26,659.551C1573.33,668.919 1575.63,686.278 1589.91,684.599C1604.72,682.859 1611.14,667.168 1616.37,655.107C1628.8,626.454 1645.73,589.62 1658.44,561.093" style="fill:none;stroke:rgb(255,0,0);stroke-width:0.23px;"/>
+        </g>
+        <g id="point_of_contact">
+            <g transform="matrix(0.439646,0,0,0.439646,774.193,394.233)">
+                <text x="1515.56px" y="721.792px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:13.734px;">point of contact</text>
+            </g>
+            <g transform="matrix(1,0,0,1,-41.1651,-31.2473)">
+                <circle cx="1479.66" cy="735.013" r="2.473" style="fill:rgb(154,3,3);"/>
+            </g>
+        </g>
+        <g id="jump_to_contact">
+            <g transform="matrix(0.439646,0,0,0.439646,669.874,419.965)">
+                <text x="1515.56px" y="721.792px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:13.734px;">jump to contact</text>
+            </g>
+            <g transform="matrix(0.930863,-0.365369,0.365369,0.930863,-264.988,587.501)">
+                <circle cx="1479.66" cy="735.013" r="2.473" style="fill:rgb(154,3,3);"/>
+            </g>
+        </g>
+        <g id="end_of_zeroline">
+            <g transform="matrix(0.439646,0,0,0.439646,657.412,395.714)">
+                <text x="1515.56px" y="721.792px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:13.734px;">end of zeroline</text>
+            </g>
+            <g transform="matrix(1,0,0,1,-114.107,-31.2473)">
+                <circle cx="1479.66" cy="735.013" r="2.473" style="fill:rgb(154,3,3);"/>
+            </g>
+        </g>
+        <g id="legend" transform="matrix(1,0,0,1,-4.81126,-15.0839)">
+            <g id="background" transform="matrix(1.18263,0,0,0.68469,-283.964,198.136)">
+                <rect x="1533.39" y="579.626" width="66.12" height="58.824" style="fill:rgb(175,190,226);"/>
+            </g>
+            <g transform="matrix(1.18845,0,0,1.18845,-292.357,-118.808)">
+                <rect x="1535.46" y="624.666" width="5.79" height="5.79" style="fill:rgb(202,218,250);"/>
+            </g>
+            <g id="approach_part_label" transform="matrix(0.61278,0,0,0.61278,614.942,187.164)">
+                <text x="1515.56px" y="721.792px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:13.734px;">repulsive regime</text>
+            </g>
+            <g transform="matrix(1.18845,0,0,1.18845,-292.357,-131.485)">
+                <rect x="1535.46" y="624.666" width="5.79" height="5.79" style="fill:rgb(226,234,252);"/>
+            </g>
+            <g id="approach_part_label1" serif:id="approach_part_label" transform="matrix(0.61278,0,0,0.61278,614.967,174.623)">
+                <text x="1515.56px" y="721.792px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:13.734px;">attractive area</text>
+            </g>
+            <g transform="matrix(1.18845,0,0,1.18845,-292.357,-143.309)">
+                <rect x="1535.46" y="624.666" width="5.79" height="5.79" style="fill:rgb(237,242,251);"/>
+            </g>
+            <g id="approach_part_label2" serif:id="approach_part_label" transform="matrix(0.61278,0,0,0.61278,615.106,162.799)">
+                <text x="1515.56px" y="721.792px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:13.734px;">zeroline</text>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -4,6 +4,7 @@ Glossary
 
 - **SOFA** - Software for Force Analysis
 - **AFM** - atomic force microscopy
+- **AFS** - atomic force spectroscopy
 - **FS** - force spectroscopy
 - **FSD** - force spectroscopy data
 - **Ibw** - Igor binary wave

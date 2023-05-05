@@ -20,7 +20,11 @@ Force curves which can not be corrected are discarded by SOFA. For more detailed
 Correction of the force
 =======================
 
-vlt Bild von Kurve vorher nachher einfügen
+.. figure:: images/force_correction.svg
+	:width: 600
+	:alt: image of the correction of the force values of an approach part of a force distance curve
+
+	Correction of the force values of an approach part of a force distance curve.
 
 To correct the virtual deflection the force distance curve is shifted to zero along the deflection (y) axis using the end of the zeroline. Additionally the noise in the deflection values before the point of contact is smoothed. For this, the :ref:`end of the zero line <calculate end of zero line>` must first be found. With the end of the zero line a :ref:`fit of the zero line <fit zero line>` can be calculated. Using this fit the deflection values are :ref:`shifted along the deflection (y) axis <fit zero line>`. 
 
@@ -35,6 +39,12 @@ The end of the zero line is the last measurement point before attractive forces 
 
 Restrict search area
 ~~~~~~~~~~~~~~~~~~~~
+
+.. figure:: images/restrict_search_area.svg
+	:width: 600
+	:alt: image of the restriction process to find the end of the zero line
+
+	text.
 
 In order to narrow down the area where the end of the zero line is located, a left and right boundary is calculated. For this a linear fit to the approach curve is calculated. The slope and interception values of this linear fit are cached and used to calculate the :ref:`raw offset and raw stiffness <raw offset stiffness>` channel. The left boundary is the first point of the approach curve where it's deflection value is smaller than that of the linear fit, similar to the first intersection point between the two curves. To determine the right boundary the second intersection point of the approach curve and it's linear fit is defined as the last point of the approach curve where it's deflection value is smaller than that of the linear fit. Subsequently the differences between the deflection values of the approach curve and the linear fit are calculated. Then the point with the maximum deflection difference within the area of the left and right intersection is determined. From this point, the right boundary is obtained by shifting the point slighty to the right. The exact amount is five percent of the difference between the right intersection and the point with the maximum deflection difference. After determining the left and right borders the end of the zero line can be located.
 
@@ -64,7 +74,11 @@ Using the linear fit of the approach curve until the end of the zero line the de
 Correction of the piezo displacement
 ====================================
 
-vlt Bild von Kurve vorher nachher einfügen
+.. figure:: images/piezo_correction.svg
+	:width: 800
+	:alt: image of the correction of the piezo values of an approach part of a force distance curve
+
+	Correction of the piezo values of an approach part of a force distance curve.
 
 To correct the topography offset the force distance curve is shifted to zero along the piezo (x) axis using the point of contact. This can only be done after the correction of the deflection values, since the point of contact is defined as the first zero crossing after the jump to contact. First the :ref:`zero crossing <calculate zero crossing>` is determined. Afterwards the exact :ref:`point of contact is calculated <interpolate point of contact>`. Finally the pizeo values of the approach curve can be :ref:`shifted using the point of contact <shift piezo values>`.
 

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 993 378" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;">
+    <g id="piezo_correction" transform="matrix(2.4451,0,0,2.4451,-2766.64,-2254.55)">
+        <g id="background" transform="matrix(0.408981,0,0,0.408981,1131.5,850.87)">
+            <rect x="0" y="173.131" width="992.126" height="379.849" style="fill:rgb(237,242,251);"/>
+        </g>
+        <g id="y_axis" transform="matrix(1,0,0,1.07406,-94.2201,237.542)">
+            <g id="y_axis1" serif:id="y_axis" transform="matrix(1,6.16179e-05,4.07477e-05,0.41053,-56.7438,426.143)">
+                <path d="M1495.2,528.389L1495.15,865.623" style="fill:none;stroke:black;stroke-width:0.53px;"/>
+            </g>
+            <g id="y_axis_head" transform="matrix(1,2.77556e-17,-2.77556e-17,1,-108.698,-44.5339)">
+                <path d="M1547.18,681.494L1549.91,687.688L1544.44,687.688L1547.18,681.494Z" style="fill:rgb(2,2,2);"/>
+            </g>
+            <g id="y_axis_label" transform="matrix(0.525064,0,0,0.525064,648.188,266.232)">
+                <text x="1515.56px" y="721.792px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:13.734px;">Force [nm]</text>
+            </g>
+        </g>
+        <g id="x_axis" transform="matrix(0.833064,0,0,1,235.376,322.17)">
+            <g id="x_axis1" serif:id="x_axis" transform="matrix(1.29031,0,0,1,-513.062,10.6746)">
+                <path d="M1345.09,693.554L1604.17,693.554" style="fill:none;stroke:black;stroke-width:0.39px;"/>
+            </g>
+            <g id="x_axis_head" transform="matrix(6.245e-17,1,-1,6.245e-17,2244.26,-842.949)">
+                <path d="M1547.18,681.494L1549.91,687.688L1544.44,687.688L1547.18,681.494Z" style="fill:rgb(2,2,2);"/>
+            </g>
+            <g id="x_axis_label" transform="matrix(0.525064,0,0,0.525064,724.569,319.413)">
+                <text x="1515.56px" y="721.792px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:13.734px;">Piezo [nm]</text>
+            </g>
+        </g>
+        <g id="force_distance_curve" transform="matrix(1.28624,0,0,1.28624,-618.972,190.267)">
+            <path d="M1453.17,649.542C1466.63,648.795 1490.25,649.759 1503.29,649.453C1520.76,649.042 1533.02,649.201 1561.37,650.317C1565.57,650.482 1567.7,655.974 1569.26,659.551C1573.33,668.919 1575.63,686.278 1589.91,684.599C1604.72,682.859 1611.14,667.168 1616.37,655.107C1628.8,626.454 1636.56,610.66 1649.27,582.133" style="fill:none;stroke:rgb(126,7,7);stroke-width:0.32px;"/>
+        </g>
+        <g id="force_distance_curve1" serif:id="force_distance_curve" transform="matrix(1.28624,0,0,1.28624,-737.623,190.267)">
+            <path d="M1453.17,649.542C1466.63,648.795 1490.25,649.759 1503.29,649.453C1520.76,649.042 1533.02,649.201 1561.37,650.317C1565.57,650.482 1567.7,655.974 1569.26,659.551C1573.33,668.919 1575.63,686.278 1589.91,684.599C1604.72,682.859 1611.14,667.168 1616.37,655.107C1628.8,626.454 1636.56,610.66 1649.27,582.133" style="fill:none;stroke:rgb(255,54,0);stroke-width:0.32px;"/>
+        </g>
+        <g transform="matrix(-2.63948,8.55626e-16,-1.78555e-16,-0.52,2331.34,1421.92)">
+            <path d="M330.394,769.119L330.394,771.858L330.394,763.64L330.394,766.379L370.862,766.379L370.862,763.64L371.672,767.749L370.862,771.858L370.862,769.119L330.394,769.119Z"/>
+        </g>
+        <g transform="matrix(0.569078,0,0,0.569078,603.069,629.925)">
+            <text x="1515.56px" y="721.792px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:13.734px;">point of contact</text>
+        </g>
+        <g transform="matrix(0.464715,-1.19996,1.19996,0.464715,-106.967,2460.95)">
+            <circle cx="1479.66" cy="735.013" r="2.473" style="fill:rgb(126,7,7);"/>
+        </g>
+        <g transform="matrix(0.593159,-1.14194,1.14194,0.593159,-372.792,2280.11)">
+            <circle cx="1479.66" cy="735.013" r="2.473" style="fill:rgb(255,54,0);"/>
+        </g>
+        <g id="legend" transform="matrix(1,0,0,1,916.487,284.233)">
+            <g transform="matrix(1.04285,0,0,0.584155,-287.034,256.978)">
+                <rect x="483.544" y="657.005" width="65.559" height="38.663" style="fill:rgb(211,218,230);"/>
+            </g>
+            <g transform="matrix(0.423354,0,0,0.423354,-413.267,353.145)">
+                <text x="1515.56px" y="721.792px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:13.734px;">corrected curve</text>
+            </g>
+            <g transform="matrix(0.434638,0,0,0.434638,-430.325,334.682)">
+                <text x="1515.56px" y="721.792px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:13.734px;">semi corrected curve</text>
+            </g>
+            <g transform="matrix(1,0,0,1,28.5359,8.75449)">
+                <rect x="191.258" y="645.395" width="5.043" height="5.043" style="fill:rgb(255,54,0);"/>
+            </g>
+            <g transform="matrix(1,0,0,1,28.5359,-1.61764)">
+                <rect x="191.258" y="645.395" width="5.043" height="5.043" style="fill:rgb(126,7,7);"/>
+            </g>
+        </g>
+    </g>
+</svg>
