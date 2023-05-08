@@ -1,4 +1,5 @@
 *__pycache__
+.sofaSessionBackup
 /sofa/output_data/
 /test/.coverage
 /output_data/

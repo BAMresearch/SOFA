@@ -1,0 +1,216 @@
+========
+Codebase
+========
+
+SOFA is written in Python (should require Python 3.6.1 at minimum) and uses the following external modules and libraries:
+
+- **NumPy** - for basic mathematical computations (tested with NumPy version 1.22.1)
+- **SciPy** - for some specific mathematical computations (tested with SciPy version 1.8.0)
+- **Matplotlib** - to plot the data and create the custom toolbars (tested with Matplotlib version 3.5.1)
+- **pandas** - to export the data to the different ouput file formats (tested with pandas version 1.4.1)
+- **igor** - to read files in the .ibw (igor binary wave) file format (tested with igor version 0.3)
+- **ttkbootstrap** - to give the Tkinter GUI a modern look (tested with ttkbootstrap version 1.5.1)
+
+SOFA Packages
+=============
+
+The general aim of SOFA was to write code which is simple to read and easy to extend. The implementation followed the principle of separation of concerns. Therefore SOFA is comprised of multiple distinct packages. On the code level functions are keept short and only take responsibility for one single functionality. To increase the readability of the code, SOFA tries to implement the following PEP's:
+
+- `PEP 8 <https://peps.python.org/pep-0008/>`_ - The Style Guide for Python Code
+- `PEP 257 <https://peps.python.org/pep-0257/>`_ - Docstring Conventions
+- `PEP 484 <https://peps.python.org/pep-0484/>`_ - Type Hints
+
+The implementation uses a mixture of object oriented and procedural programming, depending on which is more suitable for the different requirements at hand.
+
+.. _gui implementation:
+
+GUI
+---
+
+The GUI of SOFA is written in Tkinter and uses the ttkbootstrap theme extension, to give it a modern look. It consists of of three windows, the main window and two subwindows for the data import and export. All of them are written in an object oriented approach.
+
+.. _main window implementation:
+
+Main Window  `source <https://github.com/2Puck/sofa/tree/development>`_
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The main window of SOFA contains ... . The widgets . The main window uses mostly the pack geometry manager. Only for complexer layouts like in the in ... frame the grid manager is used.  
+
+einzelne frames erklären
+wie sind plots in tkinter eingebunden
+gui interface ansprechen warum nachher attribute setzen
+interaktionsmöglichkeiten toolbars histogram buttons
+import and export window ansprechen
+
+Import Window
+~~~~~~~~~~~~~
+
+The import window is a small subwindow to handle the import of measurement data. Like in the main window the different widgets are arranged in rows using only the pack geometry manager. It contains a indeterminate progressbar to show if the import process is still runing and which process is currently being executed. The decorator *decorator_check_required_folder_path* checks if a required measurement folder is selected before the import process starts.
+
+During the import process the selected measurement files are first imported and combined into one data dictionary with the selected import function of the :ref:`Import Data <import data implementation>` module. Afterwards the data dictionary is passed to the :ref:`GUI Interface <gui interface implementation>`, where a new force volume will be created. Finally the foldername, size and folderpath of the imported measurement data are set in the Active Data frame of the :ref:`Main Window <main window implementation>`.
+
+If an error occurs during the import process the user is informed via a message box and the import process is terminated. If the data could sucessfully be imported the window closes it self and informs the user via a message box.
+
+Export Window
+~~~~~~~~~~~~~
+
+The export window is a small subwindow to handle the export of the imported force volumes. Like in the main window the different widgets are arranged in rows using only the pack geometry manager. It contains a indeterminate progressbar to show if the import process is still runing.
+The decorator *decorator_check_required_folder_path* and *decorator_check_required_folder_name* check if the required folder path and folder name for the ouput folder are selected before the export process starts.
+
+In the export process the data of the selected force volume can be exported to the selected :ref:`export formats <export formats>`. The :ref:`Export Data <export data implementation>` module creates an output folder for data with the selected location and name. After this the data of the selected force volume is exported to the different formats.
+
+
+Window Settings
+~~~~~~~~~~~~~~~
+
+Interfaces
+----------
+
+.. _gui interface implementation:
+
+GUI Interface
+~~~~~~~~~~~~~
+
+Plot Interface
+~~~~~~~~~~~~~~
+
+.. _toolbar implementation:
+
+Toolbar
+-------
+
+The toolbar package contains the line plot and heatmap toolbars to select a certain subgroup of force curves and inspect the data more closely. Both are written as a seperate class inherted from the Matplotlib NavigationToolbar2Tk, but have custom :ref:`funcitionalities <toolbar funcitionalities>`. With Matplotlib version 3.5.1 it is no longer possible to load toolbar icons from a custom location. Therefore, both toolbars have to overwrite a part of the NavigationToolbar2Tk *__init__* function. Additionally they adjust the background color of the toolbar icons to the background color of the main window.
+
+SOFA Toolbar
+~~~~~~~~~~~~
+
+Lineplot Toolbar
+~~~~~~~~~~~~~~~~
+
+The lineplot toolbar allows the selection of single or multiple force distance curves. In addition it is possible to zoom in and out of the lineplot and toggle the different display options, like displaying the average curve.  
+
+hat mode und setzt aktiven button state
+zoom ansprechen - speichert immer nur letzen zoom dadurch muss nicht init werden
+auswahl an kurven - einzelne kurven über pick radius - gruppe and kurven über aktuell sichtbare - dabei nur kurven getroffen die datenpunkt im aktuellen ausschnitt haben
+show inactive average errorbar alle über gui interface auf architecture verweisen
+
+Heatmap Toolbar
+~~~~~~~~~~~~~~~
+
+bereich auswählen - rechteck relativ selbsterklärend - freie fläche wie wird das gemacht - alles umkreisen duplikate löschen
+bereich einschliesen ausschliesen - ändert inaktive datenpunkte
+flip und rotieren ohne achsen anpassen erklären bzw auf arcitecture heatmap orientation verweisen
+
+Force Spectroscopy Data
+-----------------------
+
+
+
+Force Volume
+~~~~~~~~~~~~
+
+
+
+Force Distance Curve
+~~~~~~~~~~~~~~~~~~~~
+
+
+
+Channel
+~~~~~~~
+
+
+
+Average Force Distance Curve
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+Data Processing
+---------------
+
+This package is responsible for the processing of the force spectroscopy data. This includes the import and correction of the measurement data, the calulation of the different channels and the export of the data from SOFA. These modules use a procedural approach 
+- warum procedural einfacher zu testen und eigenständiger
+- named tuples und custom exception
+
+.. _import data implementation:
+
+Import Data
+~~~~~~~~~~~
+
+modul zuständig für den import von messdaten 
+enthält sämtliche verfügbaren import optionen bzw datenformate
+weitere hinzufügen benötigt funktion zum import und erweitern von *importFunctions* wird automatisch übernommen
+muss importiert werden - messdaten
+kann importiert werden - image und channel
+decortator to check if size matches
+
+Correct Data
+~~~~~~~~~~~~
+
+corrects the approch part of a single force distance curve
+wie wird mit möglichen fehlern error umgegangen
+vorgehen verweiß correction algorithm
+verweiß zu test
+
+.. _calculate channel data implementation:
+
+Calculate Channel Data
+~~~~~~~~~~~~~~~~~~~~~~
+
+enthält funktionen um die einzelnen channel zu berechen
+weitere channel braucht funktion die bestimmte argumente bekommt und folgendes zurück liefert
+erweiterung in *active_channels*
+decorator konvertiert daten in two dimensional np array
+verweiß zu test
+
+.. _export data implementation:
+
+Export Data
+~~~~~~~~~~~
+
+exportiert daten eines force volumes aus SOFA 
+erstellt dafür ordner
+konvertiert dann daten zunächst in pandas dataframes - einfacher zu exportieren
+*exportFormats* enthält alle verfügbaren export formate mit dazugehörigen export funktionen
+warum die beiden
+
+Named Tuples
+~~~~~~~~~~~~
+
+To increase the readability of the code SOFA uses NamedTuple, which are all defined in this file. They are divided into different categories and use type hints, to make it easier to understand the code.
+
+Custom Exceptions
+~~~~~~~~~~~~~~~~~
+
+To better undestand possible errors when importing and correcting the measurement data, SOFA uses some custom exceptions. Both cases have a general exception *ImportError* and *CorrectionError* and further specific exceptions. This structure allows to catch a general type of exception with a descriptive name that should make it easier to understand the problem.
+
+Data Visualization
+------------------
+
+Plot Data
+~~~~~~~~~
+
+
+
+.. _tests implementation:
+
+Tests
+=====
+
+Data Correction
+---------------
+
+Channel Calculation
+-------------------
+
+Average
+-------
+
+Using SyFoS Data
+----------------
+
+Docs
+====
+
+The SOFA documentation is written using Sphinx, uses the Furo theme and is hosted with Gihub Pages.

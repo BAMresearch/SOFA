@@ -14,12 +14,12 @@ You should have received a copy of the GNU General Public License
 along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import tkinter as tk
+#import tkinter as tk
 import ttkbootstrap as ttk
 
-from window.main_window import MainWindow
+from gui.main_window import MainWindow
 
 if __name__ == "__main__":
-	app = ttk.Window()
+	app = ttk.Window("SOFA", "minty")
 	MainWindow(app)
 	app.mainloop()

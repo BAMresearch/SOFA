@@ -1,0 +1,26 @@
+Channels
+========
+
+In general, we distinguish between **parameters** (Channels based on parameters), which can be directly estimated from force curves and used as a quantitative measure within one experimental set-up, and **physical values** (Channels based on physical values), such as the Young’s modulus, which result from a multivariable fit, based on general theories (e.g., Hertz, DMT or JKR) and can be used as absolute quantities. This distinction is very important for the succession of steps taken in the analysis of FSD.
+
+Channels based on parameters
+----------------------------
+
+Channels based on parameters have the advantage that they can be used as a quantitative measure within one experimental set-up (identical tip and calibration) and therefore can be used to evaluate and categorize Force Curves within one experiment, e.g. mechanical heterogeneities and gradients.
+There are three categories of parameters. 
+
+1. Result of SOFA’s correction algorithm (e.g., raw stiffness)
+2. Measurement parameters (e.g., fzMax)
+3. Physical properties of the sample (e.g., stiffness)
+
+
+Channels based on physical values
+---------------------------------
+
+Physical values, such as Young’s modulus are independent from the experimental set-up and can be directly compared to literature values. In order to evaluate experimental force spectroscopy data for physical values, one must apply a general theory, such as the Hertz Theory, DMT or JKR.
+Unfortunately, an indiscriminate and automated application of such fits on single curves can lead to rather large systematic and statistic errors. First, the exact geometry and mechanical properties of the AFM probe has to be established (tip shape and tip radius R, cantilever spring constant kc, the tip’s Young’s modulus Etip and poisson ratio νtip). Getting any of those parameters wrong leads to a systematic error affecting all subsequent analysis. Second, the proper theory which fits the conditions of the measurement needs to be chosen. Within one heterogeneous sample the applicability of a theory may change from one measured point to another, leading to a systematic error which affects the analysis only partially. For example, composite behavior (a mixture of more than one material in the measured volume cannot be described completely by any of the above theories. Third, individual force curves have a very low signal-to-noise ratio, resulting in a large statistical error.
+
+Customized channels
+-------------------
+
+The option to create additional customized channel is not built into SOFA as of version 1.0.

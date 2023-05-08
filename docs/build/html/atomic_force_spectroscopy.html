@@ -1,0 +1,380 @@
+<!doctype html>
+<html class="no-js">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Using SOFA" href="using_sofa.html" /><link rel="prev" title="SOFA" href="index.html" />
+
+    <meta name="generator" content="sphinx-4.5.0, furo 2022.04.07"/>
+        <title>Atomic Force Spectroscopy - SOFA</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=68f4518137b9aefe99b631505a2064c3c42c9852" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">SOFA</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  
+  <span class="sidebar-brand-text">SOFA</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul class="current">
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Atomic Force Spectroscopy</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="using_sofa.html">Using SOFA</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="supported_data_types.html">Supported Data Types</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="correction_algorithm.html">Correction Algorithm</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="channels.html">Channels</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="toolbars.html">Toolbars</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Software Architecture</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="codebase.html">Codebase</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container"><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="atomic-force-spectroscopy">
+<h1>Atomic Force Spectroscopy<a class="headerlink" href="#atomic-force-spectroscopy" title="Permalink to this headline">#</a></h1>
+<p>Atomic force microscopy (AFM) is a powerful tool used to investigate surfaces at the nanoscale level. Atomic force spectroscopy (AFS) is a variation of AFM that measures the force between a small probe and the sample surface to obtain detailed information about its properties. AFS can provide valuable insights into the physical, chemical, and mechanical properties of materials, including elasticity, adhesion, and friction. It works by bringing the probe very close to the sample surface, such that the attractive or repulsive forces between them can be measured. The probe is mounted on a cantilever that can deflect in response to the forces between it and the sample surface. By monitoring the deflection of the cantilever, the force between the probe and the surface can be measured.</p>
+<p>During a measurement, the probe is brought into contact with the sample surface and retracts after the maximum piezo is reached. By measuring the piezo displacement and the force as the probe is moved towards and away from the surface a single <a class="reference internal" href="#force-distance-curve"><span class="std std-ref">force distance curve</span></a> is obtained. This measurement process is repeteated for every measurement point of the sample. Resulting in a set of m x n force distance curves, called <a class="reference internal" href="#force-volume"><span class="std std-ref">force volume</span></a>. By analysing the individual force distance curves, conclusions can be drawn about the properties of the sample. If this is done for each force distnace curve in the force volume, <a class="reference internal" href="channels.html#channels"><span class="std std-ref">channels</span></a> about the different properties can be obtained.</p>
+<p>The interpretation of AFS data can be complex, requiring advanced modeling and analysis techniques to extract meaningful information. This is due to some <a class="reference internal" href="#measurement-erros"><span class="std std-ref">measurement errors</span></a> which occur during the measurement. SOFA automatically <a class="reference internal" href="correction_algorithm.html#correction-algorithm"><span class="std std-ref">corrects</span></a> these errors and calculates multiple different <a class="reference internal" href="channels.html#channels"><span class="std std-ref">channels</span></a> which makes the evaluation of the data much easier.</p>
+<p>For more detailed information about the underlying theories, see - add link to paper.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The current version of SOFA (1.0) only takes the approach part of the force distance curves into consederation. Therefore the retreat part of the force distance curves is neglected in the following.</p>
+</div>
+<section id="force-volume">
+<span id="id1"></span><h2>Force Volume<a class="headerlink" href="#force-volume" title="Permalink to this headline">#</a></h2>
+<p>A force volume is a set of m x n force distance curves, resulting from an AFM measurement. After the force distance curves of the force volume have been corrected the different channels can be calculated.</p>
+</section>
+<section id="force-distance-curve">
+<span id="id2"></span><h2>Force Distance Curve<a class="headerlink" href="#force-distance-curve" title="Permalink to this headline">#</a></h2>
+<figure class="align-default" id="id6">
+<img alt="image of the approach part of a force distance curve" src="_images/force_distance_curve.svg"/><figcaption>
+<p><span class="caption-text">Approach part of a corrected force distance curve with the different sections and points of interest.</span><a class="headerlink" href="#id6" title="Permalink to this image">#</a></p>
+</figcaption>
+</figure>
+<p>A force distance curve represents the force applied by the cantilever of the AFM probe on the sample surface as a function of the distance between the probe and the surface.</p>
+<section id="curve-sections">
+<span id="id3"></span><h3>Curve Sections<a class="headerlink" href="#curve-sections" title="Permalink to this headline">#</a></h3>
+<section id="zero-line">
+<h4>Zero Line<a class="headerlink" href="#zero-line" title="Permalink to this headline">#</a></h4>
+<p>The zeroline of a force distance curve represents the baseline level of the measured force when the AFM probe is positioned far away from the sample surface, beyond the range of any interaction forces. Therefore the measured force in this section is primarily due to noise or drift in the measurement system.</p>
+</section>
+<section id="attractive-area">
+<h4>Attractive Area<a class="headerlink" href="#attractive-area" title="Permalink to this headline">#</a></h4>
+<p>The attractive area of a force distance curve is the section where the probe and the sample are held together by van der Waals, electrostatic, or chemical interactions. In this region, the force decreases as the attractive forces become stronger as the probe is brought closer to the surface until the force reaches a minimum value. From this point on, the probe and sample are already so close that the attractive forces start to decrease again and the force thus increases.</p>
+</section>
+<section id="repulsive-regime">
+<h4>Repulsive Regime<a class="headerlink" href="#repulsive-regime" title="Permalink to this headline">#</a></h4>
+<p>The repulsive area of a force distance curve refers to the region of the curve where the probe and the sample surface are in contact and thus pushed apart by repulsive forces. They continue to approach each other until the maximum piezo value is reached. This region is characterized by an increase in the measured force, which is proportional to the strength of the repulsive forces.</p>
+</section>
+</section>
+<section id="points-of-interest">
+<span id="id4"></span><h3>Points of Interest<a class="headerlink" href="#points-of-interest" title="Permalink to this headline">#</a></h3>
+<section id="end-of-zeroline">
+<h4>End Of Zeroline<a class="headerlink" href="#end-of-zeroline" title="Permalink to this headline">#</a></h4>
+</section>
+<section id="jump-to-contact">
+<h4>Jump To Contact<a class="headerlink" href="#jump-to-contact" title="Permalink to this headline">#</a></h4>
+</section>
+<section id="point-of-contact">
+<h4>Point Of Contact<a class="headerlink" href="#point-of-contact" title="Permalink to this headline">#</a></h4>
+</section>
+</section>
+</section>
+<section id="measurement-erros">
+<span id="id5"></span><h2>Measurement Erros<a class="headerlink" href="#measurement-erros" title="Permalink to this headline">#</a></h2>
+<p>During the measurement each force distance curve</p>
+<section id="topography-offset">
+<h3>Topography Offset<a class="headerlink" href="#topography-offset" title="Permalink to this headline">#</a></h3>
+<p>The topography offset is a shift of the force distance curve in the piezo (x) axis. This error arises because</p>
+</section>
+<section id="virtual-deflection">
+<h3>Virtual Deflection<a class="headerlink" href="#virtual-deflection" title="Permalink to this headline">#</a></h3>
+<p>The virtual deflection is a shift of the force distance curve in force (y) axis. This error is caused by the fact that</p>
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="using_sofa.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Using SOFA</div>
+              </div>
+              <svg><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="index.html">
+              <svg><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Home</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2022, Schleiser Tim, Dorothee Silbernagl, Fritzsche Sven
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            <div class="icons">
+              <a class="muted-link " href="https://github.com/2Puck/sofa" aria-label="GitHub">
+                <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path>
+                </svg>
+            </a>
+              
+            </div>
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contents
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Atomic Force Spectroscopy</a><ul>
+<li><a class="reference internal" href="#force-volume">Force Volume</a></li>
+<li><a class="reference internal" href="#force-distance-curve">Force Distance Curve</a><ul>
+<li><a class="reference internal" href="#curve-sections">Curve Sections</a><ul>
+<li><a class="reference internal" href="#zero-line">Zero Line</a></li>
+<li><a class="reference internal" href="#attractive-area">Attractive Area</a></li>
+<li><a class="reference internal" href="#repulsive-regime">Repulsive Regime</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#points-of-interest">Points of Interest</a><ul>
+<li><a class="reference internal" href="#end-of-zeroline">End Of Zeroline</a></li>
+<li><a class="reference internal" href="#jump-to-contact">Jump To Contact</a></li>
+<li><a class="reference internal" href="#point-of-contact">Point Of Contact</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#measurement-erros">Measurement Erros</a><ul>
+<li><a class="reference internal" href="#topography-offset">Topography Offset</a></li>
+<li><a class="reference internal" href="#virtual-deflection">Virtual Deflection</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/scripts/furo.js"></script>
+    </body>
+</html>
