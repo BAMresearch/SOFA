@@ -34,13 +34,17 @@ The GUI of SOFA is written in Tkinter and uses the ttkbootstrap theme extension,
 Main Window  `source <https://github.com/2Puck/sofa/tree/development>`_
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The main window of SOFA contains ... . The widgets . The main window uses mostly the pack geometry manager. Only for complexer layouts like in the in ... frame the grid manager is used.  
+The main window of SOFA allows the user to import, process and export experimental force spectroscopy data. To improve the clarity of the window it is divided into smaller frames. The *Files* frame contains two buttons to open the :ref:`import <import window implementation>` and :ref:`export window <export window implementation>`. In the *Active Data* frame the imported force volumes can be switched using the drop-down menu and the name size and location of the active force volume. The plots . The different widgets in the frames are arranged with the pack geometry manager. 
+
+The widgets . The main window uses mostly the pack geometry manager. Only for complexer layouts like in the in ... frame the grid manager is used.  
 
 einzelne frames erklären
 wie sind plots in tkinter eingebunden
 gui interface ansprechen warum nachher attribute setzen
 interaktionsmöglichkeiten toolbars histogram buttons
 import and export window ansprechen
+
+.. _import window implementation:
 
 Import Window
 ~~~~~~~~~~~~~
@@ -50,6 +54,8 @@ The import window is a small subwindow to handle the import of measurement data.
 During the import process the selected measurement files are first imported and combined into one data dictionary with the selected import function of the :ref:`Import Data <import data implementation>` module. Afterwards the data dictionary is passed to the :ref:`GUI Interface <gui interface implementation>`, where a new force volume will be created. Finally the foldername, size and folderpath of the imported measurement data are set in the Active Data frame of the :ref:`Main Window <main window implementation>`.
 
 If an error occurs during the import process the user is informed via a message box and the import process is terminated. If the data could sucessfully be imported the window closes it self and informs the user via a message box.
+
+.. _export window implementation:
 
 Export Window
 ~~~~~~~~~~~~~
@@ -118,11 +124,6 @@ Force Distance Curve
 
 Channel
 ~~~~~~~
-
-
-
-Average Force Distance Curve
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 

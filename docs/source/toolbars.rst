@@ -17,9 +17,6 @@ Lineplot Toolbar
 - **Reset Zoom** - Reset the zoom.
 - **Select Sinlge Curve** - Toggle the curve selection mode, to disable or activate single curves by click.
 - **Select Visible Curves** - Disable all curves that have a datapoint within the current view.
-- **Display Average Curve** - Calculate and display the average of the currently active curves.
-- **Toggle Errorbar** - Display or hide the standard deviation of the average curve.
-- **Toggle Inactive Curves** - Show or hide the currently inactive curves.
 
 .. _heatmap toolbar:
 

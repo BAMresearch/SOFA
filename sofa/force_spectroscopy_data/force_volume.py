@@ -19,8 +19,8 @@ import numpy as np
 
 import data_processing.named_tuples as nt
 from data_processing.calculate_channel_data import calculate_channel_data
+from data_processing.calculate_average import calculate_average
 from force_spectroscopy_data.force_distance_curve import ForceDistanceCurve
-from force_spectroscopy_data.average_force_distance_curve import AverageForceDistanceCurve
 from force_spectroscopy_data.channel import Channel
 
 class ForceVolume():
@@ -41,7 +41,7 @@ class ForceVolume():
 		Every force distance curve of the force volume.
 	channels : dict[Channel]
 		All calculated and possibly imported channels.
-	averageForceDistanceCurve : AverageForceDistanceCurve
+	average : nt.
 		The average data of the currently active force 
 		distance curves.
 	"""
@@ -63,7 +63,7 @@ class ForceVolume():
 		self.imageData: Dict = {}
 		self.forceDistanceCurves: List[ForceDistanceCurve] = []
 		self.channels: Dict[Channel] = {}
-		self.averageForceDistanceCurve: AverageForceDistanceCurve
+		self.average: nt.AverageForceDistanceCurve
 
 		# Set optional data if imported.
 		if "imageData" in importedData:
@@ -172,12 +172,21 @@ class ForceVolume():
 				data=channelData
 			)
 
-	def calculate_average_data(self) -> None:
+	def calculate_average(
+		self,
+		inactiveDataPoints: List[int]
+	) -> None:
 		"""
 		Calculate the average from the currently active 
 		force distance curves.
 		"""
-		pass
+		activeForceDistanceCurves = self.get_active_force_distance_curves_data(
+			inactiveDataPoints
+		)
+
+		self.average = calculate_average(
+			activeForceDistanceCurves
+		)
 
 	def get_force_distance_curves_data(
 		self
@@ -194,6 +203,22 @@ class ForceVolume():
 			for forceDistanceCurve
 			in self.forceDistanceCurves
 			if forceDistanceCurve.couldBeCorrected
+		]
+
+	def get_active_force_distance_curves_data(
+		self,
+		inactiveDataPoints: List[int]
+	) -> List:
+		"""
+		"""
+		return [
+			forceDistanceCurve.dataApproachCorrected
+			for index, forceDistanceCurve
+			in enumerate(self.forceDistanceCurves)
+			if (
+				forceDistanceCurve.couldBeCorrected and
+				index not in inactiveDataPoints
+			)
 		]
 
 	def get_active_heatmap_data(

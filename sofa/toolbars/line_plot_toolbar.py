@@ -18,9 +18,11 @@ import os
 import functools
 from typing import List, Tuple, Optional
 
+import matplotlib as mpl
 import numpy as np 
 
 from toolbars.sofa_toolbar import SofaToolbar
+import data_processing.named_tuples as nt
 
 def decorator_check_zoom_history_empty(function):
 	"""
@@ -85,10 +87,7 @@ class LinePlotToolbar(SofaToolbar):
 			("zoom_out", "", os.path.join(iconPath, "zoom_out.gif"), "_zoom_out"),
 			("reset_zoom", "", os.path.join(iconPath, "zoom_reset.gif"), "_reset_zoom"),
 			("pick_single", "", os.path.join(iconPath, "pick_one.gif"), "_toggle_pick_single_line"),
-			("pick_multiple", "", os.path.join(iconPath, "pick_all.gif"), "_pick_multiple_lines"),
-			("show_inactive", "", os.path.join(iconPath, "pick_all.gif"), "_show_inactive"),
-			("display_average", "", os.path.join(iconPath, "average.gif"), "_display_average"),
-			("display_errorbar", "", os.path.join(iconPath, "errorbar.gif"), "_display_as_errorbar")
+			("pick_multiple", "", os.path.join(iconPath, "pick_all.gif"), "_pick_multiple_lines")
 		)
 		self.guiInterface = guiInterface
 
@@ -136,7 +135,7 @@ class LinePlotToolbar(SofaToolbar):
 
 	def _start_zoom_motion(
 		self, 
-		event: matplotlib.backend_bases.MouseEvent
+		event: mpl.backend_bases.MouseEvent
 	) -> None:
 		"""
 		Buffer the starting point for zooming, if it 
@@ -144,7 +143,7 @@ class LinePlotToolbar(SofaToolbar):
 
 		Parameters
 		----------
-		event : matplotlib.backend_bases.MouseEvent
+		event : mpl.backend_bases.MouseEvent
 			button_press_event triggers when the 
 			mouse button is pressed.
 		"""
@@ -158,7 +157,7 @@ class LinePlotToolbar(SofaToolbar):
 	@decorator_check_zoom_valid
 	def _end_zoom_motion(
 		self, 
-		event: matplotlib.backend_bases.MouseEvent
+		event: mpl.backend_bases.MouseEvent
 	) -> None:
 		"""
 		Zoom to the spanned rectangle, if it is
@@ -166,7 +165,7 @@ class LinePlotToolbar(SofaToolbar):
 
 		Parameters
 		----------
-		event : matplotlib.backend_bases.MouseEvent
+		event : mpl.backend_bases.MouseEvent
 			button_release_event triggers when the 
 			mouse button is released.
 		"""
@@ -226,7 +225,7 @@ class LinePlotToolbar(SofaToolbar):
 		)
 
 	@staticmethod
-	def _standardize_value_pair(firstValue, secondValue) -> Tuple[]:
+	def _standardize_value_pair(firstValue, secondValue) -> Tuple[float]:
 		"""
 		"""
 		if firstValue > secondValue:
@@ -258,14 +257,14 @@ class LinePlotToolbar(SofaToolbar):
 	
 	def _pick_single_line(
 		self, 
-		event: matplotlib.backend_bases.PickEvent
+		event: mpl.backend_bases.PickEvent
 	) -> None:
 		"""
 		Click a curve to toggle it's state.
 
 		Parameters
 		----------
-		event : matplotlib.backend_bases.PickEvent
+		event : mpl.backend_bases.PickEvent
 			pick_event triggers when a line is
 			selected.
 		"""
@@ -343,9 +342,9 @@ class LinePlotToolbar(SofaToolbar):
 			Line representation of the curve that is toggled.
 		"""
 		if line.get_color() == "gray":
-			self.guiInterface.remove_inactive_data_points.(int(line._label))
+			self.guiInterface.remove_inactive_data_points(int(line._label))
 		elif line.get_color() == "red":
-			self.guiInterface.add_inactive_data_points.(int(line._label))
+			self.guiInterface.add_inactive_data_points(int(line._label))
 
 	def _deactivate_curve(
 		self, 
@@ -360,25 +359,4 @@ class LinePlotToolbar(SofaToolbar):
 			Line representation of the curve that is deactivated.
 		"""
 		if line.get_color() == "red":
-			self.guiInterface.add_inactive_data_points.(int(line._label))
-
-	def _show_inactive(self) -> None:
-		"""
-		Toggle the option to show only active curves.
-		"""
-		self.guiInterface.toggle_plot_inactive()
-		self.guiInterface.update_line_plot()
-
-	def _display_average(self) -> None:
-		"""
-		Toggle the presentation of the average curve.
-		"""
-		self.guiInterface.toggle_plot_average()
-		self.guiInterface.update_line_plot()
-
-	def _display_as_errorbar(self) -> None:
-		"""
-		Toggle the presentation of the average as errorbar.
-		"""
-		self.guiInterface.toggle_plot_errorbar()
-		self.guiInterface.update_line_plot()
+			self.guiInterface.add_inactive_data_points(int(line._label))

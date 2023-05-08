@@ -19,6 +19,7 @@ import functools
 import data_processing.named_tuples as nt
 import data_visualization.plot_data as plt_data
 from force_spectroscopy_data.force_volume import ForceVolume
+from interfaces.plot_interface import PlotInterface
 
 def decorator_get_active_force_volume(function):
 	"""Get current selected force volume."""
@@ -57,7 +58,7 @@ class GUIInterface():
 	forceVolumes : Dict[ForceVolume]
 		Set of every imported force volume.
 	keyActiveForceVolume : ttk.StringVar
-		Name of active force volume.
+		Variable that stores the name of active force volume.
 	linePlotParameters : nt.LinePlotParameters
 		
 	heatmapParameters : nt.HeatmapParameters
@@ -70,7 +71,7 @@ class GUIInterface():
 		Initialize a blank interface. The attributes can only be 
 		set after 
 		"""
-		self.forceVolumes: Dict[ForceVolume] = {}
+		self.forceVolumes: Dict = {}
 		self.keyActiveForceVolume: ttk.StringVar
 		self.linePlotParameters: nt.LinePlotParameters 
 		self.heatmapParameters: nt.HeatmapParameters
@@ -90,16 +91,14 @@ class GUIInterface():
 		self.linePlotParameters = nt.LinePlotParameters(
 			linked=guiParameters["linkedLinePlot"],
 			holder=guiParameters["holderLinePlot"],
-			plotInactive=False,
-			plotAverage=False,
-			plotErrorbar=False
+			plotInactive=guiParameters["displayInactiveCurves"],
+			plotAverage=guiParameters["displayAverage"],
+			plotErrorbar=guiParameters["displayErrorbar"]
 		)
 		self.heatmapParameters = nt.HeatmapParameters(
 			linked=guiParameters["linkedHeatmap"],
 			holder=guiParameters["holderHeatmap"],
-			activeChannel=guiParameters["activeChannelHeatmap"],
-			selectedArea=[],
-			orientationIndices=[]
+			activeChannel=guiParameters["activeChannelHeatmap"]
 		)
 		self.histogramParameters = nt.HistogramParameters(
 			linked=guiParameters["linkedHistogram"],
@@ -118,9 +117,15 @@ class GUIInterface():
 		importedData : Dict
 		"""
 		forceVolume = ForceVolume(importedData)
+		plotInterface = PlotInterface(forceVolume.size)
+
+		extendForceVolume = nt.ExtendForceVolume(
+			forceVolume,
+			plotInterface
+		)
 
 		self.keyActiveForceVolume.set(forceVolume.name)
-		self.forceVolumes[forceVolume.name] = forceVolume
+		self.forceVolumes[forceVolume.name] = extendForceVolume
 
 		self.plot_active_force_volume()
 
@@ -132,37 +137,6 @@ class GUIInterface():
 		self._plot_line_plot()
 		self.plot_heatmap()
 		self.plot_histogram()
-
-	def update_active_force_volume_plots(self) -> None: 
-		"""
-		"""
-		self.update_line_plot()
-		self.plot_heatmap()
-		self.plot_histogram()
-
-	def update_inactive_data_points_line_plot(self) -> None:
-		"""
-		"""
-		if self.linePlotParameters.linked.get():
-			self.update_active_force_volume_plots()
-		else:
-			self.update_line_plot()
-
-	def update_inactive_data_points_heatmap(self) -> None:
-		"""
-		"""
-		if self.heatmapParameters.linked.get():
-			self.update_active_force_volume_plots()
-		else:
-			self.plot_heatmap()
-
-	def update_inactive_data_points_histogram(self) -> None:
-		"""
-		"""
-		if self.histogramParameters.linked.get():
-			self.update_active_force_volume_plots()
-		else:
-			self.plot_histogram()
 		
 	@decorator_get_active_force_volume
 	def _plot_line_plot(
@@ -211,6 +185,37 @@ class GUIInterface():
 			self.histogramParameters.zoom
 		)
 
+	def update_active_force_volume_plots(self) -> None: 
+		"""
+		"""
+		self.update_line_plot()
+		self.plot_heatmap()
+		self.plot_histogram()
+
+	def update_inactive_data_points_line_plot(self) -> None:
+		"""
+		"""
+		if self.linePlotParameters.linked.get():
+			self.update_active_force_volume_plots()
+		else:
+			self.update_line_plot()
+
+	def update_inactive_data_points_heatmap(self) -> None:
+		"""
+		"""
+		if self.heatmapParameters.linked.get():
+			self.update_active_force_volume_plots()
+		else:
+			self.plot_heatmap()
+
+	def update_inactive_data_points_histogram(self) -> None:
+		"""
+		"""
+		if self.histogramParameters.linked.get():
+			self.update_active_force_volume_plots()
+		else:
+			self.plot_histogram()
+
 	@decorator_get_active_force_volume
 	def update_line_plot(
 		self,
@@ -222,10 +227,10 @@ class GUIInterface():
 			self.linePlotParameters.holder,
 			activeForceVolume.get_force_distance_curves_lines(),
 			activeForceVolume.inactiveDataPoints,
-			self.linePlotParameters.showInactive
+			self.linePlotParameters.showInactive.get()
 		)
 
-		if self.linePlotParameters.plotAverage:
+		if self.linePlotParameters.plotAverage.get():
 			self.update_line_plot_average(
 				activeForceVolume
 			)
@@ -240,7 +245,7 @@ class GUIInterface():
 		# Check if any points are still active
 		# Calculate average
 
-		if self.linePlotParameters.plotErrorbar:
+		if self.linePlotParameters.plotErrorbar.get():
 			plt.add_errorbar_to_line_plot(
 
 			)
@@ -259,19 +264,3 @@ class GUIInterface():
 
 		"""
 		return self.forceVolumes[self.keyActiveForceVolume.get()]
-
-	def toggle_plot_inactive(self) -> None: 
-		"""
-		"""
-		self.linePlotParameters.plotInactive = not self.linePlotParameters.plotInactive
-
-	def toggle_plot_average(self) -> None: 
-		"""
-		"""
-		self.linePlotParameters.plotAverage = not self.linePlotParameters.plotAverage
-
-	def toggle_plot_errorbar(self) -> None: 
-		"""
-		"""
-		if self.linePlotParameters.plotAverage:
-			self.linePlotParameters.plotErrorbar = not self.linePlotParameters.plotErrorbar

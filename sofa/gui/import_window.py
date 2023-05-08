@@ -307,7 +307,7 @@ class ImportWindow(ttk.Frame):
 
 		try:
 			importedData = selected_import_function(
-				selectedImportParameters,
+				selectedImportParameters
 			)
 		except ce.ImportError as e:
 			self._stop_progressbar()

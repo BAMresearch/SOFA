@@ -15,6 +15,8 @@ along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 """
 from typing import List, Dict, Tuple
 
+import numpy as np
+
 class PlotInterface():
 	"""
 
@@ -29,10 +31,10 @@ class PlotInterface():
 
 	histogramBins : 
 	"""
-	def __init__(self) -> None:
+	def __init__(self, size) -> None:
 		"""
 		"""
-		self.size = 
+		self.size. Tuple[int] = size
 		self.inactiveDataPoints: List = []
 
 		self.linePlotForceDistanceLines: List = []
@@ -42,12 +44,10 @@ class PlotInterface():
 		self.heatmapOrientationMatrix: np.ndarray = self._create_heatmap_orientation_matrix()
 		self.heatmapSelectedArea: List = []  
 
-		self.histogramBins: 
+		self.histogramBins: List = []
 
 	def _create_heatmap_orientation_matrix(self) -> np.ndarray:
 		"""
 		"""
 		return np.arange(self.size[0] * self.size[1]).reshape(self.size)
-
-	def 
 

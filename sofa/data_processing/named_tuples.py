@@ -34,8 +34,6 @@ class HeatmapParameters(NamedTuple):
 	linked: tk.BooleanVar
 	holder: FigureCanvasTkAgg
 	activeChannel: tk.StringVar
-	selectedArea: List[mpl.lines.Line2D]
-	orientationIndices: List[int]
 
 class HistogramParameters(NamedTuple):  
 	linked: tk.BooleanVar
@@ -43,6 +41,10 @@ class HistogramParameters(NamedTuple):
 	activeChannel: tk.StringVar
 	zoom: tk.BooleanVar
 	numberOfBins: ttk.Entry
+
+class ExtendedForceVolume(NamedTuple):
+	forceVolume: int
+	plotInterface: int 
 
 # FDC data
 class ForceDistanceCurve(NamedTuple): 
@@ -62,6 +64,9 @@ class ChannelMetadata(NamedTuple):
 	endOfZeroline: ForceDistancePoint
 	pointOfContact: ForceDistancePoint
 	coefficientsFitApproachCurve: CoefficientsFitApproachCurve
+
+class AverageForceDistanceCurve(NamedTuple):
+	standardDeviation: ndarray
 
 class NormedCurves(NamedTuple):
 	piezoApproach: ndarray

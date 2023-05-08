@@ -168,43 +168,43 @@ class MainWindow(ttk.Frame):
 			command=self._update_force_volume,
 			bootstyle=""
 		)
-		dropdownForceVolume.grid(row=0, column=0, padx=10, sticky=W)
+		dropdownForceVolume.grid(row=0, column=2, padx=10, sticky=E)
 
 		labelActiveData = ttk.Label(
 			frameActiveData, 
 			text="Name:"
 		)
-		labelActiveData.grid(row=1, column=0, padx=10, sticky=W)
+		labelActiveData.grid(row=0, column=0, padx=10, sticky=W)
 
 		valueActiveData = ttk.Label(
 			frameActiveData,
 			textvariable=self.stringVarActiveData
 		)
-		valueActiveData.grid(row=1, column=1, padx=10, sticky=W)
+		valueActiveData.grid(row=0, column=1, padx=10, sticky=W)
 
 		labelActiveDataSize = ttk.Label(
 			frameActiveData, 
 			text="Size:"
 		)
-		labelActiveDataSize.grid(row=2, column=0, padx=10, sticky=W)
+		labelActiveDataSize.grid(row=1, column=0, padx=10, sticky=W)
 
 		valueActiveDataSize = ttk.Label(
 			frameActiveData,
 			textvariable=self.stringVarActiveDataSize
 		)
-		valueActiveDataSize.grid(row=2, column=1, padx=10, sticky=W)
+		valueActiveDataSize.grid(row=1, column=1, padx=10, sticky=W)
 
 		labelActiveDataLocation = ttk.Label(
 			frameActiveData, 
 			text="Location:"
 		)
-		labelActiveDataLocation.grid(row=3, column=0, padx=10, sticky=W)
+		labelActiveDataLocation.grid(row=2, column=0, padx=10, sticky=W)
 
 		valueActiveDataLocation = ttk.Label(
 			frameActiveData,
 			textvariable=self.stringVarActiveDataLocation
 		)
-		valueActiveDataLocation.grid(row=3, column=1, padx=10, sticky=W)
+		valueActiveDataLocation.grid(row=2, column=1, padx=10, sticky=W)
 
 	def _create_frame_linked_plots(
 		self, 
@@ -304,8 +304,29 @@ class MainWindow(ttk.Frame):
 		frameLinePlot = ttk.Labelframe(frameParent, text="Line Plot", padding=10)
 		frameLinePlot.pack(side=LEFT, fill=BOTH, expand=YES, padx=(0, 15))
 
-		labelEmpty = ttk.Label(frameLinePlot, text="")
-		labelEmpty.grid(row=0, column=0, pady=15)
+		self.displayAverage = tk.BooleanVar(self, value=False)
+		checkbuttonZoom = ttk.Checkbutton(
+			frameLinePlot, 
+			text="Display Average", 
+			variable=self.displayAverage,
+			bootstyle="round-toggle")
+		checkbuttonZoom.grid(row=0, column=0, padx=5, pady=15, sticky=W)
+
+		self.displayErrorbar = tk.BooleanVar(self, value=False)
+		checkbuttonZoom = ttk.Checkbutton(
+			frameLinePlot, 
+			text="Display Errorbar", 
+			variable=self.displayErrorbar,
+			bootstyle="round-toggle")
+		checkbuttonZoom.grid(row=0, column=1, padx=5)
+
+		self.displayInactiveCurves = tk.BooleanVar(self, value=False)
+		checkbuttonZoom = ttk.Checkbutton(
+			frameLinePlot, 
+			text="Display Inactive Curves", 
+			variable=self.displayInactiveCurves,
+			bootstyle="round-toggle")
+		checkbuttonZoom.grid(row=0, column=2, padx=5, sticky=E)
 
 		figureLineplot = Figure(figsize=(6, 4.8), facecolor=self.colorPlot)
 		self.holderFigureLineplot = FigureCanvasTkAgg(figureLineplot, frameLinePlot)
@@ -314,8 +335,8 @@ class MainWindow(ttk.Frame):
 			self.holderFigureLineplot, frameToolbarLineplot, 
 			self.guiInterface
 		)
-		self.holderFigureLineplot.get_tk_widget().grid(row=1, column=0)
-		frameToolbarLineplot.grid(row=2, column=0)
+		self.holderFigureLineplot.get_tk_widget().grid(row=1, column=0, columnspan=3)
+		frameToolbarLineplot.grid(row=2, column=0, columnspan=3)
 
 	def _create_heatmap_frame(
 		self, 
@@ -454,6 +475,9 @@ class MainWindow(ttk.Frame):
 			"keyActiveForceVolume": self.activeForceVolume,
 			"holderLinePlot": self.holderFigureLineplot,
 			"linkedLinePlot": self.interactiveLinePlot,
+			"displayAverage": self.displayAverage,
+			"displayErrorbar": self.displayErrorbar,
+			"displayInactiveCurves": self.displayInactiveCurves,
 			"holderHeatmap": self.holderFigureHeatmap,
 			"activeChannelHeatmap": self.heatmapChannel,
 			"linkedHeatmap": self.interactiveHeatmap,
@@ -464,17 +488,6 @@ class MainWindow(ttk.Frame):
 			"numberOfBins": self.numberOfBins
 		}
 		self.guiInterface.set_gui_parameters(guiParameters)
-
-	def _create_import_window(self) -> None:
-		"""
-		Create a subwindow to import data.
-		"""
-		toplevelImport = ttk.Toplevel("Import Data")
-		ImportWindow(
-			toplevelImport,
-			self.guiInterface, 
-			self.set_data_active_force_volume
-		)
 
 	def set_data_active_force_volume(
 		self,
@@ -498,6 +511,17 @@ class MainWindow(ttk.Frame):
 		self.stringVarActiveData.set(name)
 		self.stringVarActiveDataSize.set(str(size))
 		self.stringVarActiveDataLocation.set(location)
+
+	def _create_import_window(self) -> None:
+		"""
+		Create a subwindow to import data.
+		"""
+		toplevelImport = ttk.Toplevel("Import Data")
+		ImportWindow(
+			toplevelImport,
+			self.guiInterface, 
+			self.set_data_active_force_volume
+		)
 
 	def _create_export_window(self) -> None:
 		"""

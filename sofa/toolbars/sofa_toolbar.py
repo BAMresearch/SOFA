@@ -13,7 +13,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 """
+from typing import List, Optional
 
+#import matplotlib as mpl
 from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk
 from matplotlib.backend_bases import NavigationToolbar2
 import tkinter as tk
