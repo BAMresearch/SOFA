@@ -336,9 +336,10 @@ class ImportWindow(ttk.Frame):
 		Returns
 		-------
 		importParameter : nt.ImportParameter
-			Contains the selected import parameters and opotions.
+			Bundels the selected import parameters and opotions.
 		"""
 		return nt.ImportParameter(
+			dataFormat=self.selectedDataType.get(),
 			filePathData=self.filePathData.get(),
 			filePathImage=self.filePathImage.get(),
 			filePathChannel=self.filePathChannel.get(),

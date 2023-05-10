@@ -76,6 +76,7 @@ class NormedCurves(NamedTuple):
 
 # Data import
 class ImportParameter(NamedTuple):
+	dataFormat: str
 	folderPathMeasurementData: str 
 	filePathImage: str 
 	filePathChannel: str 
