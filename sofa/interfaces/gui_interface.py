@@ -13,7 +13,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 """
-from typing import Dict
+from typing import Dict, List
 import functools
 
 import data_processing.named_tuples as nt
@@ -352,6 +352,15 @@ class GUIInterface():
 		activePlotInterface.reset_inactive_data_points()
 
 	@decorator_get_active_plot_interface
+	def reset_heatmap_orientation_matrix(
+		self,
+		activePlotInterface: PlotInterface
+	) -> None:
+		"""
+		"""
+		activePlotInterface._create_heatmap_orientation_matrix()
+
+	@decorator_get_active_plot_interface
 	def add_inactive_data_point(
 		self,
 		activePlotInterface: PlotInterface,
@@ -370,3 +379,67 @@ class GUIInterface():
 		"""
 		"""
 		activePlotInterface.remove_inactive_data_point(inactiveDataPoint)
+
+	@decorator_get_active_plot_interface
+	def add_inactive_data_points(
+		self,
+		activePlotInterface: PlotInterface,
+		inactiveDataPoints: List[int]
+	) -> None:
+		"""
+		"""
+		activePlotInterface.add_inactive_data_points(inactiveDataPoints)
+
+	@decorator_get_active_plot_interface
+	def flip_heatmap_orientation_matrix_horizontal(
+		self,
+		activePlotInterface: PlotInterface,
+	) -> None:
+		"""
+		"""
+		activePlotInterface.flip_heatmap_orientation_matrix_horizontal()
+
+	@decorator_get_active_plot_interface
+	def flip_heatmap_orientation_matrix_vertical(
+		self,
+		activePlotInterface: PlotInterface,
+	) -> None:
+		"""
+		"""
+		activePlotInterface.flip_heatmap_orientation_matrix_vertical()
+
+	@decorator_get_active_plot_interface
+	def rotate_heatmap_orientation_matrix(
+		self,
+		activePlotInterface: PlotInterface,
+	) -> None:
+		"""
+		"""
+		activePlotInterface.rotate_heatmap_orientation_matrix()
+
+	@decorator_get_active_force_volume
+	def flip_channel_horizontal(
+		self,
+		activeForceVolume: ForceVolume
+	) -> None:
+		"""
+		"""
+		activeForceVolume.flip_channel_horizontal()
+
+	@decorator_get_active_force_volume
+	def flip_channel_vertical(
+		self,
+		activeForceVolume: ForceVolume
+	) -> None:
+		"""
+		"""
+		activeForceVolume.flip_channel_vertical()
+
+	@decorator_get_active_force_volume
+	def rotate_channel(
+		self,
+		activeForceVolume: ForceVolume
+	) -> None:
+		"""
+		"""
+		activeForceVolume.rotate_channel()

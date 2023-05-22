@@ -253,3 +253,21 @@ class ForceVolume():
 		return self.channels[activeChannel].get_active_histogram_data(
 			inactiveDataPoints
 		)
+
+	def flip_channel_horizontal(self) -> None: 
+		"""
+		"""
+		for channel in self.channels.values():
+			channel.flip_channel_horizontal()
+
+	def flip_channel_vertical(self) -> None: 
+		"""
+		"""
+		for channel in self.channels.values():
+			channel.flip_channel_vertical()
+
+	def rotate_channel(self) -> None: 
+		"""
+		"""
+		for channel in self.channels.values():
+			channel.rotate_channel()

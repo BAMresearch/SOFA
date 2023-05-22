@@ -94,7 +94,7 @@ class Channel():
 		flatHeatmapData = self.data.copy().flatten()
 		mappedInactiveDataPoints = self._map_heatmap_orientation_to_inactive_datapoints(
 			inactiveDataPoints,
-			heatmapOrientationMatrix
+			heatmapOrientationMatrix.flatten()
 		)
 		np.put(
 			flatHeatmapData, 
@@ -192,3 +192,18 @@ class Channel():
 			Channel values with no nan values.
 		"""
 		return channelData[np.isfinite(channelData)]
+
+	def flip_channel_horizontal(self) -> None: 
+		"""
+		"""
+		self.data = np.flip(self.data, 0)
+
+	def flip_channel_vertical(self) -> None: 
+		"""
+		"""
+		self.data = np.flip(self.data, 1)
+
+	def rotate_channel(self) -> None: 
+		"""
+		"""
+		self.data = np.rot90(self.data)

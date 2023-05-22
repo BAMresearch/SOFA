@@ -15,11 +15,23 @@ along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
+import functools
 from typing import List, Tuple, Optional
 
 import numpy as np 
 
 from toolbars.sofa_toolbar import SofaToolbar
+
+def decorator_check_selected_area(function):
+	"""
+	Check if the zoom history is not empty.
+	"""
+	@functools.wraps(function)
+	def wrapper_check_selected_area(self):
+		if len(self.selectedArea) != 0:
+			function(self)
+
+	return wrapper_check_selected_area
 
 class HeatmapToolbar(SofaToolbar):
 	"""
@@ -55,30 +67,35 @@ class HeatmapToolbar(SofaToolbar):
 		)	
 		self.guiInterface = guiInterface
 		self.selectedArea = []
+		self.selectedAreaBorders = []
 
 		super().__init__(canvas_, parent_, toolItems)
 
 	def _reset_heatmap(self) -> None:
-		"""Reset the selected area, the orientation 
-		   and the inactive data points."""
+		"""
+		Reset the selected area, the orientation 
+		and the inactive data points.
+		"""
 		self.selectedArea = []
 		self._delete_selected_area_lines()
 
-		self.dataHandler.init_mapped_indices()
-		self.dataHandler.reset_channel_data()
+		self.guiInterface.reset_inactive_data_points()
+		self.guiInterface.reset_heatmap_orientation_matrix()
 
-		self.dataHandler.inactiveDataPoints = []
-
-		self._check_interactive_plot()
+		self.guiInterface.update_inactive_data_points_heatmap()
 		
 	def _toggle_select_area(self) -> None:
-		"""Toggle the selector to select an area."""
+		"""
+		Toggle the selector to select an area.
+		"""
 		self._update_toolbar_mode("select area")
 		self._update_event_connections()
 		self._update_toolbar_buttons()
 
 	def _select_area_on_click(self, event) -> None:
-		"""Prepare to capture the mouse motion."""
+		"""
+		Prepare to capture the mouse motion.
+		"""
 		self.selectedArea = []
 	   
 		self.eventConnections.append(
@@ -89,8 +106,10 @@ class HeatmapToolbar(SofaToolbar):
 		)
 
 	def _select_area_motion(self, event) -> None:
-		"""Capture and store the data of the mouse, 
-		   while moving over the heatmap."""
+		"""
+		Capture and store the data of the mouse, 
+		while moving over the heatmap.
+		"""
 		if event.xdata and event.ydata:
 			self.selectedArea.append(
 				(
@@ -100,7 +119,9 @@ class HeatmapToolbar(SofaToolbar):
 			)
 
 	def _select_area_on_release(self, event) -> None:
-		"""Mark the selected area in the heatmap."""
+		"""
+		Mark the selected area in the heatmap.
+		"""
 		# Stop capaturing mouse movement.
 		self.holder.figure.canvas.mpl_disconnect(
 			self.eventConnections[-1]
@@ -120,15 +141,15 @@ class HeatmapToolbar(SofaToolbar):
 		for i, section in enumerate(self.selectedArea):
 			self._orbit_area(section, i)
 		
-		self._delete_equal_lines(
-			self.dataHandler.heatmapParameters["selectedArea"]
-		)
+		self._delete_equal_lines()
 	
 		self.holder.draw()
 
-	def _delete_equal_lines(self, selectedAreaLines: List) -> None:
-		"""Find all lines that exist more than once and delete them."""
-		lineData = [line.get_xydata() for line in selectedAreaLines]
+	def _delete_equal_lines(self) -> None:
+		"""
+		Find all lines that exist more than once and delete them.
+		"""
+		lineData = [line.get_xydata() for line in self.selectedAreaBorders]
 		
 		uniqueValues, count = np.unique(
 			lineData, axis=0, return_counts=True
@@ -136,26 +157,30 @@ class HeatmapToolbar(SofaToolbar):
 		doubledValues = uniqueValues[np.where(count > 1)]
 		doubledIndices = []
 
-		for i, line in enumerate(selectedAreaLines):
+		for i, line in enumerate(self.selectedAreaBorders):
 			for value in doubledValues:
 				if np.array_equal(line.get_xydata(), value):
 					line.remove()
 					doubledIndices.append(i)
 
-		self.dataHandler.heatmapParameters["selectedArea"] = [
+		self.selectedAreaBorders = [
 			line
-			for index, line in enumerate(selectedAreaLines) 
+			for index, line in enumerate(self.selectedAreaBorders) 
 			if index not in doubledIndices
 		]
 
 	def _toggle_select_rect(self) -> None:
-		"""Toggle the selector to select a rectangle."""
+		"""
+		Toggle the selector to select a rectangle.
+		"""
 		self._update_toolbar_mode("select rect")
 		self._update_event_connections()
 		self._update_toolbar_buttons()
 
 	def _select_rect_on_click(self, event) -> None:
-		"""Store startingpoint of the rectangle, if existing."""
+		"""
+		Store startingpoint of the rectangle, if existing.
+		"""
 		self.selectedArea = []
 		self.xStart = self.yStart = np.nan
 	   
@@ -164,7 +189,9 @@ class HeatmapToolbar(SofaToolbar):
 			self.yStart = event.ydata
 
 	def _select_rect_on_release(self, event) -> None:
-		"""Mark the selected rectangle in the heatmap."""
+		"""
+		Mark the selected rectangle in the heatmap.
+		"""
 		if np.isfinite(self.xStart) and event.xdata:
 			self._delete_selected_area_lines()
 			
@@ -197,16 +224,24 @@ class HeatmapToolbar(SofaToolbar):
 		yStart: int, 
 		yEnd: int
 	) -> List[List[int]]:
-		"""Spans a rectangle between a start and end point. 
+		"""
+		Spans a rectangle between a start and end point. 
 
-		Parameters:
-			xStart(int): X value of the start point.
-			xEnd(int): X value of the end point.
-			yStart(int): Y value of the start point.
-			yEnd(int): Y value of the end point.
+		Parameters
+		----------
+		xStart : int 
+			X value of the start point.
+		xEnd : int
+			X value of the end point.
+		yStart : int
+			Y value of the start point.
+		yEnd : int
+			Y value of the end point.
 
-		Returns: 
-			selectedArea(list): A list of all points within the rectangle.
+		Returns
+		-------
+		selectedArea : list
+			A list of all points within the rectangle.
 		"""
 		return [
 			[i, j] 
@@ -214,12 +249,12 @@ class HeatmapToolbar(SofaToolbar):
 			for j in range(yStart, yEnd)
 		]
 
+	@decorator_check_selected_area
 	def _include_area(self) -> None:
-		"""Add everything except the selected area to the inactive data points."""
-		if len(self.selectedArea) == 0:
-			return
-
-		m, n = np.shape(self.dataHandler._get_heatmap_data())
+		"""
+		Add everything except the selected area to the inactive data points.
+		"""
+		m, n = self.guiInterface._get_active_force_volume().size
 		# Map new inactive points in a two dimensional array to their corresponding points in a one dimensional array.
 		newInactiveDataPoints = [
 			i 
@@ -231,75 +266,84 @@ class HeatmapToolbar(SofaToolbar):
 		self.selectedArea = []
 		self._delete_selected_area_lines()	
 		
-		self.dataHandler.add_inactive_data_points(newInactiveDataPoints)
+		self.guiInterface.add_inactive_data_points(newInactiveDataPoints)
 
-		self._check_interactive_plot()
+		self.guiInterface.update_inactive_data_points_heatmap()
 
+	@decorator_check_selected_area
 	def _exclude_area(self) -> None:
-		"""Add the selected area to the inactive data points."""
-		if len(self.selectedArea) == 0:
-			return
-
-		m, n = np.shape(self.dataHandler._get_heatmap_data()) 
+		"""
+		Add the selected area to the inactive data points.
+		"""
+		m, n = self.guiInterface._get_active_force_volume().size 
 		# Map new inactive points in a two dimensional array to their corresponding points in a one dimensional array.
 		newInactiveDataPoints = [dataPoint[1] * n + dataPoint[0] for dataPoint in self.selectedArea]
 	
 		self.selectedArea = []
 		self._delete_selected_area_lines()	
 		
-		self.dataHandler.add_inactive_data_points(newInactiveDataPoints)
+		self.guiInterface.add_inactive_data_points(newInactiveDataPoints)
 
-		self._check_interactive_plot()
+		self.guiInterface.update_inactive_data_points_heatmap()
 
 	def _flip_heatmap_h(self) -> None:
-		"""Flip every heatmap horizontal."""
-		for line in self.dataHandler.heatmapParameters["selectedArea"]:
+		"""
+		Flip every heatmap horizontal.
+		"""
+		for line in self.selectedAreaBorders:
 			self._flip_line_h(line)
 
 		self._flip_area_h()
-		self.dataHandler.heatmapParameters["mappedIndices"] = np.flip(self.dataHandler.heatmapParameters["mappedIndices"], 0)
+		self.guiInterface.flip_heatmap_orientation_matrix_horizontal()
 		
 		for channel in self.dataHandler.channelData.values():
 			channel["data"] = np.flip(
 				channel["data"], 0
 			)
-		self.dataHandler.plot_heatmap()
+		self.guiInterface.plot_heatmap()
 
 	def _flip_heatmap_v(self) -> None: 
-		"""Flip every heatmap vertical."""
-		for line in self.dataHandler.heatmapParameters["selectedArea"]:
+		"""
+		Flip every heatmap vertical.
+		"""
+		for line in self.selectedAreaBorders:
 			self._flip_line_v(line)
 
 		self._flip_area_v()
-		self.dataHandler.heatmapParameters["mappedIndices"] = np.flip(self.dataHandler.heatmapParameters["mappedIndices"], 1)
+		self.guiInterface.flip_heatmap_orientation_matrix_vertical()
 
 		for channel in self.dataHandler.channelData.values():
 			channel["data"] = np.flip(
 				channel["data"], 1
 			)
-		self.dataHandler.plot_heatmap()
+		self.guiInterface.plot_heatmap()
 	
 	def _rotate_heatmap(self) -> None:
-		"""Rotate every heatmap by 90 degrees to the left."""	
-		for line in self.dataHandler.heatmapParameters["selectedArea"]:
+		"""
+		Rotate every heatmap by 90 degrees to the left.
+		"""	
+		for line in self.selectedAreaBorders:
 			self._rotate_line(line)
 
 		self._rotate_area()
-		self.dataHandler.heatmapParameters["mappedIndices"] = np.rot90(self.dataHandler.heatmapParameters["mappedIndices"])
+		self.guiInterface.rotate_heatmap_orientation_matrix()
 
 		for channel in self.dataHandler.channelData.values():
 			channel["data"] = np.rot90(
 				channel["data"]
 			)
-		self.dataHandler.plot_heatmap()
+		self.guiInterface.plot_heatmap()
 
 	def _flip_line_h(self, line) -> None:
-		"""Flip a single line horizontal.
-
-		Parameters:
-			line(Line2D): The line to be flipped.
 		"""
-		m, n = np.shape(self.dataHandler._get_heatmap_data())
+		Flip a single line horizontal.
+
+		Parameters
+		----------
+		line : Line2D
+			The line to be flipped.
+		"""
+		m, n = self.guiInterface._get_active_force_volume().size
 		flippedLine = line.get_xydata().copy()
 
 		flippedLine[0][1] = m - flippedLine[0][1]
@@ -311,19 +355,24 @@ class HeatmapToolbar(SofaToolbar):
 		)
 
 	def _flip_area_h(self) -> None:
-		"""Flip an area horizontal."""
-		m, n = np.shape(self.dataHandler._get_heatmap_data())
+		"""
+		Flip an area horizontal.
+		"""
+		m, n = self.guiInterface._get_active_force_volume().size
 
 		for i in range(len(self.selectedArea)):
 			self.selectedArea[i][1] = m - self.selectedArea[i][1] - 1
 
 	def _flip_line_v(self, line) -> None:
-		"""Flip a single line vertical.
-
-		Parameters:
-			line(Line2D): The line to be flipped.
 		"""
-		m, n = np.shape(self.dataHandler._get_heatmap_data())
+		Flip a single line vertical.
+
+		Parameters
+		----------
+		line : Line2D
+			The line to be flipped.
+		"""
+		m, n = self.guiInterface._get_active_force_volume().size
 		flippedLine = line.get_xydata().copy()
 
 		flippedLine[0][0] = n - flippedLine[0][0]
@@ -335,19 +384,24 @@ class HeatmapToolbar(SofaToolbar):
 		)
 
 	def _flip_area_v(self) -> None:
-		"""Flip an area vertical."""
+		"""
+		Flip an area vertical.
+		"""
 		m, n = np.shape(self.dataHandler._get_heatmap_data())
 
 		for i in range(len(self.selectedArea)):
 			self.selectedArea[i][0] = n - self.selectedArea[i][0] - 1 
 
 	def _rotate_line(self, line) -> None:
-		"""Rotate a single line by 90 degrees.
-
-		Parameters:
-			line(Line2D): The line to be rotated.
 		"""
-		m, n = np.shape(self.dataHandler._get_heatmap_data())
+		Rotate a single line by 90 degrees.
+
+		Parameters
+		----------
+		line : Line2D
+			The line to be rotated.
+		"""
+		m, n = self.guiInterface._get_active_force_volume().size
 		rotatedLine = line.get_xydata().copy()
 		
 		rotatedLine[0] = [rotatedLine[0][1], n-rotatedLine[0][0]]
@@ -359,8 +413,10 @@ class HeatmapToolbar(SofaToolbar):
 		)
 
 	def _rotate_area(self) -> None:
-		"""Rotate an area by 90 degrees."""
-		m, n = np.shape(self.dataHandler._get_heatmap_data())
+		"""
+		Rotate an area by 90 degrees.
+		"""
+		m, n = self.guiInterface._get_active_force_volume().size
 
 		for i in range(len(self.selectedArea)):
 			temp1, temp2 = self.selectedArea[i][1], n-self.selectedArea[i][0]-1
@@ -368,11 +424,15 @@ class HeatmapToolbar(SofaToolbar):
 			self.selectedArea[i][1] = temp2
 
 	def _orbit_area(self, area: Tuple[int, int], index: int) -> None:
-		"""Orbit an area in the heatmap.
+		"""
+		Orbit an area in the heatmap.
 
-		Parameters:
-			area(tuple): The entry to frame.
-			index(int): An index to distinguish the different lines.
+		Parameters
+		----------
+		area : tuple
+			The entry to frame.
+		index : int
+			An index to distinguish the different lines.
 		"""
 		# Plot left line.
 		self._plot_marking_line((area[0], area[0]), (area[1], area[1]+1))
@@ -394,7 +454,7 @@ class HeatmapToolbar(SofaToolbar):
 			xValues(tuple):
 			yValues(tuple):
 		"""
-		self.dataHandler.heatmapParameters["selectedArea"].append(
+		self.selectedAreaBorders.append(
 			self.holder.figure.get_axes()[0].plot(
 				xValues, yValues, 
 				color='r', linestyle='-', linewidth=2
@@ -402,7 +462,9 @@ class HeatmapToolbar(SofaToolbar):
 		)
 
 	def _delete_selected_area_lines(self) -> None:
-		"""Delete existing marks."""
-		for line in self.dataHandler.heatmapParameters["selectedArea"]:
+		"""
+		Delete existing marks.
+		"""
+		for line in self.selectedAreaBorders:
 			line.remove()
-		self.dataHandler.heatmapParameters["selectedArea"] = []
+		self.selectedAreaBorders = []

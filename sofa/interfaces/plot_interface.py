@@ -85,16 +85,48 @@ class PlotInterface():
 
 	def add_inactive_data_point(
 		self, 
-		inactiveDataPoints: int
+		inactiveDataPoint: int
 	) -> None: 
 		"""
 		"""
-		self.inactiveDataPoints.append(inactiveDataPoints)
+		if inactiveDataPoint not in self.inactiveDataPoints:
+			self.inactiveDataPoints.append(inactiveDataPoint)
 
 	def remove_inactive_data_point(
 		self,
-		inactiveDataPoints: int
+		inactiveDataPoint: int
 	) -> None: 
 		"""
 		"""
-		self.inactiveDataPoints.remove(inactiveDataPoints)
+		if inactiveDataPoint in self.inactiveDataPoints:
+			self.inactiveDataPoints.remove(inactiveDataPoint)
+
+	def add_inactive_data_points(
+		self, 
+		inactiveDataPoints: List[int]
+	) -> None: 
+		"""
+		"""
+		flatHeatmapOrientationMatrix = self.heatmapOrientationMatrix.flatten()
+
+		# Map new data points to the current alignment.
+		for inactiveDataPoint in inactiveDataPoints:
+			self.inactiveDataPoints.append(flatHeatmapOrientationMatrix[inactiveDataPoint])
+		
+		# Remove duplicates.
+		self.inactiveDataPoints = list(set(self.inactiveDataPoints))
+
+	def flip_heatmap_orientation_matrix_horizontal() -> None: 
+		"""
+		"""
+		self.heatmapOrientationMatrix = np.flip(self.heatmapOrientationMatrix, 0)
+
+	def flip_heatmap_orientation_matrix_vertical() -> None: 
+		"""
+		"""
+		self.heatmapOrientationMatrix = np.flip(self.heatmapOrientationMatrix, 1)
+
+	def rotate_heatmap_orientation_matrix() -> None: 
+		"""
+		"""
+		self.heatmapOrientationMatrix = np.flip(self.heatmapOrientationMatrix, 0)
