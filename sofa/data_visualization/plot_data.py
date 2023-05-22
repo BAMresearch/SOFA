@@ -270,9 +270,10 @@ def plot_histogram(
 		One dimensional data of the active data points
 		of the channel.
 	numberOfBins : int
-		
+		Number of data bins into which the data is divided.
 	zoom : bool
-		
+		If true adjust the view limits to the current 
+		minimum and maximum values.
 	"""
 	ax = get_axes(holder)
 
@@ -311,6 +312,7 @@ def add_average_to_line_plot(
 	averageLine: mpl.lines.Line2D
 ) -> None: 
 	"""
+	Add the average to the line plot.
 	"""
 	ax = get_axes(holder)
 
@@ -323,6 +325,8 @@ def add_errorbar_to_line_plot(
 	errorbar: mpl.container.ErrorbarContainer
 ) -> None: 
 	"""
+	Add the average with the standard deviation as 
+	errorbar to the line plot.
 	"""
 	ax = get_axes(holder)
 
@@ -334,6 +338,7 @@ def remove_average_curve_from_line_plot(
 	averageLine: mpl.lines.Line2D
 ) -> None:
 	"""
+	Remove the average curve from the line plot.
 	"""
 	averageLine.remove()
 
@@ -341,6 +346,7 @@ def remove_errorbar_from_line_plot(
 	errorbar: mpl.container.ErrorbarContainer
 ) -> None:
 	"""
+	Remove the errorbar from the line plot.
 	"""
 	errorbar.remove()
 
@@ -351,7 +357,8 @@ def update_line_plot(
 	showInactive: bool
 ) -> None:
 	"""
-	
+	Update the state of every force distance curve
+	displayed in the line plot.
 
 	Parameters
 	----------

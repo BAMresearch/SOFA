@@ -195,15 +195,18 @@ class Channel():
 
 	def flip_channel_horizontal(self) -> None: 
 		"""
+		Flip the channel data horizontaly.
 		"""
 		self.data = np.flip(self.data, 0)
 
 	def flip_channel_vertical(self) -> None: 
 		"""
+		Flip the channel data vertically.
 		"""
 		self.data = np.flip(self.data, 1)
 
 	def rotate_channel(self) -> None: 
 		"""
+		Rotate the channel data by 90 degress.
 		"""
 		self.data = np.rot90(self.data)

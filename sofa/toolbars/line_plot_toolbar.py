@@ -37,7 +37,8 @@ def decorator_check_zoom_history_empty(function):
 
 def decorator_check_zoom_inside_axes(function):
 	"""
-	.
+	Check if the zoom motion starts and ends within
+	the axes.
 	"""
 	@functools.wraps(function)
 	def wrapper_check_zoom_inside_axes(self, *args):
@@ -61,7 +62,7 @@ def decorator_check_zoom_valid(function):
 
 class LinePlotToolbar(SofaToolbar):
 	'''
-	A custom toolbar to process data, displayed in a lineplot.
+	A custom toolbar to process data, displayed in a line plot.
 
 	Attributes
 	----------
@@ -186,6 +187,12 @@ class LinePlotToolbar(SofaToolbar):
 
 	def _get_current_view_limits(self) -> nt.ViewLimits:
 		"""
+		
+
+		Returns
+		-------
+		currentViewLimits : nt.ViewLimits
+
 		"""
 		axes = self.holder.figure.get_axes()[0]
 

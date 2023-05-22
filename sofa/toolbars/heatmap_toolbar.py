@@ -295,11 +295,8 @@ class HeatmapToolbar(SofaToolbar):
 
 		self._flip_area_h()
 		self.guiInterface.flip_heatmap_orientation_matrix_horizontal()
+		self.guiInterface.flip_channel_horizontal()
 		
-		for channel in self.dataHandler.channelData.values():
-			channel["data"] = np.flip(
-				channel["data"], 0
-			)
 		self.guiInterface.plot_heatmap()
 
 	def _flip_heatmap_v(self) -> None: 
@@ -311,11 +308,8 @@ class HeatmapToolbar(SofaToolbar):
 
 		self._flip_area_v()
 		self.guiInterface.flip_heatmap_orientation_matrix_vertical()
+		self.guiInterface.flip_channel_vertical()
 
-		for channel in self.dataHandler.channelData.values():
-			channel["data"] = np.flip(
-				channel["data"], 1
-			)
 		self.guiInterface.plot_heatmap()
 	
 	def _rotate_heatmap(self) -> None:
@@ -327,11 +321,8 @@ class HeatmapToolbar(SofaToolbar):
 
 		self._rotate_area()
 		self.guiInterface.rotate_heatmap_orientation_matrix()
-
-		for channel in self.dataHandler.channelData.values():
-			channel["data"] = np.rot90(
-				channel["data"]
-			)
+		self.guiInterface.rotate_channel()
+		
 		self.guiInterface.plot_heatmap()
 
 	def _flip_line_h(self, line) -> None:
