@@ -21,30 +21,64 @@ import data_visualization.plot_data as plt_data
 from force_spectroscopy_data.force_volume import ForceVolume
 from interfaces.plot_interface import PlotInterface
 
+def decorator_get_active_data_set(function):
+	"""
+	Get the force volume and plot interface of the 
+	current selected data set.
+	"""
+	@functools.wraps(function)
+	def wrapper_get_active_data_set(self, *args, **kwargs):
+		activeForceVolume = self._get_active_force_volume()
+		activePlotInterface = self._get_active_plot_interface()
+		function(self, activeForceVolume, activePlotInterface, *args, **kwargs)
+
+	return wrapper_get_active_data_set
+
 def decorator_get_active_force_volume(function):
-	"""Get current selected force volume."""
+	"""
+	Get current selected force volume.
+	"""
 	@functools.wraps(function)
 	def wrapper_get_active_force_volume(self, *args, **kwargs):
 		activeForceVolume = self._get_active_force_volume()
-		function(activeForceVolume, *args, **kwargs)
+		function(self, activeForceVolume, *args, **kwargs)
 
 	return wrapper_get_active_force_volume
 
+def decorator_get_active_plot_interface(function):
+	"""
+	Get current selected force volume.
+	"""
+	@functools.wraps(function)
+	def wrapper_get_active_plot_interface(self, *args, **kwargs):
+		activePlotInterface = self._get_active_plot_interface()
+		function(self, activePlotInterface, *args, **kwargs)
+
+	return wrapper_get_active_plot_interface
+
 def decorator_get_active_heatmap_channel(function):
-	"""Get name of current selected channel of heatmap."""
+	"""
+	Get name of current selected channel of heatmap.
+	"""
 	@functools.wraps(function)
 	def wrapper_get_active_force_volume(self, *args, **kwargs):
-		keyActiveHeatmapChannel = self.heatmapParameters.activeChannel.get()
-		function(keyActiveHeatmapChannel, *args, **kwargs)
+		keyActiveHeatmapChannel = self._text_to_camel_case(
+			self.heatmapParameters.activeChannel.get()
+		)
+		function(self, keyActiveHeatmapChannel, *args, **kwargs)
 
 	return wrapper_get_active_force_volume
 
 def decorator_get_active_histogram_channel(function):
-	"""Get name of current selected channel of histogram."""
+	"""
+	Get name of current selected channel of histogram.
+	"""
 	@functools.wraps(function)
 	def wrapper_get_active_force_volume(self, *args, **kwargs):
-		keyActiveHistogramChannel = self.histogramParameters.activeChannel.get()
-		function(keyActiveHistogramChannel, *args, **kwargs)
+		keyActiveHistogramChannel = self._text_to_camel_case(
+			self.histogramParameters.activeChannel.get()
+		)
+		function(self, keyActiveHistogramChannel, *args, **kwargs)
 
 	return wrapper_get_active_force_volume
 
@@ -71,7 +105,7 @@ class GUIInterface():
 		Initialize a blank interface. The attributes can only be 
 		set after 
 		"""
-		self.forceVolumes: Dict = {}
+		self.importedDataSets: Dict = {}
 		self.keyActiveForceVolume: ttk.StringVar
 		self.linePlotParameters: nt.LinePlotParameters 
 		self.heatmapParameters: nt.HeatmapParameters
@@ -117,15 +151,16 @@ class GUIInterface():
 		importedData : Dict
 		"""
 		forceVolume = ForceVolume(importedData)
-		plotInterface = PlotInterface(forceVolume.size)
-
-		extendForceVolume = nt.ExtendForceVolume(
-			forceVolume,
-			plotInterface
+		plotInterface = PlotInterface(
+			forceVolume.size,
+			forceVolume.get_force_distance_curves_data()
 		)
 
+		self.importedDataSets[forceVolume.name] = {
+			"forceVolume": forceVolume,
+			"plotInterface": plotInterface
+		}
 		self.keyActiveForceVolume.set(forceVolume.name)
-		self.forceVolumes[forceVolume.name] = extendForceVolume
 
 		self.plot_active_force_volume()
 
@@ -137,52 +172,60 @@ class GUIInterface():
 		self._plot_line_plot()
 		self.plot_heatmap()
 		self.plot_histogram()
-		
-	@decorator_get_active_force_volume
+	
+	@decorator_get_active_data_set
 	def _plot_line_plot(
 		self, 
-		activeForceVolume: ForceVolume
+		activeForceVolume: ForceVolume,
+		activePlotInterface: PlotInterface
 	) -> None:
 		"""
 		
 		"""
 		plt_data.plot_line_plot(
 			self.linePlotParameters.holder, 
-			activeForceVolume.get_force_distance_curves_lines()
+			activePlotInterface.linePlotForceDistanceLines
 		)
 
-	@decorator_get_active_force_volume
 	@decorator_get_active_heatmap_channel
+	@decorator_get_active_data_set
 	def plot_heatmap(
 		self, 
 		activeForceVolume: ForceVolume,
+		activePlotInterface: PlotInterface,
 		keyActiveHeatmapChannel: str
 	) -> None: 
 		"""
 		"""
 		plt_data.plot_heatmap(
 			self.heatmapParameters.holder,
-			activeForceVolume.get_heatmap_data(
-				keyActiveHeatmapChannel
+			activeForceVolume.get_active_heatmap_data(
+				keyActiveHeatmapChannel,
+				activePlotInterface.inactiveDataPoints,
+				activePlotInterface.heatmapOrientationMatrix
 			),
-			self.heatmapParameters.selectedArea
+			activePlotInterface.heatmapSelectedAreaBorders
 		)
 
-	@decorator_get_active_force_volume
 	@decorator_get_active_histogram_channel
+	@decorator_get_active_data_set
 	def plot_histogram(
 		self, 
 		activeForceVolume: ForceVolume,
+		activePlotInterface: PlotInterface,
 		keyActiveHistogramChannel: str
 	) -> None:
 		"""
 		"""
 		plt_data.plot_histogram(
 			self.histogramParameters.holder, 
-			activeForceVolume.get_histogram_data(keyActiveHistogramChannel, active=False),
 			activeForceVolume.get_histogram_data(keyActiveHistogramChannel),
-			self.histogramParameters.numberOfBins,
-			self.histogramParameters.zoom
+			activeForceVolume.get_active_histogram_data(
+				keyActiveHistogramChannel,
+				activePlotInterface.inactiveDataPoints
+			),
+			self.histogramParameters.numberOfBins.get(),
+			self.histogramParameters.zoom.get()
 		)
 
 	def update_active_force_volume_plots(self) -> None: 
@@ -216,25 +259,25 @@ class GUIInterface():
 		else:
 			self.plot_histogram()
 
-	@decorator_get_active_force_volume
+	@decorator_get_active_data_set
 	def update_line_plot(
 		self,
-		activeForceVolume: ForceVolume
+		activeForceVolume: ForceVolume,
+		activePlotInterface: PlotInterface
 	) -> None:
 		"""
 		"""
-		plt.update_line_plot(
+		plt_data.update_line_plot(
 			self.linePlotParameters.holder,
-			activeForceVolume.get_force_distance_curves_lines(),
-			activeForceVolume.inactiveDataPoints,
-			self.linePlotParameters.showInactive.get()
+			activePlotInterface.linePlotForceDistanceLines,
+			activePlotInterface.inactiveDataPoints,
+			self.linePlotParameters.plotInactive.get()
 		)
 
 		if self.linePlotParameters.plotAverage.get():
-			self.update_line_plot_average(
-				activeForceVolume
-			)
+			self.update_line_plot_average()
 
+	@decorator_get_active_force_volume
 	def update_line_plot_average(
 		self,
 		activeForceVolume: ForceVolume
@@ -246,11 +289,11 @@ class GUIInterface():
 		# Calculate average
 
 		if self.linePlotParameters.plotErrorbar.get():
-			plt.add_errorbar_to_line_plot(
+			plt_data.add_errorbar_to_line_plot(
 
 			)
 		else:
-			plt.add_average_to_line_plot(
+			plt_data.add_average_to_line_plot(
 
 			)
 
@@ -263,4 +306,67 @@ class GUIInterface():
 		activeForceVolume : ForceVolume
 
 		"""
-		return self.forceVolumes[self.keyActiveForceVolume.get()]
+		return self.importedDataSets[self.keyActiveForceVolume.get()]["forceVolume"]
+
+	def _get_active_plot_interface(self) -> ForceVolume:
+		"""
+
+
+		Returns
+		-------
+		activeForceVolume : ForceVolume
+
+		"""
+		return self.importedDataSets[self.keyActiveForceVolume.get()]["plotInterface"]
+
+	@staticmethod
+	def _text_to_camel_case(inputString: str) -> str:
+		"""Converts text string to a lower CamelCase format.
+
+		Parameters:
+			inputString(str): Text string.
+
+		Returns:
+			outputString(str): String in lower CamelCase.
+		"""
+		inputString = inputString.replace(" ", "")
+		inputString = inputString[0].lower() + inputString[1:]
+
+		return inputString
+
+	def check_imported_data_set(self) -> bool: 
+		"""
+		"""
+		if self.importedDataSets:
+			return True
+			
+		return False
+
+	@decorator_get_active_plot_interface
+	def reset_inactive_data_points(
+		self,
+		activePlotInterface: PlotInterface
+	) -> None:
+		"""
+		"""
+		activePlotInterface.reset_inactive_data_points()
+
+	@decorator_get_active_plot_interface
+	def add_inactive_data_point(
+		self,
+		activePlotInterface: PlotInterface,
+		inactiveDataPoint: int
+	) -> None:
+		"""
+		"""
+		activePlotInterface.add_inactive_data_point(inactiveDataPoint)
+
+	@decorator_get_active_plot_interface
+	def remove_inactive_data_point(
+		self,
+		activePlotInterface: PlotInterface,
+		inactiveDataPoint: int
+	) -> None:
+		"""
+		"""
+		activePlotInterface.remove_inactive_data_point(inactiveDataPoint)

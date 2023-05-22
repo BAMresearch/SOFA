@@ -96,12 +96,12 @@ class Channel():
 			inactiveDataPoints,
 			heatmapOrientationMatrix
 		)
-		activeFlatHeatmapData = np.put(
-			heatmapData, 
+		np.put(
+			flatHeatmapData, 
 			mappedInactiveDataPoints,
 			np.nan
 		)
-		activeHeatmapData = activeFlatHeatmapData.reshape(self.size)
+		activeHeatmapData = flatHeatmapData.reshape(self.size)
 
 		return activeHeatmapData
 

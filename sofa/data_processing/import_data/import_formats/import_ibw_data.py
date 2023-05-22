@@ -85,7 +85,7 @@ def import_ibw_data(
 
 	# Import required data.
 	importedData["measurementData"] = import_ibw_measurement(
-		importParameter.folderPathMeasurementData,
+		importParameter.filePathData,
 	)
 
 	# Import optional data.
@@ -104,14 +104,14 @@ def import_ibw_data(
 	return importedData
 
 def import_ibw_measurement(
-	folderPathMeasurementData: str
+	filePathData: str
 ) -> nt.MeasurementData:
 	"""
 	Import measurement data in the .ibw file format.
 
 	Parameters
 	----------
-	folderPathMeasurementData : str
+	filePathData : str
 		Path to the data folder.
 
 	Returns
@@ -121,13 +121,13 @@ def import_ibw_measurement(
 		of the measurement.
 	"""
 	folderName = get_folder_name(
-		folderPathMeasurementData
+		filePathData
 	)
 	size = get_data_size(
-		folderPathMeasurementData
+		filePathData
 	)
 	approachCurves, retractCurves = import_ibw_measurement_curves(
-		folderPathMeasurementData
+		filePathData
 	)
 
 	return nt.MeasurementData(
@@ -137,13 +137,13 @@ def import_ibw_measurement(
 		retractCurves
 	)
 
-def get_folder_name(folderPathMeasurementData: str) -> str:
+def get_folder_name(filePathData: str) -> str:
 	"""
 	Get the name of a folder from it's path.
 
 	Parameters
 	----------
-	folderPathMeasurementData : str
+	filePathData : str
 		Path to the data folder.
 
 	Returns
@@ -151,15 +151,15 @@ def get_folder_name(folderPathMeasurementData: str) -> str:
 	folderName : str
 		Basename of the folder path.
 	"""
-	return os.path.basename(folderPathMeasurementData)
+	return os.path.basename(filePathData)
 
-def get_data_size(folderPathMeasurementData: str) -> Tuple[int, int]:
+def get_data_size(filePathData: str) -> Tuple[int, int]:
 	"""
 	Get the size of the measurement grid.
 
 	Parameters
 	----------
-	folderPathMeasurementData : str
+	filePathData : str
 		Path to the data folder.
 
 	Returns
@@ -169,27 +169,29 @@ def get_data_size(folderPathMeasurementData: str) -> Tuple[int, int]:
 		and height (slow scan size) of the measurement grid.
 	"""
 	numberOfLines = len(
-		os.listdir(folderPathMeasurementData)
+		os.listdir(filePathData)
 	)
 	folderPathFirstLine = os.path.join(
-		folderPathMeasurementData, 
-		os.listdir(folderPathMeasurementData)[0]
+		filePathData, 
+		os.listdir(filePathData)[0]
 	)
-	numberOfPoints = len(
-		os.listdir(folderPathFirstLine)
-	) / 2
+	numberOfPoints = int(
+		len(
+			os.listdir(folderPathFirstLine)
+		) / 2
+	)
 
 	return numberOfLines, numberOfPoints
 
 def import_ibw_measurement_curves(
-	folderPathMeasurementData: str
+	filePathData: str
 ) -> Tuple[List[nt.ForceDistanceCurve]]:
 	"""
 	Import all measurement curves from a given folder.
 
 	Parameters
 	----------
-	folderPathMeasurementData : str
+	filePathData : str
 		Path to the data folder.
 
 	Returns
@@ -202,11 +204,11 @@ def import_ibw_measurement_curves(
 		curve.
 	"""
 	dataFilePathsPiezo = get_data_file_paths_in_folder(
-		folderPathMeasurementData,
+		filePathData,
 		"**/*ZSnsr.ibw"
 	)
 	dataFilePathsDeflection = get_data_file_paths_in_folder(
-		folderPathMeasurementData,
+		filePathData,
 		"**/*Defl.ibw"
 	)
 

@@ -27,6 +27,7 @@ class SofaToolbar(NavigationToolbar2Tk):
 		"""
 		self.holder = canvas_
 		self.mode: str = ""
+		self.eventConnections = []
 
 		self.activeButtonColor: str = "#999999"
 		self.inactiveButtonColor: str = "#ffffff"
@@ -108,7 +109,20 @@ class SofaToolbar(NavigationToolbar2Tk):
 		"""
 		self._reset_event_connections()
 
-		if self.mode == "select area":
+		# Line plot toolbar modes
+		if self.mode == "zoom in":
+			self.eventConnections.extend(
+				(
+					self.holder.figure.canvas.mpl_connect("button_press_event", self._start_zoom_motion),
+				 	self.holder.figure.canvas.mpl_connect("button_release_event", self._end_zoom_motion)
+				)
+			)
+		elif self.mode == "pick single line":
+			self.eventConnections.append(
+				self.holder.figure.canvas.mpl_connect("pick_event", self._pick_single_line),
+			)
+		# Heatmap toolbar modes
+		elif self.mode == "select area":
 			self.eventConnections.extend(
 				(
 					self.holder.figure.canvas.mpl_connect("button_press_event", self._select_area_on_click),
@@ -121,24 +135,6 @@ class SofaToolbar(NavigationToolbar2Tk):
 					self.holder.figure.canvas.mpl_connect("button_press_event", self._select_rect_on_click),
 					self.holder.figure.canvas.mpl_connect("button_release_event", self._select_rect_on_release)
 				)
-			)
-
-	def _update_event_connections(self) -> None:
-		"""
-		Update event connections in dependace of the current mode.
-		"""
-		self._delete_all_event_connections()
-
-		if self.mode == "zoom in":
-			self.eventConnections.extend(
-				(
-					self.holder.figure.canvas.mpl_connect("button_press_event", self._start_zoom_motion),
-				 	self.holder.figure.canvas.mpl_connect("button_release_event", self._end_zoom_motion)
-				)
-			)
-		elif self.mode == "pick single line":
-			self.eventConnections.append(
-				self.holder.figure.canvas.mpl_connect("pick_event", self._pick_single_line),
 			)
 
 	def _reset_event_connections(self) -> None:
@@ -155,45 +151,33 @@ class SofaToolbar(NavigationToolbar2Tk):
 		Update the state of the toolbar buttons.
 		"""
 		if self.mode == "":
-			inactiveButtons = [
-				self._buttons["select_area"],
-				self._buttons["select_rectangle"]
-			]
+			inactiveButtons = self._buttons.values()
 			self._set_toolbar_button_state(inactiveButtons)
-		elif self.mode == "select area":
-			inactiveButtons = [self._buttons["select_rectangle"]]
-			self._set_toolbar_button_state(
-				inactiveButtons, self._buttons["select_area"]
-			)
-		elif self.mode == "select rect":
-			inactiveButtons = [self._buttons["select_area"]]
-			self._set_toolbar_button_state(
-				inactiveButtons, self._buttons["select_rectangle"]
-			)
-
-	def _update_toolbar_buttons(self) -> None:
-		"""
-		Update the state of the toolbar buttons.
-		"""
-		if self.mode == "":
-			inactiveButtons = [
-				self._buttons["zoom_in"],
-				self._buttons["pick_single"]
-			]
-			self._set_toolbar_button_state(inactiveButtons)
+		# Line plot toolbar modes
 		elif self.mode == "zoom in":
-			inactiveButtons = [self._buttons["pick_single"]]
+			inactiveButtons = self._buttons.values()
 			self._set_toolbar_button_state(
 				inactiveButtons, self._buttons["zoom_in"]
 			)
 		elif self.mode == "pick single line":
-			inactiveButtons = [self._buttons["zoom_in"]]
+			inactiveButtons = self._buttons.values()
 			self._set_toolbar_button_state(
 				inactiveButtons, self._buttons["pick_single"]
 			)
+		# Heatmap toolbar modes
+		elif self.mode == "select area":
+			inactiveButtons = self._buttons.values()
+			self._set_toolbar_button_state(
+				inactiveButtons, self._buttons["select_area"]
+			)
+		elif self.mode == "select rect":
+			inactiveButtons = self._buttons.values()
+			self._set_toolbar_button_state(
+				inactiveButtons, self._buttons["select_rectangle"]
+			)
 
-	@staticmethod
 	def _set_toolbar_button_state(
+		self,
 		inactiveButtons: List[tk.Button], 
 		activeButton: Optional[tk.Button] = None
 	) -> None:

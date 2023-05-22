@@ -20,6 +20,7 @@ from matplotlib.lines import Line2D
 
 from data_processing.correct_data import correct_approach_curve
 import data_processing.named_tuples as nt
+import data_processing.custom_exceptions as ce
 
 class ForceDistanceCurve():
 	"""
@@ -69,7 +70,7 @@ class ForceDistanceCurve():
 			self.dataApproachCorrected, self.channelMetadata = correct_approach_curve(
 				self.dataApproachRaw
 			)
-		except CorrectionError:
+		except ce.CorrectionError:
 			self.couldBeCorrected = False
 		else:
 			self.couldBeCorrected = True 

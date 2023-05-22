@@ -17,6 +17,8 @@ from typing import List, Dict, Tuple
 
 import numpy as np
 
+import data_visualization.plot_data as plt_data
+
 class PlotInterface():
 	"""
 
@@ -31,23 +33,68 @@ class PlotInterface():
 
 	histogramBins : 
 	"""
-	def __init__(self, size) -> None:
+	def __init__(
+		self, 
+		size,
+		forceDistanceCurves
+	) -> None:
 		"""
 		"""
-		self.size. Tuple[int] = size
+		self.size: Tuple[int] = size
 		self.inactiveDataPoints: List = []
 
 		self.linePlotForceDistanceLines: List = []
 		self.linePlotAverageLines: List = []
 		self.linePlotZoomHistory: List = []
 
-		self.heatmapOrientationMatrix: np.ndarray = self._create_heatmap_orientation_matrix()
-		self.heatmapSelectedArea: List = []  
+		self.heatmapOrientationMatrix: np.ndarray
+		self.heatmapSelectedAreaBorders: List = []  
 
 		self.histogramBins: List = []
+
+		self._create_line_plot_force_distance_lines(
+			forceDistanceCurves
+		)
+		self._create_heatmap_orientation_matrix()
+
+	def _create_line_plot_force_distance_lines(
+		self, 
+		forceDistanceCurves
+	) -> List:
+		"""
+		"""
+		for index, forceDistanceCurve in enumerate(forceDistanceCurves):
+			self.linePlotForceDistanceLines.append(
+				plt_data.create_corrected_line(
+					str(index),
+					forceDistanceCurve
+				)
+			)
 
 	def _create_heatmap_orientation_matrix(self) -> np.ndarray:
 		"""
 		"""
-		return np.arange(self.size[0] * self.size[1]).reshape(self.size)
+		self.heatmapOrientationMatrix = np.arange(
+			self.size[0] * self.size[1]
+		).reshape(self.size)
 
+	def reset_inactive_data_points(self) -> None: 
+		"""
+		"""
+		self.inactiveDataPoints = []
+
+	def add_inactive_data_point(
+		self, 
+		inactiveDataPoints: int
+	) -> None: 
+		"""
+		"""
+		self.inactiveDataPoints.append(inactiveDataPoints)
+
+	def remove_inactive_data_point(
+		self,
+		inactiveDataPoints: int
+	) -> None: 
+		"""
+		"""
+		self.inactiveDataPoints.remove(inactiveDataPoints)

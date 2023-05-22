@@ -23,7 +23,7 @@ import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
 import data_processing.named_tuples as nt
-import data_processing.import_data as imp_data
+import data_processing.import_data.import_data as imp_data
 
 def decorator_check_required_folder_path(function):
 	"""
@@ -85,6 +85,7 @@ class ImportWindow(ttk.Frame):
 		
 		self.pack(fill=BOTH, expand=YES)
 
+		self.toplevel = root
 		self.guiInterface = guiInterface
 		self.update_main_window_active_data = set_data_active_force_volume
 		self.dataTypes = imp_data.importFunctions.keys()
@@ -325,7 +326,7 @@ class ImportWindow(ttk.Frame):
 
 		self._stop_progressbar()
 
-		self.destroy()
+		self.toplevel.destroy()
 
 		return messagebox.showinfo("Success", "Data was successfully imported.")
 
@@ -374,3 +375,4 @@ class ImportWindow(ttk.Frame):
 			Description of the current process.
 		"""
 		self.progressbarCurrentLabel.set(label)
+		self.update_idletasks()

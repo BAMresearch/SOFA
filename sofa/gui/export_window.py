@@ -100,6 +100,7 @@ class ExportWindow(ttk.Frame):
 		
 		self.pack(fill=BOTH, expand=YES)
 
+		self.toplevel = root
 		self.guiInterface = guiInterface
 
 		self._setup_input_variables()
@@ -285,22 +286,28 @@ class ExportWindow(ttk.Frame):
 			exportParameters.folderPath,
 			exportParameters.folderName
 		)
+		activeForceVolume = self.guiInterface._get_active_force_volume()
 
 		if exportParameters.exportToCsv:
 			self._update_progressbar_label("Exporting to csv...")
-			exp_data.export_to_csv(self.guiInterface, outputFolder)
+			exp_data.export_to_csv(activeForceVolume, outputFolder)
 
 		if exportParameters.exportToXlsx:
 			self._update_progressbar_label("Exporting to xlsx...")
-			exp_data.export_to_xlsx(self.guiInterface, outputFolder)
+			exp_data.export_to_xlsx(activeForceVolume, outputFolder)
 
 		if exportParameters.exportPlots:
 			self._update_progressbar_label("Exporting plots...")
-			exp_data.export_plots(self.guiInterface, outputFolder)
+			exp_data.export_plots(
+				self.guiInterface.linePlotParameters.holder,
+				self.guiInterface.heatmapParameters.holder,
+				self.guiInterface.histogramParameters.holder,
+				outputFolder
+			)
 
 		self._stop_progressbar()
 
-		self.destroy()
+		self.toplevel.destroy()
 
 		return messagebox.showinfo("Success", "Data is exported.")
 

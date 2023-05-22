@@ -57,7 +57,7 @@ class ForceVolume():
 		importedData : Dict 
 			Data of all imported measurement files.
 		"""
-		self.name: str = importedData["measurementData"].filename
+		self.name: str = importedData["measurementData"].folderName
 		self.size: Tuple[int] = importedData["measurementData"].size
 
 		self.imageData: Dict = {}
@@ -128,6 +128,7 @@ class ForceVolume():
 		)
 
 	def _create_force_distance_curves(
+		self,
 		importedApproachCurves: List[nt.ForceDistanceCurve]
 	) -> None:
 		"""
@@ -143,7 +144,7 @@ class ForceVolume():
 		for index, approachCurve in enumerate(importedApproachCurves):
 			self.forceDistanceCurves.append(
 				ForceDistanceCurve(
-					name="Curve_" + Index,
+					identifier="Curve_" + str(index),
 					dataApproachRaw=approachCurve
 				)
 			)

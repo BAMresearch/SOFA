@@ -54,6 +54,7 @@ class HeatmapToolbar(SofaToolbar):
 			("rotate", "", os.path.join(iconPath, "rotate.gif"), "_rotate_heatmap")
 		)	
 		self.guiInterface = guiInterface
+		self.selectedArea = []
 
 		super().__init__(canvas_, parent_, toolItems)
 
@@ -72,7 +73,7 @@ class HeatmapToolbar(SofaToolbar):
 		
 	def _toggle_select_area(self) -> None:
 		"""Toggle the selector to select an area."""
-		self._update_mode("select area")
+		self._update_toolbar_mode("select area")
 		self._update_event_connections()
 		self._update_toolbar_buttons()
 
@@ -149,7 +150,7 @@ class HeatmapToolbar(SofaToolbar):
 
 	def _toggle_select_rect(self) -> None:
 		"""Toggle the selector to select a rectangle."""
-		self._update_mode("select rect")
+		self._update_toolbar_mode("select rect")
 		self._update_event_connections()
 		self._update_toolbar_buttons()
 

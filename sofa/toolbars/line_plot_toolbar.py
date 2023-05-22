@@ -41,7 +41,7 @@ def decorator_check_zoom_inside_axes(function):
 	"""
 	@functools.wraps(function)
 	def wrapper_check_zoom_inside_axes(self, *args):
-		event = args[1]
+		event = args[0]
 		if self.zoomXStart and self.zoomYStart and event.xdata and event.ydata:
 			function(self, *args)
 
@@ -53,7 +53,7 @@ def decorator_check_zoom_valid(function):
 	"""
 	@functools.wraps(function)
 	def wrapper_check_zoom_valid(self, *args):
-		event = args[1]
+		event = args[0]
 		if self.zoomXStart != event.xdata and self.zoomYStart != event.ydata:
 			function(self, *args)
 
@@ -90,6 +90,7 @@ class LinePlotToolbar(SofaToolbar):
 			("pick_multiple", "", os.path.join(iconPath, "pick_all.gif"), "_pick_multiple_lines")
 		)
 		self.guiInterface = guiInterface
+		self.zoomHistory = []
 
 		super().__init__(canvas_, parent_, toolItems)
 
@@ -97,9 +98,8 @@ class LinePlotToolbar(SofaToolbar):
 		"""Reset zoom and the inactive data points."""
 		self._reset_zoom()
 
-		self.guiInterface.reset_inactive_data_points(
-			source="linePlot"
-		)
+		self.guiInterface.reset_inactive_data_points()
+		self.guiInterface.update_inactive_data_points_line_plot()
 	
 	@decorator_check_zoom_history_empty
 	def _reset_zoom(self) -> None:
@@ -129,7 +129,7 @@ class LinePlotToolbar(SofaToolbar):
 		"""
 		Toggle the selector to zoom.
 		"""
-		self._update_mode("zoom in")
+		self._update_toolbar_mode("zoom in")
 		self._update_event_connections()
 		self._update_toolbar_buttons()
 
@@ -199,8 +199,8 @@ class LinePlotToolbar(SofaToolbar):
 			viewYMax
 		)
 
-	@staticmethod
 	def _get_standardized_view_limits(
+		self,
 		zoomXStart: int,
 		zoomXEnd: int,
 		zoomYStart: int,
@@ -213,8 +213,8 @@ class LinePlotToolbar(SofaToolbar):
 			zoomXEnd
 		)
 		zoomYStart, zoomYEnd = self._standardize_value_pair(
-			zoomXStart, 
-			zoomXEnd
+			zoomYStart, 
+			zoomYEnd
 		)
 
 		return nt.ViewLimits(
@@ -251,7 +251,7 @@ class LinePlotToolbar(SofaToolbar):
 
 	def _toggle_pick_single_line(self) -> None:
 		"""Toggle the selctor to pick a single curve."""
-		self._update_mode("pick single line")
+		self._update_toolbar_mode("pick single line")
 		self._update_event_connections()
 		self._update_toolbar_buttons()
 	
@@ -269,9 +269,7 @@ class LinePlotToolbar(SofaToolbar):
 			selected.
 		"""
 		self._toggle_line(event.artist)
-		self.guiInterface.update_inactive_data_points(
-			source="linePlot"
-		)
+		self.guiInterface.update_inactive_data_points_line_plot()
 
 	def _pick_multiple_lines(self) -> None:
 		"""
@@ -286,9 +284,7 @@ class LinePlotToolbar(SofaToolbar):
 			if hasIntersection:
 				self._deactivate_line(line)
 		
-		self.guiInterface.update_inactive_data_points(
-			source="linePlot"
-		)
+		self.guiInterface.update_inactive_data_points_line_plot()
 
 	@staticmethod
 	def _check_line_intersection(
@@ -329,7 +325,7 @@ class LinePlotToolbar(SofaToolbar):
 
 		return False
 
-	def _toggle_curve(
+	def _toggle_line(
 		self, 
 		line
 	) -> None:
@@ -342,11 +338,11 @@ class LinePlotToolbar(SofaToolbar):
 			Line representation of the curve that is toggled.
 		"""
 		if line.get_color() == "gray":
-			self.guiInterface.remove_inactive_data_points(int(line._label))
+			self.guiInterface.remove_inactive_data_point(int(line._label))
 		elif line.get_color() == "red":
-			self.guiInterface.add_inactive_data_points(int(line._label))
+			self.guiInterface.add_inactive_data_point(int(line._label))
 
-	def _deactivate_curve(
+	def _deactivate_line(
 		self, 
 		line
 	) -> None:
@@ -359,4 +355,4 @@ class LinePlotToolbar(SofaToolbar):
 			Line representation of the curve that is deactivated.
 		"""
 		if line.get_color() == "red":
-			self.guiInterface.add_inactive_data_points(int(line._label))
+			self.guiInterface.add_inactive_data_point(int(line._label))

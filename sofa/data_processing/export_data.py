@@ -15,11 +15,24 @@ along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 """
 import os
 from typing import List, Tuple, Dict
+import functools
 
 import numpy as np
 import pandas as pd
 
 import data_processing.named_tuples as nt
+
+def decorator_check_average(function):
+	"""Check if average data exists."""
+	@functools.wraps(function)
+	def wrapper_check_average(*args, **kwargs):
+		forceVolume = args[0]
+		if hasattr(forceVolume, "average"):
+			return function(*args, **kwargs)
+		else: 
+			return create_data_frame_empty_average_data()
+
+	return wrapper_check_average
 
 def setup_output_folder(
 	folderPath: str,
@@ -49,196 +62,6 @@ def setup_output_folder(
 
 	return outputFolderPath
 
-def create_data_frame_metadata(
-	forceVolume
-) -> pd.DataFrame:
-	"""
-	Cache the general data and if imported additional
-	data from an image in a pandas dataframe.
-
-	Parameters
-	----------
-	forceVolume : ForceVolume
-		Contains the raw and calculated data from the 
-		imported measurement.
-
-	Returns
-	-------
-	dataFrameMetaData : pd.Dataframe
-		Contains the name, size and additional data from 
-		the measurement, if an image was imported
-	"""
-	metaData = {
-		"name": forceVolume.name,
-		"size": forceVolume.size
-	} 
-
-	if forceVolume.metaData:
-		metaData["fss"] = forceVolume.imageData["fss"]
-		metaData["sss"] = forceVolume.imageData["sss"]
-		metaData["xOffset"] = forceVolume.imageData["xOffset"]
-		metaData["yOffset"] = forceVolume.imageData["yOffset"]
-		metaData["springConstant"] = forceVolume.imageData["springConstant"]
-
-	return pd.DataFrame.from_dict(metaData)
-
-def create_data_frame_raw_curves(
-	forceDistanceCurves: List
-) -> pd.DataFrame:
-	"""
-	Cache the raw imported measurment data in a 
-	pandas dataframe.
-
-	Parameters
-	----------
-	forceDistanceCurves : list[ForceDistanceCurve]
-		All force distance curves in the force volume.
-
-	Returns
-	-------
-	dataFrameChannelData : pd.Dataframe
-		Contains the data of the imported
-		measuremnt curves.
-	"""
-	rawPiezo = [
-		forceDistanceCurve.dataApproachRaw.piezo
-		for forceDistanceCurve
-		in forceDistanceCurves
-	]
-	rawDeflection = [
-		forceDistanceCurve.dataApproachRaw.deflection
-		for forceDistanceCurve
-		in forceDistanceCurves
-	]
-
-	return pd.DataFrame(
-		rawPiezo,
-		rawDeflection,
-		columns=["raw piezo", "raw deflection"]
-	)
-
-def create_data_frame_corrected_curves(
-	forceDistanceCurves: List
-) -> pd.DataFrame:
-	"""
-	Cache the corrected measurment data in a 
-	pandas dataframe.
-
-	Parameters
-	----------
-	forceDistanceCurves : list[ForceDistanceCurve]
-		All force distance curves in the force volume.
-
-	Returns
-	-------
-	dataFrameChannelData : pd.Dataframe
-		Contains the data of the corrected 
-		measurement curves.
-	"""
-	correctedPiezo = [
-		forceDistanceCurve.dataApproachCorrected.piezo
-		for forceDistanceCurve
-		in forceDistanceCurves
-	]
-	correctedDeflection = [
-		forceDistanceCurve.dataApproachCorrected.deflection
-		for forceDistanceCurve
-		in forceDistanceCurves
-	]
-
-	return pd.DataFrame(
-		correctedPiezo,
-		correctedDeflection,
-		columns=["corrected piezo", "corrected deflection"]
-	)
-
-def create_data_frame_average_data(
-	averageForceDistanceCurve
-) -> pd.DataFrame:
-	"""
-	Cache the the calculated average data in a 
-	pandas dataframe.
-
-	Parameters
-	----------
-	averageForceDistanceCurve : AverageForceDistanceCurve
-		Average of the active force distance curve with
-		the standard deviation if selected.
-
-	Returns
-	-------
-	dataFrameChannelData : pd.Dataframe
-		Contains the data of the calculated average
-		curve.
-	"""
-	return pd.DataFrame(
-		averageForceDistanceCurve.averageData.piezo,
-		averageForceDistanceCurve.averageData.deflection,
-		averageForceDistanceCurve.standardDeviation,
-		columns=[
-			"average piezo", 
-			"average deflection", 
-			"standard deviation"
-		]
-	) 
-
-def create_data_frame_channel_data(
-	channels: List
-) -> pd.DataFrame:
-	"""
-	Cache the flattended data of the calculated 
-	channels in a pandas dataframe.
-
-	Parameters
-	----------
-	channels : list[Channel]
-		All channels calculated from the corrected data. 
-
-	Returns
-	-------
-	dataFrameChannelData : pd.Dataframe
-		Contains the data of every calculated channel.
-	"""
-	channelData = {}
-
-	for channel in channels:
-		channelData[channel.name] = channel.rawData.flatten()
-
-	return pd.DataFrame.from_dict(channelData)
-
-def get_force_volume_data(
-	forceVolume
-) -> nt.DataFramesForceVolume:
-	"""
-	Convert the data of a force volume to panda dataframes
-	to simpliy the export of the data.
-
-	Parameters
-	----------
-	forceVolume : ForceVolume
-		Contains the raw and calculated data from the 
-		imported measurement.
-
-	Returns
-	-------
-	dataFramesForceVolume : nt.DataFramesForceVolume
-		Data of the force volume cached in different
-		distinct panda data frames.
-	"""
-	dataFrameMetaData = create_data_frame_metadata(forceVolume)
-	dataFramerawCurves = create_data_frame_raw_curves(forceVolume.forceDistanceCurves)
-	dataFrameCorrectedCurves = create_data_frame_corrected_curves(forceVolume.forceDistanceCurves)
-	dataFrameAverageData = create_data_frame_average_data(forceVolume.averageForceDistanceCurve)
-	dataFrameChannelData = create_data_frame_channel_data(forceVolume.channels)
-
-	return nt.DataFramesForceVolume(
-		metaData=dataFrameMetaData,
-		rawCurves=dataFramerawCurves,
-		correctedCurves=dataFrameCorrectedCurves,
-		averageData=dataFrameAverageData,
-		channelData=dataFrameChannelData
-	)
-
 def export_to_csv(
 	forceVolume, 
 	pathOutputFolder: str, 
@@ -266,16 +89,279 @@ def export_to_csv(
 
 	write_csv_file(
 		dataFramesForceVolume.metaData,
-		os.path.join(outputFolder, "meta_data.csv")
+		os.path.join(pathOutputFolder, "meta_data.csv")
 	)
 	write_csv_file(
 		dataFrameCombinedCurveData,
-		os.path.join(outputFolder, "curve_data.csv")
+		os.path.join(pathOutputFolder, "curve_data.csv")
 	)
 	write_csv_file(
 		dataFramesForceVolume.channelData,
-		os.path.join(outputFolder, "channel_data.csv")
+		os.path.join(pathOutputFolder, "channel_data.csv")
 	)
+
+def export_to_xlsx(
+	forceVolume, 
+	pathOutputFolder: str
+) -> None:
+	"""
+	Export the processed data of the imported 
+	force volume to the .xlsx file format.
+
+	Parameters
+	----------
+	forceVolume : ForceVolume
+		Contains the raw and calculated data from the 
+		imported measurement.
+	pathOutputFolder : str
+		Path to the folder in which the data will be stored.
+	"""
+	dataFramesForceVolume = get_force_volume_data(forceVolume)
+	outPutFilePath = os.path.join(pathOutputFolder, "data.xlsx")
+	
+	with pd.ExcelWriter(outPutFilePath) as writer:  
+		dataFramesForceVolume.metaData.to_excel(writer, sheet_name='Meta Data')
+		dataFramesForceVolume.rawCurves.to_excel(writer, sheet_name='Raw Curves')
+		dataFramesForceVolume.correctedCurves.to_excel(writer, sheet_name='Corrected Curves')
+		dataFramesForceVolume.averageData.to_excel(writer, sheet_name='Average Data')
+		dataFramesForceVolume.channelData.to_excel(writer, sheet_name='Channel Data')
+
+def export_plots(
+	holderLinePlot,
+	holderHeatmap,
+	holderHistogram,
+	pathOutputFolder: str
+) -> None:
+	"""
+	Export the plots of the imported force volume.
+
+	Parameters
+	----------
+	plotHolders : dict
+		Contains the holders of every figure in the main window
+		of SOFA.
+	pathOutputFolder : str
+		Path to the folder in which the plots will be stored.
+	"""
+	save_figure(
+		holderLinePlot,
+		os.path.join(pathOutputFolder, "lineplot")
+	)
+	save_figure(
+		holderHeatmap,
+		os.path.join(pathOutputFolder, "heatmap")
+	)
+	save_figure(
+		holderHistogram,
+		os.path.join(pathOutputFolder, "histogram")
+	)
+
+def get_force_volume_data(
+	forceVolume
+) -> nt.DataFramesForceVolume:
+	"""
+	Convert the data of a force volume to panda dataframes
+	to simpliy the export of the data.
+
+	Parameters
+	----------
+	forceVolume : ForceVolume
+		Contains the raw and calculated data from the 
+		imported measurement.
+
+	Returns
+	-------
+	dataFramesForceVolume : nt.DataFramesForceVolume
+		Data of the force volume cached in different
+		distinct panda data frames.
+	"""
+	dataFrameMetaData = create_data_frame_metadata(forceVolume)
+	dataFramerawCurves = create_data_frame_raw_curves(forceVolume.forceDistanceCurves)
+	dataFrameCorrectedCurves = create_data_frame_corrected_curves(forceVolume.forceDistanceCurves)
+	dataFrameAverageData = create_data_frame_average_data(forceVolume)
+	dataFrameChannelData = create_data_frame_channel_data(forceVolume.channels)
+
+	return nt.DataFramesForceVolume(
+		metaData=dataFrameMetaData,
+		rawCurves=dataFramerawCurves,
+		correctedCurves=dataFrameCorrectedCurves,
+		averageData=dataFrameAverageData,
+		channelData=dataFrameChannelData
+	)
+
+def create_data_frame_metadata(
+	forceVolume
+) -> pd.DataFrame:
+	"""
+	Cache the general data and if imported additional
+	data from an image in a pandas dataframe.
+
+	Parameters
+	----------
+	forceVolume : ForceVolume
+		Contains the raw and calculated data from the 
+		imported measurement.
+
+	Returns
+	-------
+	dataFrameMetaData : pd.Dataframe
+		Contains the name, size and additional data from 
+		the measurement, if an image was imported
+	"""
+	metaData = {
+		"name": forceVolume.name,
+		"size": forceVolume.size
+	} 
+
+	if forceVolume.imageData:
+		metaData["fss"] = forceVolume.imageData["fss"]
+		metaData["sss"] = forceVolume.imageData["sss"]
+		metaData["xOffset"] = forceVolume.imageData["xOffset"]
+		metaData["yOffset"] = forceVolume.imageData["yOffset"]
+		metaData["springConstant"] = forceVolume.imageData["springConstant"]
+
+	return pd.DataFrame.from_dict(metaData)
+
+def create_data_frame_raw_curves(
+	forceDistanceCurves: List
+) -> pd.DataFrame:
+	"""
+	Cache the raw imported measurment data in a 
+	pandas dataframe.
+
+	Parameters
+	----------
+	forceDistanceCurves : list[ForceDistanceCurve]
+		All force distance curves in the force volume.
+
+	Returns
+	-------
+	dataFrameRawCurves : pd.Dataframe
+		Contains the data of the imported
+		measuremnt curves.
+	"""
+	rawPiezo = [
+		forceDistanceCurve.dataApproachRaw.piezo
+		for forceDistanceCurve
+		in forceDistanceCurves
+	]
+	rawDeflection = [
+		forceDistanceCurve.dataApproachRaw.deflection
+		for forceDistanceCurve
+		in forceDistanceCurves
+	]
+	rawData = np.array([rawPiezo, rawDeflection], dtype=object).transpose()
+
+	return pd.DataFrame(
+		rawData,
+		columns=["raw piezo", "raw deflection"]
+	)
+
+def create_data_frame_corrected_curves(
+	forceDistanceCurves: List
+) -> pd.DataFrame:
+	"""
+	Cache the corrected measurment data in a 
+	pandas dataframe.
+
+	Parameters
+	----------
+	forceDistanceCurves : list[ForceDistanceCurve]
+		All force distance curves in the force volume.
+
+	Returns
+	-------
+	dataFrameCorrectedCurves : pd.Dataframe
+		Contains the data of the corrected 
+		measurement curves.
+	"""
+	correctedPiezo = [
+		forceDistanceCurve.dataApproachCorrected.piezo
+		for forceDistanceCurve
+		in forceDistanceCurves
+		if forceDistanceCurve.couldBeCorrected
+	]
+	correctedDeflection = [
+		forceDistanceCurve.dataApproachCorrected.deflection
+		for forceDistanceCurve
+		in forceDistanceCurves
+		if forceDistanceCurve.couldBeCorrected
+	]
+	correctedData = np.array([correctedPiezo, correctedDeflection], dtype=object).transpose()
+
+	return pd.DataFrame(
+		correctedData,
+		columns=["corrected piezo", "corrected deflection"]
+	)
+
+@decorator_check_average
+def create_data_frame_average_data(
+	forceVolume
+) -> pd.DataFrame:
+	"""
+	Cache the the calculated average data in a 
+	pandas dataframe.
+
+	Parameters
+	----------
+	averageForceDistanceCurve : AverageForceDistanceCurve
+		Average of the active force distance curve with
+		the standard deviation if selected.
+
+	Returns
+	-------
+	dataFrameAverageData : pd.Dataframe
+		Contains the data of the calculated average
+		curve.
+	"""
+	return pd.DataFrame(
+		average.averageData.piezo,
+		average.averageData.deflection,
+		average.standardDeviation,
+		columns=[
+			"average piezo", 
+			"average deflection", 
+			"standard deviation"
+		]
+	) 
+
+def create_data_frame_empty_average_data() -> pd.DataFrame:
+	"""
+
+
+	Returns
+	-------
+	dataFrameEmptyAverageData : pd.Dataframe
+		.
+	"""
+	return pd.DataFrame(
+		["average data has not been calculated"],
+		index=["note"]
+	)
+
+def create_data_frame_channel_data(
+	channels: List
+) -> pd.DataFrame:
+	"""
+	Cache the flattended data of the calculated 
+	channels in a pandas dataframe.
+
+	Parameters
+	----------
+	channels : list[Channel]
+		All channels calculated from the corrected data. 
+
+	Returns
+	-------
+	dataFrameChannelData : pd.Dataframe
+		Contains the data of every calculated channel.
+	"""
+	channelData = {}
+
+	for channel in channels.values():
+		channelData[channel.name] = channel.rawData.flatten()
+
+	return pd.DataFrame.from_dict(channelData)
 
 def combine_data_frames(
 	dataFrames: List[pd.DataFrame]
@@ -321,60 +407,6 @@ def write_csv_file(
 		filePathOutput
 	)
 
-def export_to_xlsx(
-	forceVolume, 
-	pathOutputFolder: str
-) -> None:
-	"""
-	Export the processed data of the imported 
-	force volume to the .xlsx file format.
-
-	Parameters
-	----------
-	forceVolume : ForceVolume
-		Contains the raw and calculated data from the 
-		imported measurement.
-	pathOutputFolder : str
-		Path to the folder in which the data will be stored.
-	"""
-	dataFramesForceVolume = get_force_volume_data(forceVolume)
-	outPutFilePath = os.path.join(outputFolder, "data.xlsx")
-
-	with pd.ExcelWriter(outPutFilePath) as writer:  
-		dataFramesForceVolume.metaData.to_excel(writer, sheet_name='Meta Data')
-		dataFramesForceVolume.rawCurves.to_excel(writer, sheet_name='Raw Curves')
-		dataFramesForceVolume.correctedCurves.to_excel(writer, sheet_name='Corrected Curves')
-		dataFramesForceVolume.averageData.to_excel(writer, sheet_name='Average Data')
-		dataFramesForceVolume.channelData.to_excel(writer, sheet_name='Channel Data')
-
-def export_plots(
-	plotHolders: Dict, 
-	pathOutputFolder: str
-) -> None:
-	"""
-	Export the plots of the imported force volume.
-
-	Parameters
-	----------
-	plotHolders : dict
-		Contains the holders of every figure in the main window
-		of SOFA.
-	pathOutputFolder : str
-		Path to the folder in which the plots will be stored.
-	"""
-	save_figure(
-		plotHolders["lineplot"],
-		os.path.join(outputFolder, "lineplot")
-	)
-	save_figure(
-		plotHolders["heatmap"],
-		os.path.join(outputFolder, "heatmap")
-	)
-	save_figure(
-		plotHolders["histogram"],
-		os.path.join(outputFolder, "histogram")
-	)
-
 def save_figure(
 	holder,
 	filePath: str
@@ -390,7 +422,8 @@ def save_figure(
 		Path in which the figure will be saved.
 	"""
 	holder.figure.savefig(
-		filePath, dpi=300
+		filePath, 
+		dpi=300
 	)
 
 # Defines all available file types to which the data can be exported.

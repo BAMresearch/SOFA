@@ -42,10 +42,6 @@ class HistogramParameters(NamedTuple):
 	zoom: tk.BooleanVar
 	numberOfBins: ttk.Entry
 
-class ExtendedForceVolume(NamedTuple):
-	forceVolume: int
-	plotInterface: int 
-
 # FDC data
 class ForceDistanceCurve(NamedTuple): 
 	piezo: ndarray
@@ -77,7 +73,7 @@ class NormedCurves(NamedTuple):
 # Data import
 class ImportParameter(NamedTuple):
 	dataFormat: str
-	folderPathMeasurementData: str 
+	filePathData: str 
 	filePathImage: str 
 	filePathChannel: str 
 	showPoorCurves: bool

@@ -1,11 +1,10 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Using SOFA" href="using_sofa.html" /><link rel="prev" title="SOFA" href="index.html" />
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Using SOFA" href="using_sofa.html" /><link rel="prev" title="SOFA" href="index.html" />
 
-    <meta name="generator" content="sphinx-4.5.0, furo 2022.04.07"/>
+    <meta name="generator" content="sphinx-5.1.1, furo 2022.04.07"/>
         <title>Atomic Force Spectroscopy - SOFA</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=68f4518137b9aefe99b631505a2064c3c42c9852" />
@@ -212,8 +211,8 @@
           </label>
         </div>
         <article role="main">
-          <section id="atomic-force-spectroscopy">
-<h1>Atomic Force Spectroscopy<a class="headerlink" href="#atomic-force-spectroscopy" title="Permalink to this headline">#</a></h1>
+          <div class="section" id="atomic-force-spectroscopy">
+<h1>Atomic Force Spectroscopy<a class="headerlink" href="#atomic-force-spectroscopy" title="Permalink to this heading">#</a></h1>
 <p>Atomic force microscopy (AFM) is a powerful tool used to investigate surfaces at the nanoscale level. Atomic force spectroscopy (AFS) is a variation of AFM that measures the force between a small probe and the sample surface to obtain detailed information about its properties. AFS can provide valuable insights into the physical, chemical, and mechanical properties of materials, including elasticity, adhesion, and friction. It works by bringing the probe very close to the sample surface, such that the attractive or repulsive forces between them can be measured. The probe is mounted on a cantilever that can deflect in response to the forces between it and the sample surface. By monitoring the deflection of the cantilever, the force between the probe and the surface can be measured.</p>
 <p>During a measurement, the probe is brought into contact with the sample surface and retracts after the maximum piezo is reached. By measuring the piezo displacement and the force as the probe is moved towards and away from the surface a single <a class="reference internal" href="#force-distance-curve"><span class="std std-ref">force distance curve</span></a> is obtained. This measurement process is repeteated for every measurement point of the sample. Resulting in a set of m x n force distance curves, called <a class="reference internal" href="#force-volume"><span class="std std-ref">force volume</span></a>. By analysing the individual force distance curves, conclusions can be drawn about the properties of the sample. If this is done for each force distnace curve in the force volume, <a class="reference internal" href="channels.html#channels"><span class="std std-ref">channels</span></a> about the different properties can be obtained.</p>
 <p>The interpretation of AFS data can be complex, requiring advanced modeling and analysis techniques to extract meaningful information. This is due to some <a class="reference internal" href="#measurement-erros"><span class="std std-ref">measurement errors</span></a> which occur during the measurement. SOFA automatically <a class="reference internal" href="correction_algorithm.html#correction-algorithm"><span class="std std-ref">corrects</span></a> these errors and calculates multiple different <a class="reference internal" href="channels.html#channels"><span class="std std-ref">channels</span></a> which makes the evaluation of the data much easier.</p>
@@ -222,59 +221,57 @@
 <p class="admonition-title">Note</p>
 <p>The current version of SOFA (1.0) only takes the approach part of the force distance curves into consederation. Therefore the retreat part of the force distance curves is neglected in the following.</p>
 </div>
-<section id="force-volume">
-<span id="id1"></span><h2>Force Volume<a class="headerlink" href="#force-volume" title="Permalink to this headline">#</a></h2>
+<div class="section" id="force-volume">
+<span id="id1"></span><h2>Force Volume<a class="headerlink" href="#force-volume" title="Permalink to this heading">#</a></h2>
 <p>A force volume is a set of m x n force distance curves, resulting from an AFM measurement. After the force distance curves of the force volume have been corrected the different channels can be calculated.</p>
-</section>
-<section id="force-distance-curve">
-<span id="id2"></span><h2>Force Distance Curve<a class="headerlink" href="#force-distance-curve" title="Permalink to this headline">#</a></h2>
-<figure class="align-default" id="id6">
-<img alt="image of the approach part of a force distance curve" src="_images/force_distance_curve.svg"/><figcaption>
-<p><span class="caption-text">Approach part of a corrected force distance curve with the different sections and points of interest.</span><a class="headerlink" href="#id6" title="Permalink to this image">#</a></p>
-</figcaption>
-</figure>
+</div>
+<div class="section" id="force-distance-curve">
+<span id="id2"></span><h2>Force Distance Curve<a class="headerlink" href="#force-distance-curve" title="Permalink to this heading">#</a></h2>
+<div class="figure align-default" id="id6">
+<img alt="image of the approach part of a force distance curve" src="_images/force_distance_curve.svg"/><p class="caption"><span class="caption-text">Approach part of a corrected force distance curve with the different sections and points of interest.</span><a class="headerlink" href="#id6" title="Permalink to this image">#</a></p>
+</div>
 <p>A force distance curve represents the force applied by the cantilever of the AFM probe on the sample surface as a function of the distance between the probe and the surface.</p>
-<section id="curve-sections">
-<span id="id3"></span><h3>Curve Sections<a class="headerlink" href="#curve-sections" title="Permalink to this headline">#</a></h3>
-<section id="zero-line">
-<h4>Zero Line<a class="headerlink" href="#zero-line" title="Permalink to this headline">#</a></h4>
+<div class="section" id="curve-sections">
+<span id="id3"></span><h3>Curve Sections<a class="headerlink" href="#curve-sections" title="Permalink to this heading">#</a></h3>
+<div class="section" id="zero-line">
+<h4>Zero Line<a class="headerlink" href="#zero-line" title="Permalink to this heading">#</a></h4>
 <p>The zeroline of a force distance curve represents the baseline level of the measured force when the AFM probe is positioned far away from the sample surface, beyond the range of any interaction forces. Therefore the measured force in this section is primarily due to noise or drift in the measurement system.</p>
-</section>
-<section id="attractive-area">
-<h4>Attractive Area<a class="headerlink" href="#attractive-area" title="Permalink to this headline">#</a></h4>
+</div>
+<div class="section" id="attractive-area">
+<h4>Attractive Area<a class="headerlink" href="#attractive-area" title="Permalink to this heading">#</a></h4>
 <p>The attractive area of a force distance curve is the section where the probe and the sample are held together by van der Waals, electrostatic, or chemical interactions. In this region, the force decreases as the attractive forces become stronger as the probe is brought closer to the surface until the force reaches a minimum value. From this point on, the probe and sample are already so close that the attractive forces start to decrease again and the force thus increases.</p>
-</section>
-<section id="repulsive-regime">
-<h4>Repulsive Regime<a class="headerlink" href="#repulsive-regime" title="Permalink to this headline">#</a></h4>
+</div>
+<div class="section" id="repulsive-regime">
+<h4>Repulsive Regime<a class="headerlink" href="#repulsive-regime" title="Permalink to this heading">#</a></h4>
 <p>The repulsive area of a force distance curve refers to the region of the curve where the probe and the sample surface are in contact and thus pushed apart by repulsive forces. They continue to approach each other until the maximum piezo value is reached. This region is characterized by an increase in the measured force, which is proportional to the strength of the repulsive forces.</p>
-</section>
-</section>
-<section id="points-of-interest">
-<span id="id4"></span><h3>Points of Interest<a class="headerlink" href="#points-of-interest" title="Permalink to this headline">#</a></h3>
-<section id="end-of-zeroline">
-<h4>End Of Zeroline<a class="headerlink" href="#end-of-zeroline" title="Permalink to this headline">#</a></h4>
-</section>
-<section id="jump-to-contact">
-<h4>Jump To Contact<a class="headerlink" href="#jump-to-contact" title="Permalink to this headline">#</a></h4>
-</section>
-<section id="point-of-contact">
-<h4>Point Of Contact<a class="headerlink" href="#point-of-contact" title="Permalink to this headline">#</a></h4>
-</section>
-</section>
-</section>
-<section id="measurement-erros">
-<span id="id5"></span><h2>Measurement Erros<a class="headerlink" href="#measurement-erros" title="Permalink to this headline">#</a></h2>
+</div>
+</div>
+<div class="section" id="points-of-interest">
+<span id="id4"></span><h3>Points of Interest<a class="headerlink" href="#points-of-interest" title="Permalink to this heading">#</a></h3>
+<div class="section" id="end-of-zeroline">
+<h4>End Of Zeroline<a class="headerlink" href="#end-of-zeroline" title="Permalink to this heading">#</a></h4>
+</div>
+<div class="section" id="jump-to-contact">
+<h4>Jump To Contact<a class="headerlink" href="#jump-to-contact" title="Permalink to this heading">#</a></h4>
+</div>
+<div class="section" id="point-of-contact">
+<h4>Point Of Contact<a class="headerlink" href="#point-of-contact" title="Permalink to this heading">#</a></h4>
+</div>
+</div>
+</div>
+<div class="section" id="measurement-erros">
+<span id="id5"></span><h2>Measurement Erros<a class="headerlink" href="#measurement-erros" title="Permalink to this heading">#</a></h2>
 <p>During the measurement each force distance curve</p>
-<section id="topography-offset">
-<h3>Topography Offset<a class="headerlink" href="#topography-offset" title="Permalink to this headline">#</a></h3>
+<div class="section" id="topography-offset">
+<h3>Topography Offset<a class="headerlink" href="#topography-offset" title="Permalink to this heading">#</a></h3>
 <p>The topography offset is a shift of the force distance curve in the piezo (x) axis. This error arises because</p>
-</section>
-<section id="virtual-deflection">
-<h3>Virtual Deflection<a class="headerlink" href="#virtual-deflection" title="Permalink to this headline">#</a></h3>
+</div>
+<div class="section" id="virtual-deflection">
+<h3>Virtual Deflection<a class="headerlink" href="#virtual-deflection" title="Permalink to this heading">#</a></h3>
 <p>The virtual deflection is a shift of the force distance curve in force (y) axis. This error is caused by the fact that</p>
-</section>
-</section>
-</section>
+</div>
+</div>
+</div>
 
         </article>
       </div>
@@ -374,6 +371,7 @@
 </div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="_static/scripts/furo.js"></script>
     </body>

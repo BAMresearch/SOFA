@@ -13,10 +13,10 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 """
-from typing import Dict
+from typing import Dict, Callable
 
 import data_processing.named_tuples as nt
-from data_processing.import_formats.import_ibw_data import import_ibw_data
+from data_processing.import_data.import_formats.import_ibw_data import import_ibw_data
 
 def import_data(
 	importParameter: nt.ImportParameter,
@@ -36,10 +36,30 @@ def import_data(
 	importedData : dict
 		Combined data of all the imported data files.
 	"""
-	importedData = importFunctions[importParameter.dataFormat][0](importParameter)
+	importFunction = get_import_function(importParameter.dataFormat)
+	importedData = importFunction(importParameter)
 
 	return importedData
-	
+
+def get_import_function(
+	fileformat: str
+) -> Callable:
+	"""
+	Map the selected file type to the corresponding
+	import function.
+
+	Parameters
+	----------
+	fileformat : str
+		Selected file type of the measurement data
+
+	Returns
+	-------
+	importFunction : function
+		Matching import function to the selected
+		file type.
+	"""
+	return importFunctions[fileformat][0]
 
 # Defines all available import options.
 importFunctions = {

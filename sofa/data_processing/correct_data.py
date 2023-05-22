@@ -242,7 +242,7 @@ def smooth_derivation(
 		Smoothed first derivation of the deflection (y) values.
 	"""
 	return gaussian_filter1d(
-		derivationApproachCurve,
+		derivationDeflection,
 		sigma=smoothFactor
 	)
 
@@ -405,7 +405,7 @@ def locate_end_of_zeroline(
 	)
 
 	try:
-		indexEndOfZeroline = pointsWithDecreasingDeflection[0] + indexLeftBorder
+		indexEndOfZeroline = pointsWithDecreasingDeflection[0][-1] + indexLeftBorder
 	except IndexError as e:
 		raise ce.UnableToLocateEndOfZerolineError from e
 	else:
@@ -443,12 +443,12 @@ def calculate_linear_fit_to_zeroline(
 	)
 
 	linearZerolineDeflectionValues = np.array(
-		[intercept + slope*approachCurve.piezo[0:endOfZeroline.index]]
+		intercept + slope*approachCurve.piezo[0:endOfZeroline.index]
 	)
 
 	fitApproachCurve = nt.ForceDistanceCurve(
 		piezo=approachCurve.piezo[0:endOfZeroline.index],
-		deflection=linearDeflectionValues
+		deflection=linearZerolineDeflectionValues
 	)
 
 	return fitApproachCurve

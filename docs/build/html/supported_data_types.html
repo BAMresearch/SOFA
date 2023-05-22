@@ -1,11 +1,10 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Correction Algorithm" href="correction_algorithm.html" /><link rel="prev" title="Using SOFA" href="using_sofa.html" />
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Correction Algorithm" href="correction_algorithm.html" /><link rel="prev" title="Using SOFA" href="using_sofa.html" />
 
-    <meta name="generator" content="sphinx-4.5.0, furo 2022.04.07"/>
+    <meta name="generator" content="sphinx-5.1.1, furo 2022.04.07"/>
         <title>Supported Data Types - SOFA</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=68f4518137b9aefe99b631505a2064c3c42c9852" />
@@ -212,15 +211,15 @@
           </label>
         </div>
         <article role="main">
-          <section id="supported-data-types">
-<h1>Supported Data Types<a class="headerlink" href="#supported-data-types" title="Permalink to this headline">#</a></h1>
+          <div class="section" id="supported-data-types">
+<h1>Supported Data Types<a class="headerlink" href="#supported-data-types" title="Permalink to this heading">#</a></h1>
 <p>Please make sure that the raw FSD can be exported from your AFM device. SOFA 1.0 can only import .ibw (igor binary wave) files, supported by <a class="reference internal" href="#ibw-oxford-instrument-asylum-afm"><span class="std std-ref">oxford instrument Asylum AFM</span></a>. In case your FSD format is accepted by SOFA, please make also sure that the data is organized as a Force Volume (FV), i.e. each FS curve is assigned to a x,y-coordinate in a spatial grid, as described in detail in <a class="reference internal" href="#force-spectroscopy-data-structure"><span class="std std-ref">Force Spectroscopy data structure</span></a>. SOFA 1.0 can only handle FV with a square grid i.e., number of curves in x and y direction is identical.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>We intend to make data import possible for most common FSD formats. If you wish to use SOFA for analyzing your experimental data, please contact <a class="reference external" href="mailto:sofa%40bam.de">sofa<span>@</span>bam<span>.</span>de</a> and provide us with a small data set of exemplary FSD (2x2 curves are sufficient), model and maker of your AFM and the maker and version of the used software.</p>
 </div>
-<section id="force-spectroscopy-data-structure">
-<span id="id1"></span><h2>Force Spectroscopy data structure<a class="headerlink" href="#force-spectroscopy-data-structure" title="Permalink to this headline">#</a></h2>
+<div class="section" id="force-spectroscopy-data-structure">
+<span id="id1"></span><h2>Force Spectroscopy data structure<a class="headerlink" href="#force-spectroscopy-data-structure" title="Permalink to this heading">#</a></h2>
 <p>FSD contains single Force Curves (aka Force-Distance curves, FDC) which consist of two data sets of equal dimensions, the controlled variable <strong>piezo displacement Z</strong> and the measured variable <strong>force F</strong>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -228,53 +227,51 @@
 </div>
 <p>Force curves can be differently stored, depending on the software used in AFM set-ups. Approach and retract part of the curve can be merged in one data set, or already split in two separate data sets. As of version 1.0, SOFA’s algorithm expects a merged data set and provides a function to split the approach part from the retract part. All subsequent steps of SOFA ignore the retract part and analyze the approach part. Incorporation of the retract part in the analysis will be provided in future versions of SOFA.</p>
 <p>Also, storage of a FV can differ significantly, depending on the software used in the AFM set-up. The two most common forms are depicted in a schematic drawing in Figure 1.</p>
-<figure class="align-default" id="id5">
+<div class="figure align-default" id="id5">
 <img alt="drawing of typical data organization of FSD sets" src="_images/data_organization_of_fsd_sets.jpg"/>
-<figcaption>
-<p><span class="caption-text">Figure 1 schematic drawing of typical data organization of FSD sets force and distance. A) 3D in n x n matrices, with n being the number of lines and rows of the measurement grid. B) 2D in a (n*n) linear data set.</span><a class="headerlink" href="#id5" title="Permalink to this image">#</a></p>
-</figcaption>
-</figure>
+<p class="caption"><span class="caption-text">Figure 1 schematic drawing of typical data organization of FSD sets force and distance. A) 3D in n x n matrices, with n being the number of lines and rows of the measurement grid. B) 2D in a (n*n) linear data set.</span><a class="headerlink" href="#id5" title="Permalink to this image">#</a></p>
+</div>
 <p>Besides the most common ways of storing FSD in a compact form as shown above, single curves can be stored in a hierarchical folder system.</p>
 <p>Most exported FSD formats also include notes or headers which describe the experimental set-up, i.e. time, date, temperature, calibration data, measurement rate, maximum force, dimension of FV in points, lines, x and y-range. In case this additional data is available, SOFA can import information, which is necessary for further analysis, such as the spring constant kc or the sensitivity Ω.</p>
 <p>Also included in the exported FSD are raw parameter maps, which can be also uploaded and used for further analysis in SOFA, as shown in Parameter maps.</p>
-</section>
-<section id="import-formats">
-<span id="id2"></span><h2>Import Formats<a class="headerlink" href="#import-formats" title="Permalink to this headline">#</a></h2>
+</div>
+<div class="section" id="import-formats">
+<span id="id2"></span><h2>Import Formats<a class="headerlink" href="#import-formats" title="Permalink to this heading">#</a></h2>
 <p>SOFA requires the data to be in a spefic format to be able to read it. Below are all currently supported import formats listet. The <a class="reference external" href="https://github.com/2Puck/sofa/tree/development/test_data">test_data</a> folder of the SOFA repository includes some files in the ibw oxford instrument asylum afm format, that SOFA can import.</p>
-<section id="ibw-oxford-instrument-asylum-afm">
-<span id="id3"></span><h3>ibw oxford instrument Asylum AFM<a class="headerlink" href="#ibw-oxford-instrument-asylum-afm" title="Permalink to this headline">#</a></h3>
-<section id="measurement-data">
-<h4>Measurement Data<a class="headerlink" href="#measurement-data" title="Permalink to this headline">#</a></h4>
+<div class="section" id="ibw-oxford-instrument-asylum-afm">
+<span id="id3"></span><h3>ibw oxford instrument Asylum AFM<a class="headerlink" href="#ibw-oxford-instrument-asylum-afm" title="Permalink to this heading">#</a></h3>
+<div class="section" id="measurement-data">
+<h4>Measurement Data<a class="headerlink" href="#measurement-data" title="Permalink to this heading">#</a></h4>
 <p>In order for SOFA to import measurement data the data needs to be organized as lines and points per line within a folder. The single data files for the piezo displacement and force need to end with <strong>ZSnsr.ibw</strong> and <strong>Defl.ibw</strong>. Within the files, SOFA expects to find the key <strong>wave</strong> and and therein the key <strong>wData</strong>.</p>
-</section>
-<section id="image">
-<h4>Image<a class="headerlink" href="#image" title="Permalink to this headline">#</a></h4>
+</div>
+<div class="section" id="image">
+<h4>Image<a class="headerlink" href="#image" title="Permalink to this heading">#</a></h4>
 <p>To be able to read an image file, SOFA expects the <strong>wave</strong> key and therein the following keys <strong>wave_header</strong>, <strong>note</strong> and <strong>wData</strong> in the file. SOFA imports the following informations from them:</p>
 <ul class="simple">
 <li><p><strong>wave_header</strong> - size of the measurement grid</p></li>
 <li><p><strong>note</strong> - fast scan size, slow scan size, x offset, y offset and spring constant</p></li>
 <li><p><strong>wData</strong> - height and adhesion channel</p></li>
 </ul>
-</section>
-<section id="parameter-maps">
-<h4>Parameter Maps<a class="headerlink" href="#parameter-maps" title="Permalink to this headline">#</a></h4>
+</div>
+<div class="section" id="parameter-maps">
+<h4>Parameter Maps<a class="headerlink" href="#parameter-maps" title="Permalink to this heading">#</a></h4>
 <p>Work in progress</p>
-</section>
-</section>
-</section>
-<section id="export-formats">
-<span id="id4"></span><h2>Export Formats<a class="headerlink" href="#export-formats" title="Permalink to this headline">#</a></h2>
+</div>
+</div>
+</div>
+<div class="section" id="export-formats">
+<span id="id4"></span><h2>Export Formats<a class="headerlink" href="#export-formats" title="Permalink to this heading">#</a></h2>
 <p>SOFA allows to export the plots of the line plot, heatmap and histogram of the active channel and the data created during the analysis cycle. The exported data consists of the name, size, if available data from an image, raw measurement data, corrected measurement data, average data and the data of every channel flatten into one dimesion. The plots are saved as png file. Below are all currently supported export formats for the data listed:</p>
 <ul class="simple">
 <li><p>.csv</p></li>
 <li><p>.xlsx</p></li>
 </ul>
-</section>
-<section id="adding-custom-import-or-export-formats">
-<h2>Adding custom Import or Export formats<a class="headerlink" href="#adding-custom-import-or-export-formats" title="Permalink to this headline">#</a></h2>
+</div>
+<div class="section" id="adding-custom-import-or-export-formats">
+<h2>Adding custom Import or Export formats<a class="headerlink" href="#adding-custom-import-or-export-formats" title="Permalink to this heading">#</a></h2>
 <p>As mentioned above you can contact us under <a class="reference external" href="mailto:sofa%40bam.de">sofa<span>@</span>bam<span>.</span>de</a> or extend the SOFA code. See <a class="reference internal" href="codebase.html#import-data-implementation"><span class="std std-ref">Import Data</span></a> or <a class="reference internal" href="codebase.html#export-data-implementation"><span class="std std-ref">Export Data</span></a> for further information about the implementation of the import and export functionality.</p>
-</section>
-</section>
+</div>
+</div>
 
         </article>
       </div>
@@ -365,6 +362,7 @@
 </div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="_static/scripts/furo.js"></script>
     </body>

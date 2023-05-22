@@ -19,6 +19,7 @@ import functools
 
 import tkinter as tk
 import ttkbootstrap as ttk
+from tkinter import messagebox
 from ttkbootstrap.constants import *
 
 import matplotlib
@@ -33,17 +34,35 @@ from data_processing.calculate_channel_data import active_channels as activeChan
 from toolbars.line_plot_toolbar import LinePlotToolbar
 from toolbars.heatmap_toolbar import HeatmapToolbar
 
-def decorator_progressbar(function):
+def decorator_check_imported_data_set_with_feedback(function):
 	"""
-	
+	Check if the required path for the measurement
+	folder is set.
 	"""
 	@functools.wraps(function)
-	def wrapper_progressbar(self, *args, **kwargs):
-		self._start_progressbar()
-		function(self, *args, **kwargs)
-		self.stop_progressbar()
+	def wrapper_check_imported_data_set(self, *args):
+		if self.guiInterface.check_imported_data_set() == False:
+			return messagebox.showinfo(
+				"Error", 
+				"No imported data sets.", 
+				parent=self
+			)
+		else:
+			function(self, *args)
 
-	return wrapper_progressbar
+	return wrapper_check_imported_data_set
+
+def decorator_check_imported_data_set(function):
+	"""
+	Check if the required path for the measurement
+	folder is set.
+	"""
+	@functools.wraps(function)
+	def wrapper_check_imported_data_set(self, *args):
+		if self.guiInterface.check_imported_data_set():
+			function(self, *args)
+
+	return wrapper_check_imported_data_set
 
 class MainWindow(ttk.Frame):
 	"""
@@ -96,7 +115,6 @@ class MainWindow(ttk.Frame):
 		self._create_frame_files(frameFirstRow)
 		self._create_frame_active_data(frameFirstRow)
 		self._create_frame_linked_plots(frameFirstRow)
-		self._create_frame_control(frameFirstRow)
 
 	def _create_second_row(self) -> None:
 		"""
@@ -160,7 +178,7 @@ class MainWindow(ttk.Frame):
 		self.stringVarActiveDataLocation = ttk.StringVar(self, value="")
 		self.stringVarActiveDataSize = ttk.StringVar(self, value="")
 		
-		dropdownForceVolume = ttk.OptionMenu(
+		self.dropdownForceVolumes = ttk.OptionMenu(
 			frameActiveData, 
 			self.activeForceVolume, 
 			"",
@@ -168,7 +186,7 @@ class MainWindow(ttk.Frame):
 			command=self._update_force_volume,
 			bootstyle=""
 		)
-		dropdownForceVolume.grid(row=0, column=2, padx=10, sticky=E)
+		self.dropdownForceVolumes.grid(row=0, column=2, padx=10, sticky=E)
 
 		labelActiveData = ttk.Label(
 			frameActiveData, 
@@ -260,34 +278,6 @@ class MainWindow(ttk.Frame):
 		frameInteractivePlots.columnconfigure(0, weight=1)
 		frameInteractivePlots.columnconfigure(1, weight=1)
 		frameInteractivePlots.columnconfigure(2, weight=1)
-
-	def _create_frame_control(
-		self, 
-		frameParent: ttk.Frame
-	) -> None:
-		"""
-		Define a progressbar to provide user feedback 
-		about possible running processes.
-
-		Parameters
-		----------
-		frameParent : ttk.Frame
-			Corresponding row of the main window.
-		"""
-		frameControl = ttk.Labelframe(frameParent, text="Control", padding=15)
-		frameControl.pack(side=LEFT, fill=BOTH, expand=YES)
-
-		self.progressbarCurrentLabel = tk.StringVar(self, value="Test")
-
-		progressbarLabel = ttk.Label(frameControl, textvariable=self.progressbarCurrentLabel)
-		progressbarLabel.grid(row=0, column=0, padx=10)
-
-		self.progressbar = ttk.Progressbar(
-			frameControl,
-			mode=INDETERMINATE,
-            bootstyle=SUCCESS
-		)
-		self.progressbar.grid(row=1, column=0, padx=10)
 		
 	def _create_line_plot_frame(
 		self, 
@@ -506,11 +496,19 @@ class MainWindow(ttk.Frame):
 		location : str
 
 		"""
-		self.forceVolumes.append(name)
-
 		self.stringVarActiveData.set(name)
 		self.stringVarActiveDataSize.set(str(size))
 		self.stringVarActiveDataLocation.set(location)
+
+		self.forceVolumes.append(name)
+		self._update_dropdown_force_volumes()
+
+	def _update_dropdown_force_volumes(self) -> None:
+		"""
+		Update the dropdown menu options for the
+		imported force volumes.
+		"""
+		self.dropdownForceVolumes.set_menu("", *self.forceVolumes)
 
 	def _create_import_window(self) -> None:
 		"""
@@ -523,6 +521,7 @@ class MainWindow(ttk.Frame):
 			self.set_data_active_force_volume
 		)
 
+	@decorator_check_imported_data_set_with_feedback
 	def _create_export_window(self) -> None:
 		"""
 		Create a subwindow to export data.
@@ -533,35 +532,34 @@ class MainWindow(ttk.Frame):
 			self.guiInterface
 		)
 
-	@decorator_progressbar
 	def _update_force_volume(self, _) -> None: 
 		"""
 		Update the active force volume.
 		"""
 		self.guiInterface.plot_active_force_volume()
 
-	@decorator_progressbar
+	@decorator_check_imported_data_set_with_feedback
 	def _update_plots(self) -> None:
 		"""
 		Update the inactive data points in every plot.
 		"""
-		self.guiInterface.update_plots()
+		self.guiInterface.update_active_force_volume_plots()
 
-	@decorator_progressbar
+	@decorator_check_imported_data_set
 	def _update_heatmap_channel(self, _) -> None:
 		"""
 		Update the displayed channel in the heatmap.
 		"""
 		self.guiInterface.plot_heatmap()
 
-	@decorator_progressbar
+	@decorator_check_imported_data_set
 	def _update_histogram_channel(self, _) -> None:
 		"""
 		Update the displayed channel in the histogram.
 		"""
 		self.guiInterface.plot_histogram()
 
-	@decorator_progressbar
+	@decorator_check_imported_data_set_with_feedback
 	def _restrict_histogram(self, direction) -> None:
 		"""
 		Change the minimum or maximum border for the histogram values.
@@ -574,24 +572,6 @@ class MainWindow(ttk.Frame):
 		"""
 		self.guiInterface.restrict_histogram(direction)
 		self.guiInterface.update_inactive_data_points_histogram()
-
-	def _start_progressbar(self) -> None:
-		"""
-		Start the progressbar.
-		"""
-		self.progressbarCurrentLabel.set("Updating data")
-		self.progressbar.start()
-
-		self.update_idletasks()
-
-	def _stop_progressbar(self) -> None:
-		"""
-		Stop the progressbar.
-		"""
-		self.progressbar.stop()
-		self.progressbarCurrentLabel.set("")
-
-		self.update_idletasks()
 
 	@staticmethod
 	def _camel_case_to_text(inputString: str) -> str:

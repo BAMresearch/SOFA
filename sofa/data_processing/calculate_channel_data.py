@@ -56,7 +56,7 @@ def calculate_channel_data(
 	"""
 	channelData = {}
 
-	for channelName, caluclate_channel in channels.items():
+	for channelName, caluclate_channel in active_channels.items():
 		channelData[channelName] = caluclate_channel(
 			forceDistanceCurves,
 			size
@@ -369,7 +369,7 @@ def calculate_curves_with_artifacts(
 	 : list
 	"""
 	return [
-		1 if check_for_decreasing_contact_values(
+		1 if forceDistanceCurve.couldBeCorrected and check_for_decreasing_contact_values(
 			forceDistanceCurve.dataApproachCorrected.deflection,
 			forceDistanceCurve.channelMetadata.pointOfContact
 		)

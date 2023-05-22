@@ -131,28 +131,38 @@ This package is responsible for the processing of the force spectroscopy data. T
 Import Data
 ~~~~~~~~~~~
 
-The Import Data module is responsible for the import of measurement data. It contains functions to import all currently supported file formats. In addition to the required measurement data, other optional files like an image file or data for additional channels can be imported as well. At first the required measurement data are imported. All data files in the folder are collected and seperated into the piezo and deflection data. Afterwards the piezo and deflection data files are loaded using the `Igor <https://github.com/wking/igor>`_. Then invalid values are removed and the curve is splitted into it's approach and retract part. After this process is finished, the optional data is imported. The decorators :code:`decorator_check_file_size_image` and :code:`decorator_check_file_size_channel` check whether all data matches in size.
+The import data package handles the import of the different file formats. To add new file types create a new module in the :ref:`import formats <import formats>` folder, import it in the :ref:`import data <import data wrapper implementation>` module and extend the dictionary :code:`importFunctions`. For detailed information about the given input and expected output of the import functions, see the :ref:`import architecture <test>` section.
 
-To add new import formats the dictionary :code:`importFunctions` .  
+.. _import data wrapper implementation:
+
+Import Data Wrapper
+"""""""""""""""""""
+
+The Import Data module is responsible for the import of measurement data with the selected data type. It imports all modules from the :ref:`import formats <import formats>` folder and maps the selected data type to the corresponding import function.
+
+.. _import formats:
 
 Import Formats
-~~~~~~~~~~~~~~
+""""""""""""""
+
+This folder contains modules with import functions for every currently supported import data type.
 
 Import Ibw Data
-"""""""""""""""
+^^^^^^^^^^^^^^^
+
+This module handles the import of measurement data in the :code:`.ibw` BAM file format. In addition to the required measurement data, other optional files like an image file or data for additional channels can be imported as well. At first the required measurement data are imported. All data files in the folder are collected and seperated into the piezo and deflection data. Afterwards the piezo and deflection data files are loaded using the `Igor <https://github.com/wking/igor>`_. Then invalid values are removed and the curve is splitted into it's approach and retract part. After this process is finished, the optional data is imported. The decorators :code:`decorator_check_file_size_image` and :code:`decorator_check_file_size_channel` check whether all data matches in size.
 
 Correct Data
 ~~~~~~~~~~~~
 
-corrects the approch part of a single force distance curve
-wie wird mit möglichen fehlern error umgegangen
-vorgehen verweiß correction algorithm
-verweiß zu test
+The correct data module is responsible for correcting the approach part of force distance curve. This process is described in detail in the :ref:`correction algorithm <correction algorithm>` section. If an error occurs during this process a :ref:`custom exeptions <custom exeptions implementation>` is raised and catched by the :code:`_import_data` function of the :ref:`import window <import window implementation>`. 
 
 .. _calculate channel data implementation:
 
 Calculate Channel Data
 ~~~~~~~~~~~~~~~~~~~~~~
+
+
 
 enthält funktionen um die einzelnen channel zu berechen
 weitere channel braucht funktion die bestimmte argumente bekommt und folgendes zurück liefert
@@ -180,6 +190,8 @@ Named Tuples
 ~~~~~~~~~~~~
 
 To increase the readability of the code SOFA uses NamedTuple, which are all defined in this file. They are divided into different categories and use type hints, to make it easier to understand the code.
+
+.. _custom exeptions implementation:
 
 Custom Exceptions
 ~~~~~~~~~~~~~~~~~

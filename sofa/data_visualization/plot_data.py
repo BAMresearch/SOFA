@@ -58,7 +58,7 @@ def create_raw_line(
 		rawMeasurementCurve.piezo, 
 		rawMeasurementCurve.deflection, 
 		c="darkred", 
-		label=identifier + "_raw",
+		label=identifier,
 		linewidth=0.5, 
 		picker=True, 
 		pickradius=1.0, 
@@ -91,7 +91,7 @@ def create_corrected_line(
 		correctedMeasurementCurve.piezo, 
 		correctedMeasurementCurve.deflection, 
 		c="red", 
-		label=identifier + "_corrected",
+		label=identifier,
 		linewidth=0.5, 
 		picker=True, 
 		pickradius=1.0, 
@@ -279,7 +279,7 @@ def plot_histogram(
 	ax.cla()
 	ax.ticklabel_format(axis="y", style="sci", scilimits=(0,0))
 
-	_, binValues, _ =ax.hist(
+	_, binValues, _ = ax.hist(
 		data, 
 		bins=numberOfBins, 
 		range=(np.min(data), np.max(data)),
@@ -370,16 +370,16 @@ def update_line_plot(
 	"""
 	for index, forceDistanceCurve in enumerate(forceDistanceCurves):
 		if index in inactiveDataPoints and showInactive:
-			self.deactivate_line(
-				forceDistanceCurve.lineRepresentationCorrectedData, 
+			deactivate_line(
+				forceDistanceCurve, 
 			)
 		elif index in inactiveDataPoints and not showInactive:
-			self.hide_line(
-				forceDistanceCurve.lineRepresentationCorrectedData, 
+			hide_line(
+				forceDistanceCurve, 
 			)
 		else:
-			self.activate_line(
-				forceDistanceCurve.lineRepresentationCorrectedData, 
+			activate_line(
+				forceDistanceCurve, 
 			)
 	
 	holder.draw()
