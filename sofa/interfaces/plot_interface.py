@@ -48,14 +48,15 @@ class PlotInterface():
 		self.linePlotZoomHistory: List = []
 
 		self.heatmapOrientationMatrix: np.ndarray
-		self.heatmapSelectedAreaBorders: List = []  
+		self.heatmapSelectedArea: List = []
+		self.heatmapSelectedAreaOutlines: List = []  
 
 		self.histogramBins: List = []
 
 		self._create_line_plot_force_distance_lines(
 			forceDistanceCurves
 		)
-		self._create_heatmap_orientation_matrix()
+		self.create_heatmap_orientation_matrix()
 
 	def _create_line_plot_force_distance_lines(
 		self, 
@@ -71,7 +72,7 @@ class PlotInterface():
 				)
 			)
 
-	def _create_heatmap_orientation_matrix(self) -> np.ndarray:
+	def create_heatmap_orientation_matrix(self) -> np.ndarray:
 		"""
 		"""
 		self.heatmapOrientationMatrix = np.arange(
@@ -116,17 +117,17 @@ class PlotInterface():
 		# Remove duplicates.
 		self.inactiveDataPoints = list(set(self.inactiveDataPoints))
 
-	def flip_heatmap_orientation_matrix_horizontal() -> None: 
+	def flip_heatmap_orientation_matrix_horizontal(self) -> None: 
 		"""
 		"""
 		self.heatmapOrientationMatrix = np.flip(self.heatmapOrientationMatrix, 0)
 
-	def flip_heatmap_orientation_matrix_vertical() -> None: 
+	def flip_heatmap_orientation_matrix_vertical(self) -> None: 
 		"""
 		"""
 		self.heatmapOrientationMatrix = np.flip(self.heatmapOrientationMatrix, 1)
 
-	def rotate_heatmap_orientation_matrix() -> None: 
+	def rotate_heatmap_orientation_matrix(self) -> None: 
 		"""
 		"""
 		self.heatmapOrientationMatrix = np.flip(self.heatmapOrientationMatrix, 0)

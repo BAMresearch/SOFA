@@ -299,6 +299,7 @@ class MainWindow(ttk.Frame):
 			frameLinePlot, 
 			text="Display Average", 
 			variable=self.displayAverage,
+			command=self._update_line_plot,
 			bootstyle="round-toggle")
 		checkbuttonZoom.grid(row=0, column=0, padx=5, pady=15, sticky=W)
 
@@ -307,6 +308,7 @@ class MainWindow(ttk.Frame):
 			frameLinePlot, 
 			text="Display Errorbar", 
 			variable=self.displayErrorbar,
+			command=self._update_line_plot,
 			bootstyle="round-toggle")
 		checkbuttonZoom.grid(row=0, column=1, padx=5)
 
@@ -315,6 +317,7 @@ class MainWindow(ttk.Frame):
 			frameLinePlot, 
 			text="Display Inactive Curves", 
 			variable=self.displayInactiveCurves,
+			command=self._update_line_plot,
 			bootstyle="round-toggle")
 		checkbuttonZoom.grid(row=0, column=2, padx=5, sticky=E)
 
@@ -544,6 +547,13 @@ class MainWindow(ttk.Frame):
 		Update the inactive data points in every plot.
 		"""
 		self.guiInterface.update_active_force_volume_plots()
+
+	@decorator_check_imported_data_set
+	def _update_line_plot(self) -> None:
+		"""
+		Update the line plot.
+		"""
+		self.guiInterface.update_line_plot()
 
 	@decorator_check_imported_data_set
 	def _update_heatmap_channel(self, _) -> None:

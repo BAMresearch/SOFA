@@ -13,15 +13,21 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 """
-from typing import List, Optional
+from typing import Optional, Tuple
 
-#import matplotlib as mpl
 from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk
 from matplotlib.backend_bases import NavigationToolbar2
 import tkinter as tk
 import tkinter.font
 
 class SofaToolbar(NavigationToolbar2Tk):
+	"""
+
+	
+	Attributes
+	----------
+
+	"""
 	def __init__(self, canvas_, parent_, toolItems):
 		"""
 		"""
@@ -89,6 +95,15 @@ class SofaToolbar(NavigationToolbar2Tk):
 		for button in self._buttons.values():
 			button.configure(bg=self.inactiveButtonColor)
 
+	@staticmethod
+	def _standardize_value_pair(firstValue, secondValue) -> Tuple[float]:
+		"""
+		"""
+		if firstValue > secondValue:
+			return secondValue, firstValue
+
+		return firstValue, secondValue
+
 	def _update_toolbar_mode(self, newMode: str) -> None:
 		"""
 		Update the mode of the toolbar.
@@ -122,18 +137,18 @@ class SofaToolbar(NavigationToolbar2Tk):
 				self.holder.figure.canvas.mpl_connect("pick_event", self._pick_single_line),
 			)
 		# Heatmap toolbar modes
-		elif self.mode == "select area":
+		elif self.mode == "select arbitrary area":
 			self.eventConnections.extend(
 				(
-					self.holder.figure.canvas.mpl_connect("button_press_event", self._select_area_on_click),
-					self.holder.figure.canvas.mpl_connect("button_release_event", self._select_area_on_release)
+					self.holder.figure.canvas.mpl_connect("button_press_event", self._select_arbitrary_area_on_click),
+					self.holder.figure.canvas.mpl_connect("button_release_event", self._select_arbitrary_area_on_release)
 				)
 			)
-		elif self.mode == "select rect":
+		elif self.mode == "select rectangular area":
 			self.eventConnections.extend(
 				(
-					self.holder.figure.canvas.mpl_connect("button_press_event", self._select_rect_on_click),
-					self.holder.figure.canvas.mpl_connect("button_release_event", self._select_rect_on_release)
+					self.holder.figure.canvas.mpl_connect("button_press_event", self._select_rectangular_area_on_click),
+					self.holder.figure.canvas.mpl_connect("button_release_event", self._select_rectangular_area_on_release)
 				)
 			)
 
@@ -151,34 +166,28 @@ class SofaToolbar(NavigationToolbar2Tk):
 		Update the state of the toolbar buttons.
 		"""
 		if self.mode == "":
-			inactiveButtons = self._buttons.values()
-			self._set_toolbar_button_state(inactiveButtons)
+			self._set_toolbar_button_state()
 		# Line plot toolbar modes
 		elif self.mode == "zoom in":
-			inactiveButtons = self._buttons.values()
 			self._set_toolbar_button_state(
-				inactiveButtons, self._buttons["zoom_in"]
+				self._buttons["zoom_in"]
 			)
 		elif self.mode == "pick single line":
-			inactiveButtons = self._buttons.values()
 			self._set_toolbar_button_state(
-				inactiveButtons, self._buttons["pick_single"]
+				self._buttons["pick_single"]
 			)
 		# Heatmap toolbar modes
 		elif self.mode == "select area":
-			inactiveButtons = self._buttons.values()
 			self._set_toolbar_button_state(
-				inactiveButtons, self._buttons["select_area"]
+				self._buttons["select_area"]
 			)
 		elif self.mode == "select rect":
-			inactiveButtons = self._buttons.values()
 			self._set_toolbar_button_state(
-				inactiveButtons, self._buttons["select_rectangle"]
+				self._buttons["select_rectangle"]
 			)
 
 	def _set_toolbar_button_state(
 		self,
-		inactiveButtons: List[tk.Button], 
 		activeButton: Optional[tk.Button] = None
 	) -> None:
 		"""
@@ -186,12 +195,10 @@ class SofaToolbar(NavigationToolbar2Tk):
 
 		Parameters
 		----------
-		inactiveButtons : list[tk.Button]
-			List with the new inactive buttons. 
 		activeButton : tk.Button 
 			Potential new active button.
 		"""
-		for button in inactiveButtons:
+		for button in self._buttons.values():
 			button.configure(bg=self.inactiveButtonColor)
 
 		if activeButton:

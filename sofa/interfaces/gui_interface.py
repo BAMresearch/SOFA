@@ -204,7 +204,7 @@ class GUIInterface():
 				activePlotInterface.inactiveDataPoints,
 				activePlotInterface.heatmapOrientationMatrix
 			),
-			activePlotInterface.heatmapSelectedAreaBorders
+			activePlotInterface.heatmapSelectedAreaOutlines
 		)
 
 	@decorator_get_active_histogram_channel
@@ -351,6 +351,15 @@ class GUIInterface():
 		"""
 		activePlotInterface.reset_inactive_data_points()
 
+	@decorator_get_active_force_volume
+	def reset_heatmap_orientation(
+		self,
+		activeForceVolume: ForceVolume
+	) -> None:
+		"""
+		"""
+		activeForceVolume.reset_channel_orientation()
+
 	@decorator_get_active_plot_interface
 	def reset_heatmap_orientation_matrix(
 		self,
@@ -358,7 +367,7 @@ class GUIInterface():
 	) -> None:
 		"""
 		"""
-		activePlotInterface._create_heatmap_orientation_matrix()
+		activePlotInterface.create_heatmap_orientation_matrix()
 
 	@decorator_get_active_plot_interface
 	def add_inactive_data_point(

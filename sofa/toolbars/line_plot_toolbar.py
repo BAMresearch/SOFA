@@ -61,7 +61,7 @@ def decorator_check_zoom_valid(function):
 	return wrapper_check_zoom_valid
 
 class LinePlotToolbar(SofaToolbar):
-	'''
+	"""
 	A custom toolbar to process data, displayed in a line plot.
 
 	Attributes
@@ -74,7 +74,7 @@ class LinePlotToolbar(SofaToolbar):
 
 	eventConnections : list[]
 
-	'''
+	"""
 	def __init__(self, canvas_, parent_, guiInterface):
 		# Set path for toolbar icons.
 		iconPath = os.path.join(
@@ -231,15 +231,6 @@ class LinePlotToolbar(SofaToolbar):
 			zoomYEnd
 		)
 
-	@staticmethod
-	def _standardize_value_pair(firstValue, secondValue) -> Tuple[float]:
-		"""
-		"""
-		if firstValue > secondValue:
-			return secondValue, firstValue
-
-		return firstValue, secondValue
-
 	def _set_zoom(
 		self, 
 		viewLimits: nt.ViewLimits
@@ -286,16 +277,19 @@ class LinePlotToolbar(SofaToolbar):
 		currentViewLimits = self._get_current_view_limits()
 		
 		for line in self.holder.figure.get_axes()[0].get_lines():
-			hasIntersection = self._check_line_intersection(line, currentViewLimits)
+			hasIntersection = self._check_line_intersection(
+				line, 
+				currentViewLimits
+			)
 			
 			if hasIntersection:
 				self._deactivate_line(line)
 		
 		self.guiInterface.update_inactive_data_points_line_plot()
 
-	@staticmethod
 	def _check_line_intersection(
-		line, 
+		self,
+		line: mpl.lines.Line2D, 
 		currentViewLimits: nt.ViewLimits
 	) -> bool:
 		"""
@@ -303,7 +297,7 @@ class LinePlotToolbar(SofaToolbar):
 		
 		Paramters
 		---------
-		line : Line2D 
+		line : matplotlib.lines.Line2D
 			Line to be checked.
 		currentViewLimits : nt.ViewLimits
 			Contains the current x and y view limits.
@@ -314,17 +308,17 @@ class LinePlotToolbar(SofaToolbar):
 			True if the line has a data point within the current
 			view limits, otherwise false.
 		"""
-		# Get valid line data.
-		lineXData = np.asarray(line.get_xdata())
-		lineXData = lineXData[~np.isnan(lineXData)]
-		lineYData = np.asarray(line.get_ydata())
-		lineYData = lineYData[~np.isnan(lineYData)]
-		# Check  whether the line has x/y values within the the view limits.
-		xIntersections = np.where(
-			np.logical_and(lineXData >= currentViewLimits.xMin, lineXData <= currentViewLimits.xMax)
+		validLineXData, validLineYData = self._get_valid_line_data(line)
+
+		xIntersections = self._get_value_intersections(
+			validLineXData,
+			currentViewLimits.xMin,
+			currentViewLimits.xMax
 		)
-		yIntersections = np.where(
-			np.logical_and(lineYData >= currentViewLimits.yMin, lineYData <= currentViewLimits.yMax)
+		yIntersections = self._get_value_intersections(
+			validLineYData,
+			currentViewLimits.yMin,
+			currentViewLimits.yMax
 		)
 		# If there is a x and y intersection at the same time, the line lies within the view.
 		if np.any(np.isin(xIntersections, yIntersections)):
@@ -332,16 +326,55 @@ class LinePlotToolbar(SofaToolbar):
 
 		return False
 
+	@staticmethod
+	def _get_valid_line_data(
+		line: mpl.lines.Line2D
+	) -> Tuple[np.ndarray]:
+		"""
+
+
+		Parameters
+		----------
+		line : matplotlib.lines.Line2D
+
+
+		Returns
+		-------
+		validLineXData : np.ndarray
+
+		validLineYData : np.ndarray
+		"""
+		lineData = line.get_xydata()
+		
+		lineXData = lineData[:,0]
+		lineYData = lineData[:,1]
+		validLineXData = lineXData[~np.isnan(lineXData)]
+		validLineYData = lineYData[~np.isnan(lineYData)]
+
+		return validLineXData, validLineYData
+
+	@staticmethod
+	def _get_value_intersections(
+		validLineData: np.ndarray,
+		minimumBorder: float,
+		maximumBorder: float
+	) -> np.ndarray:
+		"""
+		"""
+		return np.where(
+			np.logical_and(validLineData >= minimumBorder, validLineData <= maximumBorder)
+		)
+
 	def _toggle_line(
 		self, 
-		line
+		line: mpl.lines.Line2D
 	) -> None:
 		"""
-		Toggle curve state.
+		Toggle the state of a curve.
 
 		Paramerters
 		-----------
-		line : Line2D
+		line : matplotlib.lines.Line2D
 			Line representation of the curve that is toggled.
 		"""
 		if line.get_color() == "gray":
@@ -351,14 +384,14 @@ class LinePlotToolbar(SofaToolbar):
 
 	def _deactivate_line(
 		self, 
-		line
+		line: mpl.lines.Line2D
 	) -> None:
 		"""
 		Deactivate a curve.
 
 		Paramerters
 		-----------
-		line : Line2D
+		line : matplotlib.lines.Line2D
 			Line representation of the curve that is deactivated.
 		"""
 		if line.get_color() == "red":

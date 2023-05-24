@@ -254,6 +254,12 @@ class ForceVolume():
 			inactiveDataPoints
 		)
 
+	def reset_channel_orientation(self) -> None:
+		"""
+		"""
+		for channel in self.channels.values():
+			channel.data = channel.rawData.copy()
+
 	def flip_channel_horizontal(self) -> None: 
 		"""
 		"""

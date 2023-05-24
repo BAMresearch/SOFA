@@ -18,13 +18,26 @@ import os
 import functools
 from typing import List, Tuple, Optional
 
+import matplotlib as mpl
 import numpy as np 
 
 from toolbars.sofa_toolbar import SofaToolbar
 
+def decorator_check_selected_rectangle(function):
+	"""
+	
+	"""
+	@functools.wraps(function)
+	def wrapper_check_selected_rectangle(self, *args):
+		event = args[0]
+		if self.xStart and self.yStart and event.xdata and event.ydata:
+			function(self, *args)
+
+	return wrapper_check_selected_rectangle
+
 def decorator_check_selected_area(function):
 	"""
-	Check if the zoom history is not empty.
+	Check if an area is selected.
 	"""
 	@functools.wraps(function)
 	def wrapper_check_selected_area(self):
@@ -49,6 +62,8 @@ class HeatmapToolbar(SofaToolbar):
 
 	"""
 	def __init__(self, canvas_, parent_, guiInterface):
+		"""
+		"""
 		# Set path for toolbar icons.
 		iconPath = os.path.join(
 			os.path.abspath(os.path.dirname(__file__)), 
@@ -57,17 +72,17 @@ class HeatmapToolbar(SofaToolbar):
 		)
 		toolItems = (
 			("reset", "", os.path.join(iconPath, "reset.gif"), "_reset_heatmap"),
-			("select_area", "", os.path.join(iconPath, "select_area.gif"), "_toggle_select_area"),
-			("select_rectangle", "", os.path.join(iconPath, "select_rectangle.gif"), "_toggle_select_rect"),
+			("select_area", "", os.path.join(iconPath, "select_area.gif"), "_toggle_select_arbitrary_area"),
+			("select_rectangle", "", os.path.join(iconPath, "select_rectangle.gif"), "_toggle_select_rectangular_area"),
 			("include_area", "", os.path.join(iconPath, "include.gif"), "_include_area"),
 			("exclude_area", "", os.path.join(iconPath, "exclude.gif"), "_exclude_area"),
-			("flip_h", "", os.path.join(iconPath, "flip_h.gif"), "_flip_heatmap_h"),
-			("flip_v", "", os.path.join(iconPath, "flip_v.gif"), "_flip_heatmap_v"),
+			("flip_h", "", os.path.join(iconPath, "flip_h.gif"), "_flip_heatmap_horizontal"),
+			("flip_v", "", os.path.join(iconPath, "flip_v.gif"), "_flip_heatmap_vertical"),
 			("rotate", "", os.path.join(iconPath, "rotate.gif"), "_rotate_heatmap")
 		)	
 		self.guiInterface = guiInterface
 		self.selectedArea = []
-		self.selectedAreaBorders = []
+		self.selectedAreaOutlines = []
 
 		super().__init__(canvas_, parent_, toolItems)
 
@@ -77,38 +92,47 @@ class HeatmapToolbar(SofaToolbar):
 		and the inactive data points.
 		"""
 		self.selectedArea = []
-		self._delete_selected_area_lines()
+		self._delete_selected_area_outlines()
 
 		self.guiInterface.reset_inactive_data_points()
+		self.guiInterface.reset_heatmap_orientation()
 		self.guiInterface.reset_heatmap_orientation_matrix()
 
 		self.guiInterface.update_inactive_data_points_heatmap()
 		
-	def _toggle_select_area(self) -> None:
+	def _toggle_select_arbitrary_area(self) -> None:
 		"""
-		Toggle the selector to select an area.
+		Toggle the selector to select an arbitrary area.
 		"""
-		self._update_toolbar_mode("select area")
+		self._update_toolbar_mode("select arbitrary area")
 		self._update_event_connections()
 		self._update_toolbar_buttons()
 
-	def _select_area_on_click(self, event) -> None:
+	def _select_arbitrary_area_on_click(self, event) -> None:
 		"""
-		Prepare to capture the mouse motion.
+		Prepare to capture and chache the mouse motion
+		while a mouse button is clicked.
 		"""
 		self.selectedArea = []
 	   
+		self._add_motion_capture_event()
+
+	def _add_motion_capture_event(self) -> None:
+		"""
+		Add a motion_notify_event to capture the mouse
+		movement.
+		"""
 		self.eventConnections.append(
 			self.holder.figure.canvas.mpl_connect(
 				"motion_notify_event", 
-				self._select_area_motion
+				self._select_arbitrary_area_motion
 			)
 		)
 
-	def _select_area_motion(self, event) -> None:
+	def _select_arbitrary_area_motion(self, event) -> None:
 		"""
-		Capture and store the data of the mouse, 
-		while moving over the heatmap.
+		Cache the mouse movement while the mouse 
+		is within the heatmap.
 		"""
 		if event.xdata and event.ydata:
 			self.selectedArea.append(
@@ -118,130 +142,190 @@ class HeatmapToolbar(SofaToolbar):
 				)
 			)
 
-	def _select_area_on_release(self, event) -> None:
+	def _select_arbitrary_area_on_release(self, event) -> None:
 		"""
-		Mark the selected area in the heatmap.
+		Select the arbitrary area over which the mouse has moved
+		while a button was pressed and outline it in the heatmap.
 		"""
-		# Stop capaturing mouse movement.
+		self._remove_motion_capture_event()
+		self._delete_selected_area_outlines()		
+		self._remove_double_values_from_selected_area()
+		self._outline_area()
+
+	def _remove_motion_capture_event(self) -> None: 
+		"""
+		Stop caching mouse movement.
+		"""
 		self.holder.figure.canvas.mpl_disconnect(
 			self.eventConnections[-1]
 		)
 		del self.eventConnections[-1]
-		
-		self._delete_selected_area_lines()
-		
-		# Delete recurring values in the marked area.
+
+	def _delete_selected_area_outlines(self) -> None:
+		"""
+		Delete the old outlines.
+		"""
+		for outline in self.selectedAreaOutlines:
+			outline.remove()
+		self.selectedAreaOutlines = []
+
+	def _remove_double_values_from_selected_area(self) -> None: 
+		"""
+		Remove potential duplicates in the selected area.
+		"""
 		self.selectedArea = [
 			list(entry) 
 			for entry 
 			in set(self.selectedArea)
 		]
+
+	def _outline_area(self) -> None: 
+		"""
+		Outline an arbitrary area in the heatmap.
+		"""
+		for section in self.selectedArea:
+			self._outline_section(section)
 		
-		# Mark selected Area.
-		for i, section in enumerate(self.selectedArea):
-			self._orbit_area(section, i)
-		
-		self._delete_equal_lines()
+		self._delete_equal_outlines()
 	
 		self.holder.draw()
 
-	def _delete_equal_lines(self) -> None:
+	def _outline_section(
+		self, 
+		section: Tuple[int, int]
+	) -> None:
 		"""
-		Find all lines that exist more than once and delete them.
+		Outline a section/single point in the heatmap.
+
+		Parameters
+		----------
+		section : tuple[int]
+			X and y coordinates of the data point 
+			to be outlined.
 		"""
-		lineData = [line.get_xydata() for line in self.selectedAreaBorders]
-		
+		# Plot left line.
+		self._plot_outline(
+			(section[0], section[0]), 
+			(section[1], section[1]+1)
+		)
+		# Plot right line.
+		self._plot_outline(
+			(section[0]+1, section[0]+1), 
+			(section[1], section[1]+1)
+		)
+		# Plot top line.
+		self._plot_outline(
+			(section[0], section[0]+1), 
+			(section[1], section[1])
+		)
+		# Plot bottom line.
+		self._plot_outline(
+			(section[0], section[0]+1), 
+			(section[1]+1, section[1]+1)
+		)
+
+	def _delete_equal_outlines(self) -> None:
+		"""
+		Find all outlines that exist more than once and delete them.
+		"""
+		outlineData = [
+			outline.get_xydata() 
+			for outline 
+			in self.selectedAreaOutlines
+		]
 		uniqueValues, count = np.unique(
-			lineData, axis=0, return_counts=True
+			outlineData, 
+			axis=0, 
+			return_counts=True
 		)
 		doubledValues = uniqueValues[np.where(count > 1)]
+		
 		doubledIndices = []
 
-		for i, line in enumerate(self.selectedAreaBorders):
-			for value in doubledValues:
-				if np.array_equal(line.get_xydata(), value):
-					line.remove()
-					doubledIndices.append(i)
+		for index, outline in enumerate(self.selectedAreaOutlines):
+			for doubledValue in doubledValues:
+				if np.array_equal(outline.get_xydata(), doubledValue):
+					outline.remove()
+					doubledIndices.append(index)
 
-		self.selectedAreaBorders = [
-			line
-			for index, line in enumerate(self.selectedAreaBorders) 
+		self.selectedAreaOutlines = [
+			outline
+			for index, outline in enumerate(self.selectedAreaOutlines) 
 			if index not in doubledIndices
 		]
 
-	def _toggle_select_rect(self) -> None:
+	def _toggle_select_rectangular_area(self) -> None:
 		"""
-		Toggle the selector to select a rectangle.
+		Toggle the selector to select a rectangular area.
 		"""
-		self._update_toolbar_mode("select rect")
+		self._update_toolbar_mode("select rectangular area")
 		self._update_event_connections()
 		self._update_toolbar_buttons()
 
-	def _select_rect_on_click(self, event) -> None:
+	def _select_rectangular_area_on_click(self, event) -> None:
 		"""
-		Store startingpoint of the rectangle, if existing.
+		Cache startingpoint of the rectangular area,
+		if it is within the heatmap.
 		"""
 		self.selectedArea = []
-		self.xStart = self.yStart = np.nan
+		self.xStart = self.yStart = 0
 	   
-		if event.xdata:
+		if event.xdata and event.ydata:
 			self.xStart = event.xdata
 			self.yStart = event.ydata
 
-	def _select_rect_on_release(self, event) -> None:
+	@decorator_check_selected_rectangle
+	def _select_rectangular_area_on_release(self, event) -> None:
 		"""
-		Mark the selected rectangle in the heatmap.
+		Select all data points in the rectangular area
+		and outline the area in the heatmap.
 		"""
-		if np.isfinite(self.xStart) and event.xdata:
-			self._delete_selected_area_lines()
-			
-			# Standardize data.
-			if self.xStart > event.xdata:
-				self.xStart, event.xdata = event.xdata, self.xStart
-			if self.yStart > event.ydata:
-				self.yStart, event.ydata = event.ydata, self.yStart
-			
-			xStart = int(np.trunc(self.xStart))
-			xEnd = int(np.ceil(event.xdata))
-			yStart = int(np.trunc(self.yStart))
-			yEnd = int(np.ceil(event.ydata))
+		self._delete_selected_area_outlines()
+		
+		xStart, xEnd = self._standardize_value_pair(self.xStart, event.xdata)
+		yStart, yEnd = self._standardize_value_pair(self.yStart, event.ydata)
+		
+		xStart = int(np.trunc(xStart))
+		xEnd = int(np.ceil(xEnd))
+		yStart = int(np.trunc(yStart))
+		yEnd = int(np.ceil(yEnd))
 
-			self.selectedArea = self._create_selected_area(
-				xStart, xEnd, yStart, yEnd
-			)
-			
-			self._plot_marking_line((xStart, xStart), (yStart, yEnd))
-			self._plot_marking_line((xStart, xEnd), (yStart, yStart))
-			self._plot_marking_line((xEnd, xEnd), (yStart, yEnd))
-			self._plot_marking_line((xEnd, xStart), (yEnd, yEnd))
+		self.selectedArea = self._get_data_points_in_rectangular_area(
+			xStart, xEnd, yStart, yEnd
+		)
+		
+		self._plot_outline((xStart, xStart), (yStart, yEnd))
+		self._plot_outline((xStart, xEnd), (yStart, yStart))
+		self._plot_outline((xEnd, xEnd), (yStart, yEnd))
+		self._plot_outline((xEnd, xStart), (yEnd, yEnd))
 
-			self.holder.draw()
+		self.holder.draw()
 
 	@staticmethod
-	def _create_selected_area(
+	def _get_data_points_in_rectangular_area(
 		xStart: int, 
 		xEnd: int, 
 		yStart: int, 
 		yEnd: int
 	) -> List[List[int]]:
 		"""
-		Spans a rectangle between a start and end point. 
+		. 
 
 		Parameters
 		----------
 		xStart : int 
-			X value of the start point.
+			X value of one corner of the rectangular area.
 		xEnd : int
-			X value of the end point.
+			X value of the opposite corner of the rectangular area.
 		yStart : int
-			Y value of the start point.
+			Y value of one corner of the rectangular area.
 		yEnd : int
-			Y value of the end point.
+			Y value of the opposite corner of the rectangular area.
 
 		Returns
 		-------
 		selectedArea : list
-			A list of all points within the rectangle.
+			A list of all points within the rectangular area.
 		"""
 		return [
 			[i, j] 
@@ -264,7 +348,7 @@ class HeatmapToolbar(SofaToolbar):
 		]
 
 		self.selectedArea = []
-		self._delete_selected_area_lines()	
+		self._delete_selected_area_outlines()	
 		
 		self.guiInterface.add_inactive_data_points(newInactiveDataPoints)
 
@@ -280,130 +364,127 @@ class HeatmapToolbar(SofaToolbar):
 		newInactiveDataPoints = [dataPoint[1] * n + dataPoint[0] for dataPoint in self.selectedArea]
 	
 		self.selectedArea = []
-		self._delete_selected_area_lines()	
+		self._delete_selected_area_outlines()	
 		
 		self.guiInterface.add_inactive_data_points(newInactiveDataPoints)
 
 		self.guiInterface.update_inactive_data_points_heatmap()
 
-	def _flip_heatmap_h(self) -> None:
+	def _flip_heatmap_horizontal(self) -> None:
 		"""
-		Flip every heatmap horizontal.
+		Flip the heatmap horizontal.
 		"""
-		for line in self.selectedAreaBorders:
-			self._flip_line_h(line)
-
-		self._flip_area_h()
+		self._flip_selected_area_horizontal()
+		self._flip_selected_area_outlines_horizontal()
+		
 		self.guiInterface.flip_heatmap_orientation_matrix_horizontal()
 		self.guiInterface.flip_channel_horizontal()
-		
-		self.guiInterface.plot_heatmap()
-
-	def _flip_heatmap_v(self) -> None: 
-		"""
-		Flip every heatmap vertical.
-		"""
-		for line in self.selectedAreaBorders:
-			self._flip_line_v(line)
-
-		self._flip_area_v()
-		self.guiInterface.flip_heatmap_orientation_matrix_vertical()
-		self.guiInterface.flip_channel_vertical()
 
 		self.guiInterface.plot_heatmap()
-	
-	def _rotate_heatmap(self) -> None:
+
+	def _flip_selected_area_horizontal(self) -> None:
 		"""
-		Rotate every heatmap by 90 degrees to the left.
-		"""	
-		for line in self.selectedAreaBorders:
-			self._rotate_line(line)
-
-		self._rotate_area()
-		self.guiInterface.rotate_heatmap_orientation_matrix()
-		self.guiInterface.rotate_channel()
-		
-		self.guiInterface.plot_heatmap()
-
-	def _flip_line_h(self, line) -> None:
-		"""
-		Flip a single line horizontal.
-
-		Parameters
-		----------
-		line : Line2D
-			The line to be flipped.
-		"""
-		m, n = self.guiInterface._get_active_force_volume().size
-		flippedLine = line.get_xydata().copy()
-
-		flippedLine[0][1] = m - flippedLine[0][1]
-		flippedLine[1][1] = m - flippedLine[1][1]
-
-		line.set_data(
-			[flippedLine[0][0], flippedLine[1][0]], 
-			[flippedLine[0][1], flippedLine[1][1]]
-		)
-
-	def _flip_area_h(self) -> None:
-		"""
-		Flip an area horizontal.
+		Flip the selected area horizontal.
 		"""
 		m, n = self.guiInterface._get_active_force_volume().size
 
 		for i in range(len(self.selectedArea)):
 			self.selectedArea[i][1] = m - self.selectedArea[i][1] - 1
 
-	def _flip_line_v(self, line) -> None:
+	def _flip_selected_area_outlines_horizontal(self) -> None: 
 		"""
-		Flip a single line vertical.
+		Flip the outlines of the selected area horizontal.
+		"""
+		for outline in self.selectedAreaOutlines:
+			self._flip_outline_horizontal(outline)
+
+	def _flip_outline_horizontal(
+		self, 
+		outline: mpl.lines.Line2D
+	) -> None:
+		"""
+		Flip a single outline horizontal.
 
 		Parameters
 		----------
-		line : Line2D
-			The line to be flipped.
+		outline : mpl.lines.Line2D
+			The outline to be flipped.
 		"""
 		m, n = self.guiInterface._get_active_force_volume().size
-		flippedLine = line.get_xydata().copy()
+		flippedLine = outline.get_xydata().copy()
 
-		flippedLine[0][0] = n - flippedLine[0][0]
-		flippedLine[1][0] = n - flippedLine[1][0]
+		flippedLine[0][1] = m - flippedLine[0][1]
+		flippedLine[1][1] = m - flippedLine[1][1]
 
-		line.set_data(
+		outline.set_data(
 			[flippedLine[0][0], flippedLine[1][0]], 
 			[flippedLine[0][1], flippedLine[1][1]]
 		)
 
-	def _flip_area_v(self) -> None:
+	def _flip_heatmap_vertical(self) -> None: 
 		"""
-		Flip an area vertical.
+		Flip the heatmap vertical.
 		"""
-		m, n = np.shape(self.dataHandler._get_heatmap_data())
+		self._flip_selected_area_vertical()
+		self._flip_selected_area_outlines_vertical()
+
+		self.guiInterface.flip_heatmap_orientation_matrix_vertical()
+		self.guiInterface.flip_channel_vertical()
+
+		self.guiInterface.plot_heatmap()
+
+	def _flip_selected_area_vertical(self) -> None:
+		"""
+		Flip the selected area vertical.
+		"""
+		m, n = self.guiInterface._get_active_force_volume().size
 
 		for i in range(len(self.selectedArea)):
 			self.selectedArea[i][0] = n - self.selectedArea[i][0] - 1 
 
-	def _rotate_line(self, line) -> None:
+	def _flip_selected_area_outlines_vertical(self) -> None: 
 		"""
-		Rotate a single line by 90 degrees.
+		Flip the outlines of the selected area vertical.
+		"""
+		for outline in self.selectedAreaOutlines:
+			self._flip_outline_vertical(outline)
+
+	def _flip_outline_vertical(
+		self, 
+		outline: mpl.lines.Line2D
+	) -> None:
+		"""
+		Flip a single outline vertical.
 
 		Parameters
 		----------
-		line : Line2D
-			The line to be rotated.
+		outline : mpl.lines.Line2D
+			The outline to be flipped.
 		"""
 		m, n = self.guiInterface._get_active_force_volume().size
-		rotatedLine = line.get_xydata().copy()
-		
-		rotatedLine[0] = [rotatedLine[0][1], n-rotatedLine[0][0]]
-		rotatedLine[1] = [rotatedLine[1][1], n-rotatedLine[1][0]]
+		flippedLine = outline.get_xydata().copy()
 
-		line.set_data(
-			[rotatedLine[0][0], rotatedLine[1][0]], 
-			[rotatedLine[0][1], rotatedLine[1][1]]
+		flippedLine[0][0] = n - flippedLine[0][0]
+		flippedLine[1][0] = n - flippedLine[1][0]
+
+		outline.set_data(
+			[flippedLine[0][0], flippedLine[1][0]], 
+			[flippedLine[0][1], flippedLine[1][1]]
 		)
 
-	def _rotate_area(self) -> None:
+	def _rotate_heatmap(self) -> None:
+		"""
+		Rotate the heatmap by 90 degrees to the left.
+		"""	
+		self._rotate_selected_area()
+		self._rotate_selected_area_outlines()
+
+		self.guiInterface.rotate_heatmap_orientation_matrix()
+		self.guiInterface.rotate_channel()
+		
+		self.guiInterface.plot_heatmap()
+
+	def _rotate_selected_area(self) -> None:
 		"""
 		Rotate an area by 90 degrees.
 		"""
@@ -414,27 +495,37 @@ class HeatmapToolbar(SofaToolbar):
 			self.selectedArea[i][0] = temp1
 			self.selectedArea[i][1] = temp2
 
-	def _orbit_area(self, area: Tuple[int, int], index: int) -> None:
+	def _rotate_selected_area_outlines(self) -> None: 
 		"""
-		Orbit an area in the heatmap.
+		Rotate the outlines of the selected area.
+		"""
+		for outline in self.selectedAreaOutlines:
+			self._rotate_outline(outline)
+
+	def _rotate_outline(
+		self, 
+		outline: mpl.lines.Line2D
+	) -> None:
+		"""
+		Rotate a single outline by 90 degrees.
 
 		Parameters
 		----------
-		area : tuple
-			The entry to frame.
-		index : int
-			An index to distinguish the different lines.
+		outline : mpl.lines.Line2D
+			The outline to be rotated.
 		"""
-		# Plot left line.
-		self._plot_marking_line((area[0], area[0]), (area[1], area[1]+1))
-		# Plot right line.
-		self._plot_marking_line((area[0]+1, area[0]+1), (area[1], area[1]+1))
-		# Plot top line.
-		self._plot_marking_line((area[0], area[0]+1), (area[1], area[1]))
-		# Plot bottom line.
-		self._plot_marking_line((area[0], area[0]+1), (area[1]+1, area[1]+1))
+		m, n = self.guiInterface._get_active_force_volume().size
+		rotatedLine = outline.get_xydata().copy()
+		
+		rotatedLine[0] = [rotatedLine[0][1], n-rotatedLine[0][0]]
+		rotatedLine[1] = [rotatedLine[1][1], n-rotatedLine[1][0]]
 
-	def _plot_marking_line(
+		outline.set_data(
+			[rotatedLine[0][0], rotatedLine[1][0]], 
+			[rotatedLine[0][1], rotatedLine[1][1]]
+		)
+
+	def _plot_outline(
 		self, 
 		xValues: Tuple[int, int], 
 		yValues: Tuple[int, int]
@@ -445,17 +536,12 @@ class HeatmapToolbar(SofaToolbar):
 			xValues(tuple):
 			yValues(tuple):
 		"""
-		self.selectedAreaBorders.append(
+		self.selectedAreaOutlines.append(
 			self.holder.figure.get_axes()[0].plot(
-				xValues, yValues, 
-				color='r', linestyle='-', linewidth=2
+				xValues, 
+				yValues, 
+				color="r", 
+				linestyle="-", 
+				linewidth=2
 			)[0]
 		)
-
-	def _delete_selected_area_lines(self) -> None:
-		"""
-		Delete existing marks.
-		"""
-		for line in self.selectedAreaBorders:
-			line.remove()
-		self.selectedAreaBorders = []
