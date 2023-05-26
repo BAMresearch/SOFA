@@ -43,39 +43,39 @@ class PlotInterface():
 		self.size: Tuple[int] = size
 		self.inactiveDataPoints: List = []
 
-		self.linePlotForceDistanceLines: List = []
-		self.linePlotAverageLines: List = []
-		self.linePlotZoomHistory: List = []
+		self.forceDistanceLines: List = []
+		self.averageLines: List = []
+		self.zoomHistory: List = []
 
-		self.heatmapOrientationMatrix: np.ndarray
-		self.heatmapSelectedArea: List = []
-		self.heatmapSelectedAreaOutlines: List = []  
+		self.orientationMatrix: np.ndarray
+		self.selectedArea: List = []
+		self.selectedAreaOutlines: List = []  
 
-		self.histogramBins: List = []
+		self.binValues: List = []
 
-		self._create_line_plot_force_distance_lines(
+		self._create_force_distance_lines(
 			forceDistanceCurves
 		)
-		self.create_heatmap_orientation_matrix()
+		self.init_orientation_matrix()
 
-	def _create_line_plot_force_distance_lines(
+	def _create_force_distance_lines(
 		self, 
 		forceDistanceCurves
 	) -> List:
 		"""
 		"""
 		for index, forceDistanceCurve in enumerate(forceDistanceCurves):
-			self.linePlotForceDistanceLines.append(
+			self.forceDistanceLines.append(
 				plt_data.create_corrected_line(
 					str(index),
 					forceDistanceCurve
 				)
 			)
 
-	def create_heatmap_orientation_matrix(self) -> np.ndarray:
+	def init_orientation_matrix(self) -> np.ndarray:
 		"""
 		"""
-		self.heatmapOrientationMatrix = np.arange(
+		self.orientationMatrix = np.arange(
 			self.size[0] * self.size[1]
 		).reshape(self.size)
 
@@ -108,7 +108,7 @@ class PlotInterface():
 	) -> None: 
 		"""
 		"""
-		flatHeatmapOrientationMatrix = self.heatmapOrientationMatrix.flatten()
+		flatHeatmapOrientationMatrix = self.orientationMatrix.flatten()
 
 		# Map new data points to the current alignment.
 		for inactiveDataPoint in inactiveDataPoints:
@@ -117,17 +117,17 @@ class PlotInterface():
 		# Remove duplicates.
 		self.inactiveDataPoints = list(set(self.inactiveDataPoints))
 
-	def flip_heatmap_orientation_matrix_horizontal(self) -> None: 
+	def flip_orientation_matrix_horizontal(self) -> None: 
 		"""
 		"""
-		self.heatmapOrientationMatrix = np.flip(self.heatmapOrientationMatrix, 0)
+		self.orientationMatrix = np.flip(self.orientationMatrix, 0)
 
-	def flip_heatmap_orientation_matrix_vertical(self) -> None: 
+	def flip_orientation_matrix_vertical(self) -> None: 
 		"""
 		"""
-		self.heatmapOrientationMatrix = np.flip(self.heatmapOrientationMatrix, 1)
+		self.orientationMatrix = np.flip(self.orientationMatrix, 1)
 
-	def rotate_heatmap_orientation_matrix(self) -> None: 
+	def rotate_orientation_matrix(self) -> None: 
 		"""
 		"""
-		self.heatmapOrientationMatrix = np.flip(self.heatmapOrientationMatrix, 0)
+		self.orientationMatrix = np.rot90(self.orientationMatrix)

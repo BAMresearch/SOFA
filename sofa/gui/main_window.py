@@ -580,7 +580,15 @@ class MainWindow(ttk.Frame):
 			Indicates whether the minimum or maximum is 
 			decreased or increased.
 		"""
-		self.guiInterface.restrict_histogram(direction)
+		if direction == "min up":
+			self.guiInterface.restrict_histogram_min_down()
+		elif direction == "min down":
+			self.guiInterface.restrict_histogram_min_up()
+		elif direction == "max up":
+			self.guiInterface.restrict_histogram_max_down()
+		elif direction == "max down":
+			self.guiInterface.restrict_histogram_max_up()
+		
 		self.guiInterface.update_inactive_data_points_histogram()
 
 	@staticmethod

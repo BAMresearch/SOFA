@@ -13,7 +13,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 """
-from typing import Dict, List
+from typing import Dict, List, Tuple
 import functools
 
 import data_processing.named_tuples as nt
@@ -28,8 +28,8 @@ def decorator_get_active_data_set(function):
 	"""
 	@functools.wraps(function)
 	def wrapper_get_active_data_set(self, *args, **kwargs):
-		activeForceVolume = self._get_active_force_volume()
-		activePlotInterface = self._get_active_plot_interface()
+		activeForceVolume = self.get_active_force_volume()
+		activePlotInterface = self.get_active_plot_interface()
 		function(self, activeForceVolume, activePlotInterface, *args, **kwargs)
 
 	return wrapper_get_active_data_set
@@ -40,18 +40,18 @@ def decorator_get_active_force_volume(function):
 	"""
 	@functools.wraps(function)
 	def wrapper_get_active_force_volume(self, *args, **kwargs):
-		activeForceVolume = self._get_active_force_volume()
+		activeForceVolume = self.get_active_force_volume()
 		function(self, activeForceVolume, *args, **kwargs)
 
 	return wrapper_get_active_force_volume
 
 def decorator_get_active_plot_interface(function):
 	"""
-	Get current selected force volume.
+	Get current selected plot interface.
 	"""
 	@functools.wraps(function)
 	def wrapper_get_active_plot_interface(self, *args, **kwargs):
-		activePlotInterface = self._get_active_plot_interface()
+		activePlotInterface = self.get_active_plot_interface()
 		function(self, activePlotInterface, *args, **kwargs)
 
 	return wrapper_get_active_plot_interface
@@ -81,6 +81,15 @@ def decorator_get_active_histogram_channel(function):
 		function(self, keyActiveHistogramChannel, *args, **kwargs)
 
 	return wrapper_get_active_force_volume
+
+def decorator_get_histogram_parameter(function):
+	"""
+	"""
+	@functools.wraps(function)
+	def wrapper_get_histogram_parameter(self):
+		pass
+
+	return wrapper_get_histogram_parameter
 
 class GUIInterface():
 	"""
@@ -184,7 +193,7 @@ class GUIInterface():
 		"""
 		plt_data.plot_line_plot(
 			self.linePlotParameters.holder, 
-			activePlotInterface.linePlotForceDistanceLines
+			activePlotInterface.forceDistanceLines
 		)
 
 	@decorator_get_active_heatmap_channel
@@ -202,9 +211,9 @@ class GUIInterface():
 			activeForceVolume.get_active_heatmap_data(
 				keyActiveHeatmapChannel,
 				activePlotInterface.inactiveDataPoints,
-				activePlotInterface.heatmapOrientationMatrix
+				activePlotInterface.orientationMatrix
 			),
-			activePlotInterface.heatmapSelectedAreaOutlines
+			activePlotInterface.selectedAreaOutlines
 		)
 
 	@decorator_get_active_histogram_channel
@@ -226,6 +235,80 @@ class GUIInterface():
 			),
 			self.histogramParameters.numberOfBins.get(),
 			self.histogramParameters.zoom.get()
+		)
+
+	def restrict_histogram_min_down(
+		self,
+		binValues,
+		indexMinBinValue,
+		indexMaxBinValue,
+		data
+	) -> None: 
+		"""
+		
+		"""
+		# create decorator
+		minimumTreshold = heatmapParameter.binValues[heatmapParameter.indexMinValue + 1]
+		inactiveDataPoints = np.where(
+			heatmapParameter.histogramData < minimumTreshold
+		)[0]
+		activePlotInterface.add_inactive_data_points(inactiveDataPoints)
+
+	def restrict_histogram_min_down_up(
+		self
+	) -> None: 
+		"""
+
+		"""
+		while True:
+
+
+			if len(reactivatedDataPoints) > 0 or minIndex == 0:
+				break
+
+	def restrict_histogram_max_down_down(
+		self
+	) -> None: 
+		"""
+
+		"""
+		pass
+
+	def restrict_histogram_max_down_up(
+		self
+	) -> None: 
+		"""
+
+		"""
+		pass
+
+	@decorator_get_active_histogram_channel
+	@decorator_get_active_data_set
+	def _get_histogram_parameters(
+		self,
+		activeForceVolume: ForceVolume,
+		activePlotInterface: PlotInterface,
+		keyActiveHistogramChannel: str
+	) -> Tuple:
+		"""
+		"""
+		data = activeForceVolume.get_histogram_data(
+			keyActiveHistogramChannel
+		)
+		activeData = activeForceVolume.get_active_histogram_data(
+			keyActiveHistogramChannel,
+			activePlotInterface.inactiveDataPoints
+		)
+		binValues = activePlotInterface.binValues
+		indexMinBinValue = binValues[np.where(binValues <= np.min(activeData))[0][-1]]
+		indexMaxBinValue = binValues[np.where(binValues >= np.max(activeData))[0][0]]
+
+		return (
+			data,
+			activeData,
+			binValues,
+			indexMinBinValue,
+			indexMaxBinValue
 		)
 
 	def update_active_force_volume_plots(self) -> None: 
@@ -269,7 +352,7 @@ class GUIInterface():
 		"""
 		plt_data.update_line_plot(
 			self.linePlotParameters.holder,
-			activePlotInterface.linePlotForceDistanceLines,
+			activePlotInterface.forceDistanceLines,
 			activePlotInterface.inactiveDataPoints,
 			self.linePlotParameters.plotInactive.get()
 		)
@@ -297,7 +380,15 @@ class GUIInterface():
 
 			)
 
-	def _get_active_force_volume(self) -> ForceVolume:
+	def check_imported_data_set(self) -> bool: 
+		"""
+		"""
+		if self.importedDataSets:
+			return True
+			
+		return False
+
+	def get_active_force_volume(self) -> ForceVolume:
 		"""
 
 
@@ -308,7 +399,7 @@ class GUIInterface():
 		"""
 		return self.importedDataSets[self.keyActiveForceVolume.get()]["forceVolume"]
 
-	def _get_active_plot_interface(self) -> ForceVolume:
+	def get_active_plot_interface(self) -> ForceVolume:
 		"""
 
 
@@ -333,122 +424,3 @@ class GUIInterface():
 		inputString = inputString[0].lower() + inputString[1:]
 
 		return inputString
-
-	def check_imported_data_set(self) -> bool: 
-		"""
-		"""
-		if self.importedDataSets:
-			return True
-			
-		return False
-
-	@decorator_get_active_plot_interface
-	def reset_inactive_data_points(
-		self,
-		activePlotInterface: PlotInterface
-	) -> None:
-		"""
-		"""
-		activePlotInterface.reset_inactive_data_points()
-
-	@decorator_get_active_force_volume
-	def reset_heatmap_orientation(
-		self,
-		activeForceVolume: ForceVolume
-	) -> None:
-		"""
-		"""
-		activeForceVolume.reset_channel_orientation()
-
-	@decorator_get_active_plot_interface
-	def reset_heatmap_orientation_matrix(
-		self,
-		activePlotInterface: PlotInterface
-	) -> None:
-		"""
-		"""
-		activePlotInterface.create_heatmap_orientation_matrix()
-
-	@decorator_get_active_plot_interface
-	def add_inactive_data_point(
-		self,
-		activePlotInterface: PlotInterface,
-		inactiveDataPoint: int
-	) -> None:
-		"""
-		"""
-		activePlotInterface.add_inactive_data_point(inactiveDataPoint)
-
-	@decorator_get_active_plot_interface
-	def remove_inactive_data_point(
-		self,
-		activePlotInterface: PlotInterface,
-		inactiveDataPoint: int
-	) -> None:
-		"""
-		"""
-		activePlotInterface.remove_inactive_data_point(inactiveDataPoint)
-
-	@decorator_get_active_plot_interface
-	def add_inactive_data_points(
-		self,
-		activePlotInterface: PlotInterface,
-		inactiveDataPoints: List[int]
-	) -> None:
-		"""
-		"""
-		activePlotInterface.add_inactive_data_points(inactiveDataPoints)
-
-	@decorator_get_active_plot_interface
-	def flip_heatmap_orientation_matrix_horizontal(
-		self,
-		activePlotInterface: PlotInterface,
-	) -> None:
-		"""
-		"""
-		activePlotInterface.flip_heatmap_orientation_matrix_horizontal()
-
-	@decorator_get_active_plot_interface
-	def flip_heatmap_orientation_matrix_vertical(
-		self,
-		activePlotInterface: PlotInterface,
-	) -> None:
-		"""
-		"""
-		activePlotInterface.flip_heatmap_orientation_matrix_vertical()
-
-	@decorator_get_active_plot_interface
-	def rotate_heatmap_orientation_matrix(
-		self,
-		activePlotInterface: PlotInterface,
-	) -> None:
-		"""
-		"""
-		activePlotInterface.rotate_heatmap_orientation_matrix()
-
-	@decorator_get_active_force_volume
-	def flip_channel_horizontal(
-		self,
-		activeForceVolume: ForceVolume
-	) -> None:
-		"""
-		"""
-		activeForceVolume.flip_channel_horizontal()
-
-	@decorator_get_active_force_volume
-	def flip_channel_vertical(
-		self,
-		activeForceVolume: ForceVolume
-	) -> None:
-		"""
-		"""
-		activeForceVolume.flip_channel_vertical()
-
-	@decorator_get_active_force_volume
-	def rotate_channel(
-		self,
-		activeForceVolume: ForceVolume
-	) -> None:
-		"""
-		"""
-		activeForceVolume.rotate_channel()
