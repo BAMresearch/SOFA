@@ -1,6 +1,6 @@
-=======================
-SOFA (Work in progress)
-=======================
+====
+SOFA
+====
 
 Description
 ===========
@@ -20,7 +20,7 @@ For examples of how SOFA can be used and detailed information about the implemen
 
 Examples
 ========
-Test data can be found in the test_data folder. There is data for both the IM and FTC methods. For a detailed documentation on how to use the software see the tutorial section in the documentation.
+Test data can be found in the test_data folder. The data is from the FTC method. For a detailed documentation on how to use the software see the tutorial section in the documentation.
 
 Installation
 ============
