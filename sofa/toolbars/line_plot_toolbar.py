@@ -29,9 +29,10 @@ def decorator_check_zoom_history_empty(function):
 	Check if the zoom history is not empty.
 	"""
 	@functools.wraps(function)
-	def wrapper_check_zoom_history_empty(self):
-		if self.zoomHistory:
-			function(self)
+	def wrapper_check_zoom_history_empty(self, *args):
+		activePlotInterface = args[0]
+		if activePlotInterface.zoomHistory:
+			function(self, *args)
 
 	return wrapper_check_zoom_history_empty
 
@@ -42,7 +43,7 @@ def decorator_check_zoom_inside_axes(function):
 	"""
 	@functools.wraps(function)
 	def wrapper_check_zoom_inside_axes(self, *args):
-		event = args[0]
+		event = args[1]
 		if self.zoomXStart and self.zoomYStart and event.xdata and event.ydata:
 			function(self, *args)
 
@@ -54,7 +55,7 @@ def decorator_check_zoom_valid(function):
 	"""
 	@functools.wraps(function)
 	def wrapper_check_zoom_valid(self, *args):
-		event = args[0]
+		event = args[1]
 		if self.zoomXStart != event.xdata and self.zoomYStart != event.ydata:
 			function(self, *args)
 
@@ -90,39 +91,64 @@ class LinePlotToolbar(SofaToolbar):
 			("pick_single", "", os.path.join(iconPath, "pick_one.gif"), "_toggle_pick_single_line"),
 			("pick_multiple", "", os.path.join(iconPath, "pick_all.gif"), "_pick_multiple_lines")
 		)
-		self.guiInterface = guiInterface
-		self.zoomHistory = []
+		super().__init__(canvas_, parent_, toolItems, guiInterface)
 
-		super().__init__(canvas_, parent_, toolItems)
+	@SofaToolbar.decorator_get_active_plot_interface
+	def _reset_line_plot(
+		self,
+		activePlotInterface
+	) -> None:
+		"""
+		Reset zoom and the inactive data points.
 
-	def _reset_line_plot(self) -> None:
-		"""Reset zoom and the inactive data points."""
+		Parameters
+		----------
+		activePlotInterface : PlotInterface
+
+		"""
 		self._reset_zoom()
 
-		self.guiInterface.reset_inactive_data_points()
+		activePlotInterface.reset_inactive_data_points()
 		self.guiInterface.update_inactive_data_points_line_plot()
 	
+	@SofaToolbar.decorator_get_active_plot_interface
 	@decorator_check_zoom_history_empty
-	def _reset_zoom(self) -> None:
+	def _reset_zoom(
+		self, 
+		activePlotInterface
+	) -> None:
 		"""
 		Reset zoom.
+
+		Parameters
+		----------
+		activePlotInterface : PlotInterface
 		"""
 		self._set_zoom(
-			self.zoomHistory[0]
+			activePlotInterface.zoomHistory[0]
 		)		
-		self.zoomHistory = []
+		activePlotInterface.zoomHistory = []
 
 		self.holder.draw()
 
+	@SofaToolbar.decorator_get_active_plot_interface
 	@decorator_check_zoom_history_empty
-	def _zoom_out(self) -> None:
+	def _zoom_out(
+		self, 
+		activePlotInterface
+	) -> None:
 		"""
 		Set zoom to the previous one.
+
+		Parameters
+		----------
+		activePlotInterface : PlotInterface
+
 		"""
 		self._set_zoom(
-			self.zoomHistory[-1]
+			activePlotInterface.zoomHistory[-1]
 		)
-		del self.zoomHistory[-1:]
+		del activePlotInterface.zoomHistory[-1:]
 		
 		self.holder.draw()
 
@@ -154,10 +180,12 @@ class LinePlotToolbar(SofaToolbar):
 			self.zoomXStart = event.xdata
 			self.zoomYStart = event.ydata
 
+	@SofaToolbar.decorator_get_active_plot_interface
 	@decorator_check_zoom_inside_axes
 	@decorator_check_zoom_valid
 	def _end_zoom_motion(
-		self, 
+		self,
+		activePlotInterface,
 		event: mpl.backend_bases.MouseEvent
 	) -> None:
 		"""
@@ -166,13 +194,15 @@ class LinePlotToolbar(SofaToolbar):
 
 		Parameters
 		----------
+		activePlotInterface : PlotInterface
+
 		event : mpl.backend_bases.MouseEvent
 			button_release_event triggers when the 
 			mouse button is released.
 		"""
 		# Save current view limits.
-		currentViewLimits = self._get_current_view_limits()
-		self.zoomHistory.append(currentViewLimits)
+		currentViewLimits = self._get_view_limits()
+		activePlotInterface.zoomHistory.append(currentViewLimits)
 
 		standardizedViewLimits = self._get_standardized_view_limits(
 			self.zoomXStart,
@@ -185,7 +215,7 @@ class LinePlotToolbar(SofaToolbar):
 		
 		self.holder.draw()
 
-	def _get_current_view_limits(self) -> nt.ViewLimits:
+	def _get_view_limits(self) -> nt.ViewLimits:
 		"""
 		
 
@@ -274,7 +304,7 @@ class LinePlotToolbar(SofaToolbar):
 		Select all currently visiable curves that 
 		have a datapoint within the current view limits.
 		"""
-		currentViewLimits = self._get_current_view_limits()
+		currentViewLimits = self._get_view_limits()
 		
 		for line in self.holder.figure.get_axes()[0].get_lines():
 			hasIntersection = self._check_line_intersection(
@@ -365,8 +395,10 @@ class LinePlotToolbar(SofaToolbar):
 			np.logical_and(validLineData >= minimumBorder, validLineData <= maximumBorder)
 		)
 
+	@SofaToolbar.decorator_get_active_plot_interface
 	def _toggle_line(
-		self, 
+		self,
+		activePlotInterface,
 		line: mpl.lines.Line2D
 	) -> None:
 		"""
@@ -374,16 +406,20 @@ class LinePlotToolbar(SofaToolbar):
 
 		Paramerters
 		-----------
+		activePlotInterface : PlotInterface
+
 		line : matplotlib.lines.Line2D
 			Line representation of the curve that is toggled.
 		"""
 		if line.get_color() == "gray":
-			self.guiInterface.remove_inactive_data_point(int(line._label))
+			activePlotInterface.remove_inactive_data_point(int(line._label))
 		elif line.get_color() == "red":
-			self.guiInterface.add_inactive_data_point(int(line._label))
+			activePlotInterface.add_inactive_data_point(int(line._label))
 
+	@SofaToolbar.decorator_get_active_plot_interface
 	def _deactivate_line(
-		self, 
+		self,
+		activePlotInterface,
 		line: mpl.lines.Line2D
 	) -> None:
 		"""
@@ -391,8 +427,10 @@ class LinePlotToolbar(SofaToolbar):
 
 		Paramerters
 		-----------
+		activePlotInterface : PlotInterface
+
 		line : matplotlib.lines.Line2D
 			Line representation of the curve that is deactivated.
 		"""
 		if line.get_color() == "red":
-			self.guiInterface.add_inactive_data_point(int(line._label))
+			activePlotInterface.add_inactive_data_point(int(line._label))

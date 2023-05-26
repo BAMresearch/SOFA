@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License
 along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 """
 from typing import Optional, Tuple
+import functools
 
 from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk
 from matplotlib.backend_bases import NavigationToolbar2
@@ -26,12 +27,58 @@ class SofaToolbar(NavigationToolbar2Tk):
 	
 	Attributes
 	----------
+	holder 
+
+	guiInterface : GUIInterface
+
+	mode : str
+
+	eventConnections : list
+
+	activeButtonColor : str
+
+	inactiveButtonColor : str
 
 	"""
-	def __init__(self, canvas_, parent_, toolItems):
+	def decorator_get_active_data_set(function):
+		"""
+		Get the active force volume.
+		"""
+		@functools.wraps(function)
+		def wrapper_get_active_data_set(self, *args, **kwargs):
+			activeForceVolume = self.guiInterface.get_active_force_volume()
+			activePlotInterface = self.guiInterface.get_active_plot_interface()
+			function(self, activeForceVolume, activePlotInterface, *args, **kwargs)
+
+		return wrapper_get_active_data_set
+
+	def decorator_get_active_force_volume(function):
+		"""
+		Get the active force volume.
+		"""
+		@functools.wraps(function)
+		def wrapper_get_active_force_volume(self, *args, **kwargs):
+			activeForceVolume = self.guiInterface.get_active_force_volume()
+			function(self, activeForceVolume, *args, **kwargs)
+
+		return wrapper_get_active_force_volume
+
+	def decorator_get_active_plot_interface(function):
+		"""
+		Get the active plot interface.
+		"""
+		@functools.wraps(function)
+		def wrapper_get_active_plot_interface(self, *args, **kwargs):
+			activePlotInterface = self.guiInterface.get_active_plot_interface()
+			function(self, activePlotInterface, *args, **kwargs)
+
+		return wrapper_get_active_plot_interface
+
+	def __init__(self, canvas_, parent_, toolItems, guiInterface):
 		"""
 		"""
 		self.holder = canvas_
+		self.guiInterface = guiInterface
 		self.mode: str = ""
 		self.eventConnections = []
 

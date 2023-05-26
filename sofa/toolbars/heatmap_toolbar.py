@@ -29,7 +29,7 @@ def decorator_check_selected_rectangle(function):
 	"""
 	@functools.wraps(function)
 	def wrapper_check_selected_rectangle(self, *args):
-		event = args[0]
+		event = args[1]
 		if self.xStart and self.yStart and event.xdata and event.ydata:
 			function(self, *args)
 
@@ -40,9 +40,10 @@ def decorator_check_selected_area(function):
 	Check if an area is selected.
 	"""
 	@functools.wraps(function)
-	def wrapper_check_selected_area(self):
-		if len(self.selectedArea) != 0:
-			function(self)
+	def wrapper_check_selected_area(self, *args):
+		activePlotInterface = args[0]
+		if len(activePlotInterface.selectedArea) != 0:
+			function(self, *args)
 
 	return wrapper_check_selected_area
 
@@ -80,23 +81,24 @@ class HeatmapToolbar(SofaToolbar):
 			("flip_v", "", os.path.join(iconPath, "flip_v.gif"), "_flip_heatmap_vertical"),
 			("rotate", "", os.path.join(iconPath, "rotate.gif"), "_rotate_heatmap")
 		)	
-		self.guiInterface = guiInterface
-		self.selectedArea = []
-		self.selectedAreaOutlines = []
+		super().__init__(canvas_, parent_, toolItems, guiInterface)
 
-		super().__init__(canvas_, parent_, toolItems)
-
-	def _reset_heatmap(self) -> None:
+	@SofaToolbar.decorator_get_active_data_set
+	def _reset_heatmap(
+		self, 
+		activeForceVolume,
+		activePlotInterface
+	) -> None:
 		"""
 		Reset the selected area, the orientation 
 		and the inactive data points.
 		"""
-		self.selectedArea = []
+		activePlotInterface.selectedArea = []
 		self._delete_selected_area_outlines()
 
-		self.guiInterface.reset_inactive_data_points()
-		self.guiInterface.reset_heatmap_orientation()
-		self.guiInterface.reset_heatmap_orientation_matrix()
+		activePlotInterface.reset_inactive_data_points()
+		activePlotInterface.init_orientation_matrix()
+		activeForceVolume.reset_channel_orientation()
 
 		self.guiInterface.update_inactive_data_points_heatmap()
 		
@@ -108,12 +110,17 @@ class HeatmapToolbar(SofaToolbar):
 		self._update_event_connections()
 		self._update_toolbar_buttons()
 
-	def _select_arbitrary_area_on_click(self, event) -> None:
+	@SofaToolbar.decorator_get_active_plot_interface
+	def _select_arbitrary_area_on_click(
+		self, 
+		activePlotInterface,
+		event
+	) -> None:
 		"""
 		Prepare to capture and chache the mouse motion
 		while a mouse button is clicked.
 		"""
-		self.selectedArea = []
+		activePlotInterface.selectedArea = []
 	   
 		self._add_motion_capture_event()
 
@@ -129,13 +136,18 @@ class HeatmapToolbar(SofaToolbar):
 			)
 		)
 
-	def _select_arbitrary_area_motion(self, event) -> None:
+	@SofaToolbar.decorator_get_active_plot_interface
+	def _select_arbitrary_area_motion(
+		self,
+		activePlotInterface, 
+		event
+	) -> None:
 		"""
 		Cache the mouse movement while the mouse 
 		is within the heatmap.
 		"""
 		if event.xdata and event.ydata:
-			self.selectedArea.append(
+			activePlotInterface.selectedArea.append(
 				(
 					int(np.trunc(event.xdata)), 
 					int(np.trunc(event.ydata))
@@ -161,29 +173,41 @@ class HeatmapToolbar(SofaToolbar):
 		)
 		del self.eventConnections[-1]
 
-	def _delete_selected_area_outlines(self) -> None:
+	@SofaToolbar.decorator_get_active_plot_interface
+	def _delete_selected_area_outlines(
+		self,
+		activePlotInterface
+	) -> None:
 		"""
 		Delete the old outlines.
 		"""
-		for outline in self.selectedAreaOutlines:
+		for outline in activePlotInterface.selectedAreaOutlines:
 			outline.remove()
-		self.selectedAreaOutlines = []
+		activePlotInterface.selectedAreaOutlines = []
 
-	def _remove_double_values_from_selected_area(self) -> None: 
+	@SofaToolbar.decorator_get_active_plot_interface
+	def _remove_double_values_from_selected_area(
+		self,
+		activePlotInterface
+	) -> None: 
 		"""
 		Remove potential duplicates in the selected area.
 		"""
-		self.selectedArea = [
+		activePlotInterface.selectedArea = [
 			list(entry) 
 			for entry 
-			in set(self.selectedArea)
+			in set(activePlotInterface.selectedArea)
 		]
 
-	def _outline_area(self) -> None: 
+	@SofaToolbar.decorator_get_active_plot_interface
+	def _outline_area(
+		self,
+		activePlotInterface
+	) -> None: 
 		"""
 		Outline an arbitrary area in the heatmap.
 		"""
-		for section in self.selectedArea:
+		for section in activePlotInterface.selectedArea:
 			self._outline_section(section)
 		
 		self._delete_equal_outlines()
@@ -224,14 +248,18 @@ class HeatmapToolbar(SofaToolbar):
 			(section[1]+1, section[1]+1)
 		)
 
-	def _delete_equal_outlines(self) -> None:
+	@SofaToolbar.decorator_get_active_plot_interface
+	def _delete_equal_outlines(
+		self,
+		activePlotInterface
+	) -> None:
 		"""
 		Find all outlines that exist more than once and delete them.
 		"""
 		outlineData = [
 			outline.get_xydata() 
 			for outline 
-			in self.selectedAreaOutlines
+			in activePlotInterface.selectedAreaOutlines
 		]
 		uniqueValues, count = np.unique(
 			outlineData, 
@@ -242,15 +270,15 @@ class HeatmapToolbar(SofaToolbar):
 		
 		doubledIndices = []
 
-		for index, outline in enumerate(self.selectedAreaOutlines):
+		for index, outline in enumerate(activePlotInterface.selectedAreaOutlines):
 			for doubledValue in doubledValues:
 				if np.array_equal(outline.get_xydata(), doubledValue):
 					outline.remove()
 					doubledIndices.append(index)
 
-		self.selectedAreaOutlines = [
+		activePlotInterface.selectedAreaOutlines = [
 			outline
-			for index, outline in enumerate(self.selectedAreaOutlines) 
+			for index, outline in enumerate(activePlotInterface.selectedAreaOutlines) 
 			if index not in doubledIndices
 		]
 
@@ -262,20 +290,29 @@ class HeatmapToolbar(SofaToolbar):
 		self._update_event_connections()
 		self._update_toolbar_buttons()
 
-	def _select_rectangular_area_on_click(self, event) -> None:
+	@SofaToolbar.decorator_get_active_plot_interface
+	def _select_rectangular_area_on_click(
+		self,
+		activePlotInterface, 
+		event
+	) -> None:
 		"""
 		Cache startingpoint of the rectangular area,
 		if it is within the heatmap.
 		"""
-		self.selectedArea = []
+		activePlotInterface.selectedArea = []
 		self.xStart = self.yStart = 0
 	   
 		if event.xdata and event.ydata:
 			self.xStart = event.xdata
 			self.yStart = event.ydata
 
+	@SofaToolbar.decorator_get_active_plot_interface
 	@decorator_check_selected_rectangle
-	def _select_rectangular_area_on_release(self, event) -> None:
+	def _select_rectangular_area_on_release(
+		self, 
+		activePlotInterface,
+		event) -> None:
 		"""
 		Select all data points in the rectangular area
 		and outline the area in the heatmap.
@@ -290,7 +327,7 @@ class HeatmapToolbar(SofaToolbar):
 		yStart = int(np.trunc(yStart))
 		yEnd = int(np.ceil(yEnd))
 
-		self.selectedArea = self._get_data_points_in_rectangular_area(
+		activePlotInterface.selectedArea = self._get_data_points_in_rectangular_area(
 			xStart, xEnd, yStart, yEnd
 		)
 		
@@ -333,69 +370,95 @@ class HeatmapToolbar(SofaToolbar):
 			for j in range(yStart, yEnd)
 		]
 
+	@SofaToolbar.decorator_get_active_plot_interface
 	@decorator_check_selected_area
-	def _include_area(self) -> None:
+	def _include_area(
+		self, 
+		activePlotInterface
+	) -> None:
 		"""
 		Add everything except the selected area to the inactive data points.
 		"""
-		m, n = self.guiInterface._get_active_force_volume().size
+		m, n = self.guiInterface.get_active_force_volume().size
 		# Map new inactive points in a two dimensional array to their corresponding points in a one dimensional array.
 		newInactiveDataPoints = [
 			i 
 			for i in range(m * n) 
 			if i not in [dataPoint[1] * n + dataPoint[0] 
-			for dataPoint in self.selectedArea]
+			for dataPoint in activePlotInterface.selectedArea]
 		]
 
-		self.selectedArea = []
+		activePlotInterface.selectedArea = []
 		self._delete_selected_area_outlines()	
 		
-		self.guiInterface.add_inactive_data_points(newInactiveDataPoints)
+		activePlotInterface.add_inactive_data_points(newInactiveDataPoints)
 
 		self.guiInterface.update_inactive_data_points_heatmap()
 
+	@SofaToolbar.decorator_get_active_plot_interface
 	@decorator_check_selected_area
-	def _exclude_area(self) -> None:
+	def _exclude_area(
+		self,
+		activePlotInterface
+	) -> None:
 		"""
 		Add the selected area to the inactive data points.
 		"""
-		m, n = self.guiInterface._get_active_force_volume().size 
-		# Map new inactive points in a two dimensional array to their corresponding points in a one dimensional array.
-		newInactiveDataPoints = [dataPoint[1] * n + dataPoint[0] for dataPoint in self.selectedArea]
+		m, n = self.guiInterface.get_active_force_volume().size 
+		# Map new inactive points in a two dimensional array to 
+		# their corresponding points in a one dimensional array.
+		newInactiveDataPoints = [
+			dataPoint[1] * n + dataPoint[0] 
+			for dataPoint 
+			in activePlotInterface.selectedArea
+		]
 	
-		self.selectedArea = []
+		activePlotInterface.selectedArea = []
 		self._delete_selected_area_outlines()	
 		
-		self.guiInterface.add_inactive_data_points(newInactiveDataPoints)
+		activePlotInterface.add_inactive_data_points(newInactiveDataPoints)
 
 		self.guiInterface.update_inactive_data_points_heatmap()
 
-	def _flip_heatmap_horizontal(self) -> None:
+	@SofaToolbar.decorator_get_active_data_set
+	def _flip_heatmap_horizontal(
+		self,
+		activeForceVolume,
+		activePlotInterface
+	) -> None:
 		"""
 		Flip the heatmap horizontal.
 		"""
 		self._flip_selected_area_horizontal()
 		self._flip_selected_area_outlines_horizontal()
 		
-		self.guiInterface.flip_heatmap_orientation_matrix_horizontal()
-		self.guiInterface.flip_channel_horizontal()
+		activePlotInterface.flip_orientation_matrix_horizontal()
+		activeForceVolume.flip_channel_horizontal()
 
 		self.guiInterface.plot_heatmap()
 
-	def _flip_selected_area_horizontal(self) -> None:
+	@SofaToolbar.decorator_get_active_plot_interface
+	def _flip_selected_area_horizontal(
+		self,
+		activePlotInterface
+	) -> None:
 		"""
 		Flip the selected area horizontal.
 		"""
-		m, n = self.guiInterface._get_active_force_volume().size
+		m, n = self.guiInterface.get_active_force_volume().size
 
-		for i in range(len(self.selectedArea)):
-			self.selectedArea[i][1] = m - self.selectedArea[i][1] - 1
+		for section in activePlotInterface.selectedArea:
+			section[1] = m - section[1] - 1
 
-	def _flip_selected_area_outlines_horizontal(self) -> None: 
+	@SofaToolbar.decorator_get_active_plot_interface
+	def _flip_selected_area_outlines_horizontal(
+		self,
+		activePlotInterface
+	) -> None: 
 		"""
 		Flip the outlines of the selected area horizontal.
 		"""
-		for outline in self.selectedAreaOutlines:
+		for outline in activePlotInterface.selectedAreaOutlines:
 			self._flip_outline_horizontal(outline)
 
 	def _flip_outline_horizontal(
@@ -410,7 +473,7 @@ class HeatmapToolbar(SofaToolbar):
 		outline : mpl.lines.Line2D
 			The outline to be flipped.
 		"""
-		m, n = self.guiInterface._get_active_force_volume().size
+		m, n = self.guiInterface.get_active_force_volume().size
 		flippedLine = outline.get_xydata().copy()
 
 		flippedLine[0][1] = m - flippedLine[0][1]
@@ -421,32 +484,45 @@ class HeatmapToolbar(SofaToolbar):
 			[flippedLine[0][1], flippedLine[1][1]]
 		)
 
-	def _flip_heatmap_vertical(self) -> None: 
+	@SofaToolbar.decorator_get_active_data_set
+	def _flip_heatmap_vertical(
+		self,
+		activeForceVolume,
+		activePlotInterface
+	) -> None: 
 		"""
 		Flip the heatmap vertical.
 		"""
 		self._flip_selected_area_vertical()
 		self._flip_selected_area_outlines_vertical()
 
-		self.guiInterface.flip_heatmap_orientation_matrix_vertical()
-		self.guiInterface.flip_channel_vertical()
+		activePlotInterface.flip_orientation_matrix_vertical()
+		activeForceVolume.flip_channel_vertical()
 
 		self.guiInterface.plot_heatmap()
 
-	def _flip_selected_area_vertical(self) -> None:
+	@SofaToolbar.decorator_get_active_plot_interface
+	def _flip_selected_area_vertical(
+		self,
+		activePlotInterface
+	) -> None:
 		"""
 		Flip the selected area vertical.
 		"""
-		m, n = self.guiInterface._get_active_force_volume().size
+		m, n = self.guiInterface.get_active_force_volume().size
 
-		for i in range(len(self.selectedArea)):
-			self.selectedArea[i][0] = n - self.selectedArea[i][0] - 1 
+		for section in activePlotInterface.selectedArea:
+			section[0] = n - section[0] - 1 
 
-	def _flip_selected_area_outlines_vertical(self) -> None: 
+	@SofaToolbar.decorator_get_active_plot_interface
+	def _flip_selected_area_outlines_vertical(
+		self,
+		activePlotInterface
+	) -> None: 
 		"""
 		Flip the outlines of the selected area vertical.
 		"""
-		for outline in self.selectedAreaOutlines:
+		for outline in activePlotInterface.selectedAreaOutlines:
 			self._flip_outline_vertical(outline)
 
 	def _flip_outline_vertical(
@@ -461,7 +537,7 @@ class HeatmapToolbar(SofaToolbar):
 		outline : mpl.lines.Line2D
 			The outline to be flipped.
 		"""
-		m, n = self.guiInterface._get_active_force_volume().size
+		m, n = self.guiInterface.get_active_force_volume().size
 		flippedLine = outline.get_xydata().copy()
 
 		flippedLine[0][0] = n - flippedLine[0][0]
@@ -472,34 +548,47 @@ class HeatmapToolbar(SofaToolbar):
 			[flippedLine[0][1], flippedLine[1][1]]
 		)
 
-	def _rotate_heatmap(self) -> None:
+	@SofaToolbar.decorator_get_active_data_set
+	def _rotate_heatmap(
+		self,
+		activeForceVolume,
+		activePlotInterface
+	) -> None:
 		"""
 		Rotate the heatmap by 90 degrees to the left.
 		"""	
 		self._rotate_selected_area()
 		self._rotate_selected_area_outlines()
 
-		self.guiInterface.rotate_heatmap_orientation_matrix()
-		self.guiInterface.rotate_channel()
+		activePlotInterface.rotate_orientation_matrix()
+		activeForceVolume.rotate_channel()
 		
 		self.guiInterface.plot_heatmap()
 
-	def _rotate_selected_area(self) -> None:
+	@SofaToolbar.decorator_get_active_plot_interface
+	def _rotate_selected_area(
+		self,
+		activePlotInterface
+	) -> None:
 		"""
 		Rotate an area by 90 degrees.
 		"""
-		m, n = self.guiInterface._get_active_force_volume().size
+		m, n = self.guiInterface.get_active_force_volume().size
+		
+		for section in activePlotInterface.selectedArea:
+			temp1, temp2 = section[1], n - section[0] - 1
+			section[0] = temp1
+			section[1] = temp2
 
-		for i in range(len(self.selectedArea)):
-			temp1, temp2 = self.selectedArea[i][1], n-self.selectedArea[i][0]-1
-			self.selectedArea[i][0] = temp1
-			self.selectedArea[i][1] = temp2
-
-	def _rotate_selected_area_outlines(self) -> None: 
+	@SofaToolbar.decorator_get_active_plot_interface
+	def _rotate_selected_area_outlines(
+		self,
+		activePlotInterface
+	) -> None: 
 		"""
 		Rotate the outlines of the selected area.
 		"""
-		for outline in self.selectedAreaOutlines:
+		for outline in activePlotInterface.selectedAreaOutlines:
 			self._rotate_outline(outline)
 
 	def _rotate_outline(
@@ -514,7 +603,7 @@ class HeatmapToolbar(SofaToolbar):
 		outline : mpl.lines.Line2D
 			The outline to be rotated.
 		"""
-		m, n = self.guiInterface._get_active_force_volume().size
+		m, n = self.guiInterface.get_active_force_volume().size
 		rotatedLine = outline.get_xydata().copy()
 		
 		rotatedLine[0] = [rotatedLine[0][1], n-rotatedLine[0][0]]
@@ -525,8 +614,10 @@ class HeatmapToolbar(SofaToolbar):
 			[rotatedLine[0][1], rotatedLine[1][1]]
 		)
 
+	@SofaToolbar.decorator_get_active_plot_interface
 	def _plot_outline(
-		self, 
+		self,
+		activePlotInterface,
 		xValues: Tuple[int, int], 
 		yValues: Tuple[int, int]
 	) -> None:
@@ -536,7 +627,7 @@ class HeatmapToolbar(SofaToolbar):
 			xValues(tuple):
 			yValues(tuple):
 		"""
-		self.selectedAreaOutlines.append(
+		activePlotInterface.selectedAreaOutlines.append(
 			self.holder.figure.get_axes()[0].plot(
 				xValues, 
 				yValues, 
