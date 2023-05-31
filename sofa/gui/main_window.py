@@ -594,13 +594,13 @@ class MainWindow(ttk.Frame):
 			decreased or increased.
 		"""
 		if direction == "min up":
-			self.guiInterface.restrict_histogram_min_down()
-		elif direction == "min down":
 			self.guiInterface.restrict_histogram_min_up()
+		elif direction == "min down":
+			self.guiInterface.restrict_histogram_min_down()
 		elif direction == "max up":
-			self.guiInterface.restrict_histogram_max_down()
-		elif direction == "max down":
 			self.guiInterface.restrict_histogram_max_up()
+		elif direction == "max down":
+			self.guiInterface.restrict_histogram_max_down()
 		
 		self.guiInterface.update_inactive_data_points_histogram()
 
