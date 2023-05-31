@@ -16,6 +16,8 @@ along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 from typing import Dict, List, Tuple
 import functools
 
+import numpy as np
+
 import data_processing.named_tuples as nt
 import data_visualization.plot_data as plt_data
 from force_spectroscopy_data.force_volume import ForceVolume
@@ -275,53 +277,139 @@ class GUIInterface():
 			self.histogramParameters.zoom.get()
 		)
 
-	def restrict_histogram_min_down(
-		self,
-	) -> None: 
-		"""
-		Restrict the histogram by decreasing the
-		border for the minimum value.
-		"""
-		restrictionParameters = self._get_histogram_restriction_parameters()
-
-		minimumTreshold = heatmapParameter.binValues[heatmapParameter.indexMinValue + 1]
-		inactiveDataPoints = np.where(
-			heatmapParameter.histogramData < minimumTreshold
-		)[0]
-		activePlotInterface.add_inactive_data_points(inactiveDataPoints)
-
+	@decorator_get_active_plot_interface
 	def restrict_histogram_min_up(
-		self
+		self,
+		activePlotInterface: PlotInterface
 	) -> None: 
 		"""
 		Restrict the histogram by increasing the
 		border for the minimum value.
+
+		Parameters
+		----------
+		activePlotInterface : PlotInterface
+			Interface between a force volume and 
+			the different plots.
 		"""
 		restrictionParameters = self._get_histogram_restriction_parameters()
+		print(restrictionParameters)
+		if restrictionParameters.indexMinBinValue >= restrictionParameters.indexMaxBinValue - 1:
+			return
+
+		minimumTreshold = restrictionParameters.binValues[restrictionParameters.indexMinBinValue + 1]
+		inactiveDataPoints = np.where(
+			restrictionParameters.data < minimumTreshold
+		)[0]
+
+		activePlotInterface.add_inactive_data_points(inactiveDataPoints)
+
+	@decorator_get_active_plot_interface
+	def restrict_histogram_min_down(
+		self,
+		activePlotInterface: PlotInterface
+	) -> None: 
+		"""
+		Restrict the histogram by decreasing the
+		border for the minimum value.
+
+		Parameters
+		----------
+		activePlotInterface : PlotInterface
+			Interface between a force volume and 
+			the different plots.
+		"""
+		restrictionParameters = self._get_histogram_restriction_parameters()
+		print(restrictionParameters)
+		indexMinBinValue = restrictionParameters.indexMinBinValue
+
+		if indexMinBinValue <= 0:
+			return
 
 		while True:
+			oldMinBinValue = restrictionParameters.binValues[indexMinBinValue]
+			indexMinBinValue -= 1
+			newMinBinValue = restrictionParameters.binValues[indexMinBinValue]
 
+			reactivatedDataPoints = np.where(
+				np.logical_and(
+					restrictionParameters.data >= newMinBinValue, 
+					restrictionParameters.data < oldMinBinValue
+				)
+			)[0]
 
 			if len(reactivatedDataPoints) > 0 or minIndex == 0:
 				break
 
-	def restrict_histogram_max_down(
-		self
-	) -> None: 
-		"""
-		Restrict the histogram by decreasing the
-		border for the maximum value.
-		"""
-		restrictionParameters = self._get_histogram_restriction_parameters()
+		for dataPoint in reactivatedDataPoints:
+			activePlotInterface.remove_inactive_data_point(dataPoint)
 
+	@decorator_get_active_plot_interface
 	def restrict_histogram_max_up(
-		self
+		self,
+		activePlotInterface: PlotInterface
 	) -> None: 
 		"""
 		Restrict the histogram by increasing the
 		border for the maximum value.
+
+		Parameters
+		----------
+		activePlotInterface : PlotInterface
+			Interface between a force volume and 
+			the different plots.
 		"""
 		restrictionParameters = self._get_histogram_restriction_parameters()
+		print(restrictionParameters)
+		indexMaxBinValue = restrictionParameters.indexMaxBinValue
+
+		if indexMaxBinValue >= int(self.histogramParameters.numberOfBins.get()):
+			return 
+
+		while True:
+			oldMaxBinValue = restrictionParameters.binValues[indexMaxBinValue]
+			indexMaxBinValue += 1
+			newMaxBinValue = restrictionParameters.binValues[indexMaxBinValue]
+
+			reactivatedDataPoints = np.where(
+				np.logical_and(
+					restrictionParameters.data <= newMaxBinValue, 
+					restrictionParameters.data > oldMaxBinValue
+				)
+			)[0]
+
+			if len(reactivatedDataPoints) > 0 or indexMaxBinValue == int(self.histogramParameters.numberOfBins.get()):
+				break
+
+		for dataPoint in reactivatedDataPoints:
+			activePlotInterface.remove_inactive_data_point(dataPoint)
+
+	@decorator_get_active_plot_interface
+	def restrict_histogram_max_down(
+		self,
+		activePlotInterface: PlotInterface
+	) -> None: 
+		"""
+		Restrict the histogram by decreasing the
+		border for the maximum value.
+
+		Parameters
+		----------
+		activePlotInterface : PlotInterface
+			Interface between a force volume and 
+			the different plots.
+		"""
+		restrictionParameters = self._get_histogram_restriction_parameters()
+
+		if restrictionParameters.indexMaxBinValue <= restrictionParameters.indexMinBinValue + 1:
+			return
+
+		maximumTreshold = restrictionParameters.binValues[restrictionParameters.indexMaxBinValue - 1]
+		inactiveDataPoints = np.where(
+			restrictionParameters.data > maximumTreshold
+		)[0]
+
+		activePlotInterface.add_inactive_data_points(inactiveDataPoints)
 
 	@decorator_get_active_histogram_channel
 	@decorator_get_active_data_set
@@ -330,7 +418,7 @@ class GUIInterface():
 		activeForceVolume: ForceVolume,
 		activePlotInterface: PlotInterface,
 		keyActiveHistogramChannel: str
-	) -> Tuple:
+	) -> nt.HistogramRestrictionParameters:
 		"""
 		Get all parameters needed to restrict the
 		borders of the histogram.
@@ -350,7 +438,8 @@ class GUIInterface():
 		Returns
 		-------
 		restrictionParameters : nt.HistogramRestrictionParameters
-			
+			Contains all parameters needed to restrict
+			the histogram.
 		"""
 		data = activeForceVolume.get_histogram_data(
 			keyActiveHistogramChannel
