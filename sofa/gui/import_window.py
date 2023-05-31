@@ -50,7 +50,8 @@ class ImportWindow(ttk.Frame):
 	Attributes
 	----------
 	guiInterface : GUIInterface
-		.
+		Interface between the diffenrent SOFA windwos and 
+		imported measurement data sets.
 	progressbar : ttk.Progressbar
 		Shows the user if the process of importing 
 		the data is still running. 

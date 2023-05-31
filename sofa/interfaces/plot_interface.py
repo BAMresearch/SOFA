@@ -21,17 +21,27 @@ import data_visualization.plot_data as plt_data
 
 class PlotInterface():
 	"""
-
+	
 
 	Attributes
 	----------
-	inactiveDataPoints : List[int]
+	size : tuple[int]
 
-	heatmapOrientationMatrix : np.ndarray
+	inactiveDataPoints : list[int]
 
-	heatmapSelectedArea : List[]
+	forceDistanceLines : list[mpl.lines.Line2D]
 
-	histogramBins : 
+	averageLines : list[mpl.lines.Line2D]
+	
+	zoomHistory : list[nt.ViewLimits]
+
+	orientationMatrix : np.ndarray
+
+	selectedArea : list[tuple[int]]
+
+	selectedAreaOutlines : list[mpl.lines.Line2D]
+
+	binValues : list[float]
 	"""
 	def __init__(
 		self, 
@@ -39,6 +49,7 @@ class PlotInterface():
 		forceDistanceCurves
 	) -> None:
 		"""
+
 		"""
 		self.size: Tuple[int] = size
 		self.inactiveDataPoints: List = []
@@ -60,9 +71,17 @@ class PlotInterface():
 
 	def _create_force_distance_lines(
 		self, 
-		forceDistanceCurves
+		forceDistanceCurves: List
 	) -> List:
 		"""
+		Create a displayable line representation of every 
+		corrected force distance curve of a force volume.
+
+		Parameters
+		----------
+		forceDistanceCurves : list[nt.ForceDistanceCurve]
+			Piezo(x) and deflection (y) values of every
+			corrected fore distance curve of a force volume.
 		"""
 		for index, forceDistanceCurve in enumerate(forceDistanceCurves):
 			self.forceDistanceLines.append(
@@ -74,6 +93,7 @@ class PlotInterface():
 
 	def init_orientation_matrix(self) -> np.ndarray:
 		"""
+
 		"""
 		self.orientationMatrix = np.arange(
 			self.size[0] * self.size[1]
@@ -81,6 +101,7 @@ class PlotInterface():
 
 	def reset_inactive_data_points(self) -> None: 
 		"""
+		Reset the inactive data points.
 		"""
 		self.inactiveDataPoints = []
 
@@ -89,6 +110,10 @@ class PlotInterface():
 		inactiveDataPoint: int
 	) -> None: 
 		"""
+
+		Parameters
+		----------
+		inactiveDataPoint : int
 		"""
 		if inactiveDataPoint not in self.inactiveDataPoints:
 			self.inactiveDataPoints.append(inactiveDataPoint)
@@ -98,6 +123,10 @@ class PlotInterface():
 		inactiveDataPoint: int
 	) -> None: 
 		"""
+
+		Parameters
+		----------
+		inactiveDataPoint : int
 		"""
 		if inactiveDataPoint in self.inactiveDataPoints:
 			self.inactiveDataPoints.remove(inactiveDataPoint)
@@ -107,6 +136,11 @@ class PlotInterface():
 		inactiveDataPoints: List[int]
 	) -> None: 
 		"""
+
+		Parameters
+		----------
+		inactiveDataPoints : list[int]
+
 		"""
 		flatHeatmapOrientationMatrix = self.orientationMatrix.flatten()
 
@@ -119,15 +153,18 @@ class PlotInterface():
 
 	def flip_orientation_matrix_horizontal(self) -> None: 
 		"""
+		Flip the orientation matrix of the heatmap horizontally.
 		"""
 		self.orientationMatrix = np.flip(self.orientationMatrix, 0)
 
 	def flip_orientation_matrix_vertical(self) -> None: 
 		"""
+		Flip the orientation matrix of the heatmap vertically.
 		"""
 		self.orientationMatrix = np.flip(self.orientationMatrix, 1)
 
 	def rotate_orientation_matrix(self) -> None: 
 		"""
+		Rotate the orientation matrix of the heatmap by 90 degrees.
 		"""
 		self.orientationMatrix = np.rot90(self.orientationMatrix)

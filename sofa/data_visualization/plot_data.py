@@ -313,6 +313,15 @@ def add_average_to_line_plot(
 ) -> None: 
 	"""
 	Add the average to the line plot.
+
+	Parameters
+	----------
+	holder : mpl.backends.backend_tkagg.FigureCanvasTkAgg
+		Interface between the matplotlib figure and the 
+		main window in which the plot is located.
+	averageLine : mpl.lines.Line2D
+		Line representation of a average force distance
+		curve.
 	"""
 	ax = get_axes(holder)
 
@@ -327,6 +336,15 @@ def add_errorbar_to_line_plot(
 	"""
 	Add the average with the standard deviation as 
 	errorbar to the line plot.
+
+	Parameters
+	----------
+	holder : mpl.backends.backend_tkagg.FigureCanvasTkAgg
+		Interface between the matplotlib figure and the 
+		main window in which the plot is located.
+	errorbar : mpl.container.ErrorbarContainer
+		Line representation of a average force distance
+		curve with the standard deviation as errorbars.
 	"""
 	ax = get_axes(holder)
 
@@ -339,6 +357,12 @@ def remove_average_curve_from_line_plot(
 ) -> None:
 	"""
 	Remove the average curve from the line plot.
+
+	Parameters
+	----------
+	averageLine : mpl.lines.Line2D
+		Line representation of a average force distance
+		curve.
 	"""
 	averageLine.remove()
 
@@ -347,6 +371,12 @@ def remove_errorbar_from_line_plot(
 ) -> None:
 	"""
 	Remove the errorbar from the line plot.
+
+	Parameters
+	----------
+	errorbar : mpl.container.ErrorbarContainer
+		Line representation of a average force distance
+		curve with the standard deviation as errorbars.
 	"""
 	errorbar.remove()
 

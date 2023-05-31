@@ -23,26 +23,29 @@ import tkinter.font
 
 class SofaToolbar(NavigationToolbar2Tk):
 	"""
-
+	Base class for the line plot and heatmap toolbar, which 
+	contains their shared attributes and functionalities.
 	
 	Attributes
 	----------
-	holder 
-
+	holder : mpl.backends.backend_tkagg.FigureCanvasTkAgg
+		Interface between the matplotlib figure of the line 
+		plot/heatmap and the main window of SOFA.
 	guiInterface : GUIInterface
-
+		Interface between the diffenrent SOFA windwos and 
+		imported measurement data sets.
 	mode : str
-
-	eventConnections : list
-
+		Identifier of the currently active toolbar mode.
+	eventConnectionIds : list
+		Contains all active matplotlib event connections ids. 
 	activeButtonColor : str
-
+		Color for the active toolbar buttons.
 	inactiveButtonColor : str
-
+		Color for the inactive toolbar buttons.
 	"""
 	def decorator_get_active_data_set(function):
 		"""
-		Get the active force volume.
+		Get the active force volume and plot interface.
 		"""
 		@functools.wraps(function)
 		def wrapper_get_active_data_set(self, *args, **kwargs):
@@ -76,11 +79,14 @@ class SofaToolbar(NavigationToolbar2Tk):
 
 	def __init__(self, canvas_, parent_, toolItems, guiInterface):
 		"""
+		Initialise a toolbar with custom tool items and icons
+		and adjust the button color of the toolbar to match 
+		the background color of the main window of SOFA.
 		"""
 		self.holder = canvas_
 		self.guiInterface = guiInterface
 		self.mode: str = ""
-		self.eventConnections = []
+		self.eventConnectionIds = []
 
 		self.activeButtonColor: str = "#999999"
 		self.inactiveButtonColor: str = "#ffffff"
@@ -143,8 +149,27 @@ class SofaToolbar(NavigationToolbar2Tk):
 			button.configure(bg=self.inactiveButtonColor)
 
 	@staticmethod
-	def _standardize_value_pair(firstValue, secondValue) -> Tuple[float]:
+	def _standardize_value_pair(
+		firstValue: float, 
+		secondValue: float
+	) -> Tuple[float]:
 		"""
+		Standardize two values by ensuring that the first
+		one ist smaller than the second one.
+
+		Parameters
+		----------
+		firstValue : float
+			The first value of the value pair.
+		secondValue : float
+			The second value of the value pair.
+
+		Returns
+		-------
+		firstValue : float
+			The smaller value of the value pair.
+		secondValue : float
+			The bigger value of the value pair.
 		"""
 		if firstValue > secondValue:
 			return secondValue, firstValue
@@ -173,26 +198,26 @@ class SofaToolbar(NavigationToolbar2Tk):
 
 		# Line plot toolbar modes
 		if self.mode == "zoom in":
-			self.eventConnections.extend(
+			self.eventConnectionIds.extend(
 				(
 					self.holder.figure.canvas.mpl_connect("button_press_event", self._start_zoom_motion),
 				 	self.holder.figure.canvas.mpl_connect("button_release_event", self._end_zoom_motion)
 				)
 			)
 		elif self.mode == "pick single line":
-			self.eventConnections.append(
+			self.eventConnectionIds.append(
 				self.holder.figure.canvas.mpl_connect("pick_event", self._pick_single_line),
 			)
 		# Heatmap toolbar modes
 		elif self.mode == "select arbitrary area":
-			self.eventConnections.extend(
+			self.eventConnectionIds.extend(
 				(
 					self.holder.figure.canvas.mpl_connect("button_press_event", self._select_arbitrary_area_on_click),
 					self.holder.figure.canvas.mpl_connect("button_release_event", self._select_arbitrary_area_on_release)
 				)
 			)
 		elif self.mode == "select rectangular area":
-			self.eventConnections.extend(
+			self.eventConnectionIds.extend(
 				(
 					self.holder.figure.canvas.mpl_connect("button_press_event", self._select_rectangular_area_on_click),
 					self.holder.figure.canvas.mpl_connect("button_release_event", self._select_rectangular_area_on_release)
@@ -203,10 +228,10 @@ class SofaToolbar(NavigationToolbar2Tk):
 		"""
 		Disconnect and delete all event connections.
 		"""
-		for connection in self.eventConnections:
+		for connection in self.eventConnectionIds:
 			self.holder.figure.canvas.mpl_disconnect(connection)
 
-		self.eventConnections = []
+		self.eventConnectionIds = []
 
 	def _update_toolbar_buttons(self) -> None:
 		"""

@@ -111,7 +111,10 @@ class ForceVolume():
 			data=imageData.channelAdhesion
 		)
 
-	def _set_channel_data(self, importedChannelData: nt.ImportedChannelData) -> None: 
+	def _set_channel_data(
+		self, 
+		importedChannelData: nt.ImportedChannelData
+	) -> None: 
 		"""
 		Add the channel to the calculated channels.
 
@@ -159,7 +162,8 @@ class ForceVolume():
 
 	def _calculate_channel_data(self) -> None: 
 		"""
-		
+		Calculate the different channels after the 
+		force distance curves have been corrected.
 		"""
 		channels = calculate_channel_data(
 			self.forceDistanceCurves,
@@ -193,11 +197,14 @@ class ForceVolume():
 		self
 	) -> List:
 		"""
-		Get the 
+		Get the data of the corrected force distance
+		curves.
 
 		Returns
 		-------
-		 : list
+		forceDistanceCurvesData : list
+			Piezo (x) and deflection (y) values of 
+			every corrected force distance curve.
 		"""
 		return [
 			forceDistanceCurve.dataApproachCorrected
@@ -211,6 +218,20 @@ class ForceVolume():
 		inactiveDataPoints: List[int]
 	) -> List:
 		"""
+		Get the data of the active corrected force 
+		distance curves.
+		
+		Parameters
+		----------
+		inactiveDataPoints : List[int]
+			Indices of inactive data points/force
+			distance curves.
+
+		Returns
+		-------
+		forceDistanceCurvesData : list
+			Piezo (x) and deflection (y) values of every 
+			active and corrected force distance curve.
 		"""
 		return [
 			forceDistanceCurve.dataApproachCorrected
@@ -229,6 +250,25 @@ class ForceVolume():
 		heatmapOrientationMatrix: np.ndarray
 	) -> np.ndarray:
 		"""
+		Get the active two dimensional data of the 
+		currently selected channel.
+
+		Parameters
+		----------
+		activeChannel : str
+			Name of the currently selected channel.
+		inactiveDataPoints : List[int]
+			Indices of inactive data points/force
+			distance curves.
+		heatmapOrientationMatrix : np.ndarray
+			Matrix showing the position of the force distance curves 
+			in the channel with the current orientation.
+
+		Returns
+		-------
+		activeHeatmapData : np.ndarray
+			Two dimensional active data of the 
+			currently selected channel.
 		"""
 		return self.channels[activeChannel].get_active_heatmap_data(
 			inactiveDataPoints,
@@ -240,6 +280,19 @@ class ForceVolume():
 		activeChannel: str,
 	) -> np.ndarray:
 		"""
+		Get the one dimensional data of the 
+		currently selected channel.
+
+		Parameters
+		----------
+		activeChannel : str
+			Name of the currently selected channel.
+
+		Returns
+		-------
+		histogramData : np.ndarray
+			One dimensional data of the currently 
+			selected channel.
 		"""
 		return self.channels[activeChannel].get_histogram_data()
 
@@ -249,6 +302,22 @@ class ForceVolume():
 		inactiveDataPoints: List[int]
 	) -> np.ndarray:
 		"""
+		Get the active one dimensional data of the 
+		currently selected channel.
+		
+		Parameters
+		----------
+		activeChannel : str
+			Name of the currently selected channel.
+		inactiveDataPoints : List[int]
+			Indices of inactive data points/force
+			distance curves.
+
+		Returns
+		-------
+		activeHistogramData : np.ndarray
+			One dimensional active data of the 
+			currently selected channel.
 		"""
 		return self.channels[activeChannel].get_active_histogram_data(
 			inactiveDataPoints
@@ -256,24 +325,28 @@ class ForceVolume():
 
 	def reset_channel_orientation(self) -> None:
 		"""
+		Reset the orientation of every channel.
 		"""
 		for channel in self.channels.values():
 			channel.data = channel.rawData.copy()
 
 	def flip_channel_horizontal(self) -> None: 
 		"""
+		Flip the data of every channel horizontally.
 		"""
 		for channel in self.channels.values():
 			channel.flip_channel_horizontal()
 
 	def flip_channel_vertical(self) -> None: 
 		"""
+		Flip the data of every channel vertically.
 		"""
 		for channel in self.channels.values():
 			channel.flip_channel_vertical()
 
 	def rotate_channel(self) -> None: 
 		"""
+		Rotate the data of every channel by 90 degrees.
 		"""
 		for channel in self.channels.values():
 			channel.rotate_channel()

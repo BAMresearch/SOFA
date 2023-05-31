@@ -51,7 +51,7 @@ def decorator_check_zoom_inside_axes(function):
 
 def decorator_check_zoom_valid(function):
 	"""
-	.
+	Check whether the area to be zoomed into is large enough.
 	"""
 	@functools.wraps(function)
 	def wrapper_check_zoom_valid(self, *args):
@@ -64,17 +64,7 @@ def decorator_check_zoom_valid(function):
 class LinePlotToolbar(SofaToolbar):
 	"""
 	A custom toolbar to process data, displayed in a line plot.
-
-	Attributes
-	----------
-	guiInterface : GUIInterface
-		 Handles the state and different display options of the data.
-	holder : 
-	
-	mode : str
-
-	eventConnections : list[]
-
+	This class inherits from the SofaToolbar base class.
 	"""
 	def __init__(self, canvas_, parent_, guiInterface):
 		# Set path for toolbar icons.
@@ -104,7 +94,8 @@ class LinePlotToolbar(SofaToolbar):
 		Parameters
 		----------
 		activePlotInterface : PlotInterface
-
+			Interface between a force volume and 
+			the different plots.
 		"""
 		self._reset_zoom()
 
@@ -118,11 +109,13 @@ class LinePlotToolbar(SofaToolbar):
 		activePlotInterface
 	) -> None:
 		"""
-		Reset zoom.
+		Reset zoom and the zoom history.
 
 		Parameters
 		----------
 		activePlotInterface : PlotInterface
+			Interface between a force volume and 
+			the different plots.
 		"""
 		self._set_zoom(
 			activePlotInterface.zoomHistory[0]
@@ -143,7 +136,8 @@ class LinePlotToolbar(SofaToolbar):
 		Parameters
 		----------
 		activePlotInterface : PlotInterface
-
+			Interface between a force volume and 
+			the different plots.
 		"""
 		self._set_zoom(
 			activePlotInterface.zoomHistory[-1]
@@ -195,7 +189,8 @@ class LinePlotToolbar(SofaToolbar):
 		Parameters
 		----------
 		activePlotInterface : PlotInterface
-
+			Interface between a force volume and 
+			the different plots.
 		event : mpl.backend_bases.MouseEvent
 			button_release_event triggers when the 
 			mouse button is released.
@@ -217,12 +212,13 @@ class LinePlotToolbar(SofaToolbar):
 
 	def _get_view_limits(self) -> nt.ViewLimits:
 		"""
-		
+		Get the current x and y axis limits.
 
 		Returns
 		-------
 		currentViewLimits : nt.ViewLimits
-
+			The minimum and maximum x and y values
+			of the current view.
 		"""
 		axes = self.holder.figure.get_axes()[0]
 
@@ -244,6 +240,29 @@ class LinePlotToolbar(SofaToolbar):
 		zoomYEnd: int
 	) -> nt.ViewLimits:
 		"""
+		Ensure that the x and y start values
+		are smaller than their end values.
+
+		Parameters
+		----------
+		zoomXStart : int
+			X value of the start point of the 
+			rectangle into which is zoomed.
+		zoomXEnd : int
+			X value of the end point of the 
+			rectangle into which is zoomed.
+		zoomYStart : int
+			Y value of the start point of the 
+			rectangle into which is zoomed.
+		zoomYEnd : int
+			Y value of the end point of the 
+			rectangle into which is zoomed.
+
+		Returns
+		----------
+		viewLimits : nt.ViewLimits
+			The minimum and maximum x and y values
+			of the axis.
 		"""
 		zoomXStart, zoomXEnd = self._standardize_value_pair(
 			zoomXStart, 
@@ -266,11 +285,14 @@ class LinePlotToolbar(SofaToolbar):
 		viewLimits: nt.ViewLimits
 	) -> None: 
 		"""
-
+		Adjust the x and y axis limits to zoom 
+		in or out.
 
 		Parameters
 		----------
 		viewLimits : nt.ViewLimits
+			The minimum and maximum x and y values
+			of the axis.
 		"""
 		axes = self.holder.figure.get_axes()[0]
 
@@ -278,7 +300,9 @@ class LinePlotToolbar(SofaToolbar):
 		axes.set_ylim(viewLimits.yMin, viewLimits.yMax)
 
 	def _toggle_pick_single_line(self) -> None:
-		"""Toggle the selctor to pick a single curve."""
+		"""
+		Toggle the selctor to pick a single curve.
+		"""
 		self._update_toolbar_mode("pick single line")
 		self._update_event_connections()
 		self._update_toolbar_buttons()
@@ -361,18 +385,24 @@ class LinePlotToolbar(SofaToolbar):
 		line: mpl.lines.Line2D
 	) -> Tuple[np.ndarray]:
 		"""
-
+		Get the valid piezo(x) and deflection (y)
+		values from a line representation of a 
+		force distance curve
 
 		Parameters
 		----------
 		line : matplotlib.lines.Line2D
-
+			Line representation of a force
+			distance curve.
 
 		Returns
 		-------
 		validLineXData : np.ndarray
-
+			Piezo (x) values of the force distance 
+			curve that are not nan.
 		validLineYData : np.ndarray
+			Deflection (y) values of the force distance 
+			curve that are not nan.
 		"""
 		lineData = line.get_xydata()
 		
@@ -390,6 +420,25 @@ class LinePlotToolbar(SofaToolbar):
 		maximumBorder: float
 	) -> np.ndarray:
 		"""
+		Locate the parts of a force distance curve
+		that lie within the current view limits.
+
+		Parameters
+		----------
+		validLineData : np.ndarray
+			Piezo(x) or deflection (y) values
+			of a force distance cure.
+		minimumBorder : float
+			Minimum x or y axis limit.
+		maximumBorder: float
+			Maximum x or y axis limit.
+
+		Returns
+		-------
+		valueIntersections : np.ndarray
+			Indices of all piezo (x) or deflection (y) 
+			values where the value is within the minimum and
+			maximum x or y view limit.
 		"""
 		return np.where(
 			np.logical_and(validLineData >= minimumBorder, validLineData <= maximumBorder)

@@ -36,8 +36,9 @@ from toolbars.heatmap_toolbar import HeatmapToolbar
 
 def decorator_check_imported_data_set_with_feedback(function):
 	"""
-	Check if the required path for the measurement
-	folder is set.
+	Check if any measurement data is imported and if not, 
+	open a messagebox to inform the user that he must first
+	import to data sets.
 	"""
 	@functools.wraps(function)
 	def wrapper_check_imported_data_set(self, *args):
@@ -54,8 +55,7 @@ def decorator_check_imported_data_set_with_feedback(function):
 
 def decorator_check_imported_data_set(function):
 	"""
-	Check if the required path for the measurement
-	folder is set.
+	Check if any measurement data is imported.
 	"""
 	@functools.wraps(function)
 	def wrapper_check_imported_data_set(self, *args):
@@ -71,13 +71,18 @@ class MainWindow(ttk.Frame):
 	Attributes
 	----------
 	guiInterface : GUIInterface
-
-	sourceDirectory : str
-
+		Interface between the diffenrent SOFA windwos and 
+		imported measurement data sets.
 	channelNames : list[str]
+		Names of every channel defined in the 
+		calculate_channel_data module.
+	colorPlot : str
+		Background color for the different matplotlib figures.
 	"""
 	def __init__(self, root):
 		"""
+		Initialise the main window of SOFA and create a
+		GUIInterface.
 		"""
 		super().__init__(root, padding=20)
 
@@ -489,15 +494,18 @@ class MainWindow(ttk.Frame):
 		location: str
 	) -> None:
 		"""
+		Update the name, size and location of the active
+		force volume in the active data frame.
 
 		Parameters
 		----------
 		name : str
-			
+			Name of the active force volume.
 		size : tuple[int]
-
+			Size of the measurement grid of the active
+			force volume.
 		location : str
-
+			Location of the corresponding measurement files.
 		"""
 		self.stringVarActiveData.set(name)
 		self.stringVarActiveDataSize.set(str(size))

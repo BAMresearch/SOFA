@@ -68,8 +68,8 @@ class ExportWindow(ttk.Frame):
 	Attributes
 	----------
 	guiInterface : guiInterface
-		Contains the raw and calculated data from the 
-		imported measurement.
+		Interface between the diffenrent SOFA windwos and 
+		imported measurement data sets.
 	progressbar : ttk.Progressbar
 		Shows the user if the process of exporting 
 		the data is still running.

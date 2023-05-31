@@ -84,6 +84,7 @@ def decorator_get_active_histogram_channel(function):
 
 def decorator_get_histogram_parameter(function):
 	"""
+	Get all relevant parameters to restrict the histogram.
 	"""
 	@functools.wraps(function)
 	def wrapper_get_histogram_parameter(self):
@@ -98,8 +99,8 @@ class GUIInterface():
 
 	Attributes
 	----------
-	forceVolumes : Dict[ForceVolume]
-		Set of every imported force volume.
+	importedDataSets : Dict
+		.
 	keyActiveForceVolume : ttk.StringVar
 		Variable that stores the name of active force volume.
 	linePlotParameters : nt.LinePlotParameters
@@ -254,7 +255,7 @@ class GUIInterface():
 		)[0]
 		activePlotInterface.add_inactive_data_points(inactiveDataPoints)
 
-	def restrict_histogram_min_down_up(
+	def restrict_histogram_min_up(
 		self
 	) -> None: 
 		"""
@@ -266,7 +267,7 @@ class GUIInterface():
 			if len(reactivatedDataPoints) > 0 or minIndex == 0:
 				break
 
-	def restrict_histogram_max_down_down(
+	def restrict_histogram_max_down(
 		self
 	) -> None: 
 		"""
@@ -274,7 +275,7 @@ class GUIInterface():
 		"""
 		pass
 
-	def restrict_histogram_max_down_up(
+	def restrict_histogram_max_up(
 		self
 	) -> None: 
 		"""

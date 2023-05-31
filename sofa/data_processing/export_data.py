@@ -327,12 +327,14 @@ def create_data_frame_average_data(
 
 def create_data_frame_empty_average_data() -> pd.DataFrame:
 	"""
-
+	Create an empty data frame to indicate that 
+	no average data as been calculated.
 
 	Returns
 	-------
 	dataFrameEmptyAverageData : pd.Dataframe
-		.
+		Empty dataframe with a note that no 
+		average data has been calculated.
 	"""
 	return pd.DataFrame(
 		["average data has not been calculated"],

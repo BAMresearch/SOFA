@@ -25,7 +25,8 @@ from toolbars.sofa_toolbar import SofaToolbar
 
 def decorator_check_selected_rectangle(function):
 	"""
-	
+	Check if the selected rectangular area is 
+	within the axes.
 	"""
 	@functools.wraps(function)
 	def wrapper_check_selected_rectangle(self, *args):
@@ -50,17 +51,7 @@ def decorator_check_selected_area(function):
 class HeatmapToolbar(SofaToolbar):
 	"""
 	A custom toolbar to process data, displayed as a heatmap.
-	
-	Attributes
-	----------
-	guiInterface : GUIInterface
-
-	holder : 
-
-	mode : 
-
-	eventConnections : list[]
-
+	This class inherits from the SofaToolbar base class.
 	"""
 	def __init__(self, canvas_, parent_, guiInterface):
 		"""
@@ -92,6 +83,15 @@ class HeatmapToolbar(SofaToolbar):
 		"""
 		Reset the selected area, the orientation 
 		and the inactive data points.
+
+		Parameters
+		----------
+		activeForceVolume : ForceVolume
+			Contains the imported and corrected
+			measurement data.
+		activePlotInterface : PlotInterface
+			Interface between a force volume and 
+			the different plots.
 		"""
 		activePlotInterface.selectedArea = []
 		self._delete_selected_area_outlines()
@@ -114,11 +114,17 @@ class HeatmapToolbar(SofaToolbar):
 	def _select_arbitrary_area_on_click(
 		self, 
 		activePlotInterface,
-		event
+		_
 	) -> None:
 		"""
 		Prepare to capture and chache the mouse motion
 		while a mouse button is clicked.
+
+		Parameters
+		----------
+		activePlotInterface : PlotInterface
+			Interface between a force volume and 
+			the different plots.
 		"""
 		activePlotInterface.selectedArea = []
 	   
@@ -129,7 +135,7 @@ class HeatmapToolbar(SofaToolbar):
 		Add a motion_notify_event to capture the mouse
 		movement.
 		"""
-		self.eventConnections.append(
+		self.eventConnectionIds.append(
 			self.holder.figure.canvas.mpl_connect(
 				"motion_notify_event", 
 				self._select_arbitrary_area_motion
@@ -140,11 +146,20 @@ class HeatmapToolbar(SofaToolbar):
 	def _select_arbitrary_area_motion(
 		self,
 		activePlotInterface, 
-		event
+		event: mpl.backend_bases.MouseEvent
 	) -> None:
 		"""
 		Cache the mouse movement while the mouse 
 		is within the heatmap.
+		
+		Parameters
+		----------
+		activePlotInterface : PlotInterface
+			Interface between a force volume and 
+			the different plots.
+		event : mpl.backend_bases.MouseEvent
+			motion_notify_event triggers while the
+			mouse is moving.
 		"""
 		if event.xdata and event.ydata:
 			activePlotInterface.selectedArea.append(
@@ -154,7 +169,7 @@ class HeatmapToolbar(SofaToolbar):
 				)
 			)
 
-	def _select_arbitrary_area_on_release(self, event) -> None:
+	def _select_arbitrary_area_on_release(self, _) -> None:
 		"""
 		Select the arbitrary area over which the mouse has moved
 		while a button was pressed and outline it in the heatmap.
@@ -169,9 +184,9 @@ class HeatmapToolbar(SofaToolbar):
 		Stop caching mouse movement.
 		"""
 		self.holder.figure.canvas.mpl_disconnect(
-			self.eventConnections[-1]
+			self.eventConnectionIds[-1]
 		)
-		del self.eventConnections[-1]
+		del self.eventConnectionIds[-1]
 
 	@SofaToolbar.decorator_get_active_plot_interface
 	def _delete_selected_area_outlines(
@@ -192,6 +207,12 @@ class HeatmapToolbar(SofaToolbar):
 	) -> None: 
 		"""
 		Remove potential duplicates in the selected area.
+
+		Parameters
+		----------
+		activePlotInterface : PlotInterface
+			Interface between a force volume and 
+			the different plots.
 		"""
 		activePlotInterface.selectedArea = [
 			list(entry) 
@@ -206,6 +227,12 @@ class HeatmapToolbar(SofaToolbar):
 	) -> None: 
 		"""
 		Outline an arbitrary area in the heatmap.
+
+		Parameters
+		----------
+		activePlotInterface : PlotInterface
+			Interface between a force volume and 
+			the different plots.
 		"""
 		for section in activePlotInterface.selectedArea:
 			self._outline_section(section)
@@ -255,6 +282,12 @@ class HeatmapToolbar(SofaToolbar):
 	) -> None:
 		"""
 		Find all outlines that exist more than once and delete them.
+
+		Parameters
+		----------
+		activePlotInterface : PlotInterface
+			Interface between a force volume and 
+			the different plots.
 		"""
 		outlineData = [
 			outline.get_xydata() 
@@ -294,11 +327,20 @@ class HeatmapToolbar(SofaToolbar):
 	def _select_rectangular_area_on_click(
 		self,
 		activePlotInterface, 
-		event
+		event: mpl.backend_bases.MouseEvent
 	) -> None:
 		"""
 		Cache startingpoint of the rectangular area,
 		if it is within the heatmap.
+		
+		Parameters
+		----------
+		activePlotInterface : PlotInterface
+			Interface between a force volume and 
+			the different plots.
+		event : mpl.backend_bases.MouseEvent
+			button_press_event triggers when the 
+			mouse button is pressed.
 		"""
 		activePlotInterface.selectedArea = []
 		self.xStart = self.yStart = 0
@@ -312,10 +354,20 @@ class HeatmapToolbar(SofaToolbar):
 	def _select_rectangular_area_on_release(
 		self, 
 		activePlotInterface,
-		event) -> None:
+		event: mpl.backend_bases.MouseEvent
+	) -> None:
 		"""
 		Select all data points in the rectangular area
 		and outline the area in the heatmap.
+		
+		Parameters
+		----------
+		activePlotInterface : PlotInterface
+			Interface between a force volume and 
+			the different plots.
+		event : mpl.backend_bases.MouseEvent
+			button_release_event triggers when the 
+			mouse button is released.
 		"""
 		self._delete_selected_area_outlines()
 		
@@ -346,7 +398,8 @@ class HeatmapToolbar(SofaToolbar):
 		yEnd: int
 	) -> List[List[int]]:
 		"""
-		. 
+		Get the indices of all data points of the heatmap 
+		that lie within the selected area. 
 
 		Parameters
 		----------
@@ -362,7 +415,8 @@ class HeatmapToolbar(SofaToolbar):
 		Returns
 		-------
 		selectedArea : list
-			A list of all points within the rectangular area.
+			A list of indices of all points within 
+			the rectangular area.
 		"""
 		return [
 			[i, j] 
@@ -378,6 +432,12 @@ class HeatmapToolbar(SofaToolbar):
 	) -> None:
 		"""
 		Add everything except the selected area to the inactive data points.
+
+		Parameters
+		----------
+		activePlotInterface : PlotInterface
+			Interface between a force volume and 
+			the different plots.
 		"""
 		m, n = self.guiInterface.get_active_force_volume().size
 		# Map new inactive points in a two dimensional array to their corresponding points in a one dimensional array.
@@ -403,6 +463,12 @@ class HeatmapToolbar(SofaToolbar):
 	) -> None:
 		"""
 		Add the selected area to the inactive data points.
+
+		Parameters
+		----------
+		activePlotInterface : PlotInterface
+			Interface between a force volume and 
+			the different plots.
 		"""
 		m, n = self.guiInterface.get_active_force_volume().size 
 		# Map new inactive points in a two dimensional array to 
@@ -428,6 +494,15 @@ class HeatmapToolbar(SofaToolbar):
 	) -> None:
 		"""
 		Flip the heatmap horizontal.
+
+		Parameters
+		----------
+		activeForceVolume : ForceVolume
+			Contains the imported and corrected
+			measurement data.
+		activePlotInterface : PlotInterface
+			Interface between a force volume and 
+			the different plots.
 		"""
 		self._flip_selected_area_horizontal()
 		self._flip_selected_area_outlines_horizontal()
@@ -444,6 +519,12 @@ class HeatmapToolbar(SofaToolbar):
 	) -> None:
 		"""
 		Flip the selected area horizontal.
+
+		Parameters
+		----------
+		activePlotInterface : PlotInterface
+			Interface between a force volume and 
+			the different plots.
 		"""
 		m, n = self.guiInterface.get_active_force_volume().size
 
@@ -457,6 +538,12 @@ class HeatmapToolbar(SofaToolbar):
 	) -> None: 
 		"""
 		Flip the outlines of the selected area horizontal.
+
+		Parameters
+		----------
+		activePlotInterface : PlotInterface
+			Interface between a force volume and 
+			the different plots.
 		"""
 		for outline in activePlotInterface.selectedAreaOutlines:
 			self._flip_outline_horizontal(outline)
@@ -492,6 +579,15 @@ class HeatmapToolbar(SofaToolbar):
 	) -> None: 
 		"""
 		Flip the heatmap vertical.
+
+		Parameters
+		----------
+		activeForceVolume : ForceVolume
+			Contains the imported and corrected
+			measurement data.
+		activePlotInterface : PlotInterface
+			Interface between a force volume and 
+			the different plots.
 		"""
 		self._flip_selected_area_vertical()
 		self._flip_selected_area_outlines_vertical()
@@ -508,6 +604,12 @@ class HeatmapToolbar(SofaToolbar):
 	) -> None:
 		"""
 		Flip the selected area vertical.
+
+		Parameters
+		----------
+		activePlotInterface : PlotInterface
+			Interface between a force volume and 
+			the different plots.
 		"""
 		m, n = self.guiInterface.get_active_force_volume().size
 
@@ -521,6 +623,12 @@ class HeatmapToolbar(SofaToolbar):
 	) -> None: 
 		"""
 		Flip the outlines of the selected area vertical.
+
+		Parameters
+		----------
+		activePlotInterface : PlotInterface
+			Interface between a force volume and 
+			the different plots.
 		"""
 		for outline in activePlotInterface.selectedAreaOutlines:
 			self._flip_outline_vertical(outline)
@@ -556,6 +664,15 @@ class HeatmapToolbar(SofaToolbar):
 	) -> None:
 		"""
 		Rotate the heatmap by 90 degrees to the left.
+
+		Parameters
+		----------
+		activeForceVolume : ForceVolume
+			Contains the imported and corrected
+			measurement data.
+		activePlotInterface : PlotInterface
+			Interface between a force volume and 
+			the different plots.
 		"""	
 		self._rotate_selected_area()
 		self._rotate_selected_area_outlines()
@@ -572,6 +689,12 @@ class HeatmapToolbar(SofaToolbar):
 	) -> None:
 		"""
 		Rotate an area by 90 degrees.
+
+		Parameters
+		----------
+		activePlotInterface : PlotInterface
+			Interface between a force volume and 
+			the different plots.
 		"""
 		m, n = self.guiInterface.get_active_force_volume().size
 		
@@ -587,6 +710,12 @@ class HeatmapToolbar(SofaToolbar):
 	) -> None: 
 		"""
 		Rotate the outlines of the selected area.
+
+		Parameters
+		----------
+		activePlotInterface : PlotInterface
+			Interface between a force volume and 
+			the different plots.
 		"""
 		for outline in activePlotInterface.selectedAreaOutlines:
 			self._rotate_outline(outline)
@@ -622,10 +751,19 @@ class HeatmapToolbar(SofaToolbar):
 		yValues: Tuple[int, int]
 	) -> None:
 		"""
+		Plot a single outline of the selected area.
 		
-		Parameters: 
-			xValues(tuple):
-			yValues(tuple):
+		Parameters
+		----------
+		activePlotInterface : PlotInterface
+			Interface between a force volume and 
+			the different plots. 
+		xValues : tuple[int]
+			X values of the start and end point of 
+			the outline.
+		yValues : tuple[int]
+			Y values of the start and end point of
+			the outline.
 		"""
 		activePlotInterface.selectedAreaOutlines.append(
 			self.holder.figure.get_axes()[0].plot(
