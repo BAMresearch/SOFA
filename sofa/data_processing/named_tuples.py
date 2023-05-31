@@ -42,6 +42,13 @@ class HistogramParameters(NamedTuple):
 	zoom: tk.BooleanVar
 	numberOfBins: ttk.Entry
 
+class HistogramRestrictionParameters(NamedTuple):
+	data: ndarray
+	activeData: ndarray
+	binValues: List
+	indexMinBinValue: int
+	indexMaxBinValue: int
+
 # FDC data
 class ForceDistanceCurve(NamedTuple): 
 	piezo: ndarray
