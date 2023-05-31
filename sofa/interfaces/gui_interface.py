@@ -82,16 +82,6 @@ def decorator_get_active_histogram_channel(function):
 
 	return wrapper_get_active_force_volume
 
-def decorator_get_histogram_parameter(function):
-	"""
-	Get all relevant parameters to restrict the histogram.
-	"""
-	@functools.wraps(function)
-	def wrapper_get_histogram_parameter(self):
-		pass
-
-	return wrapper_get_histogram_parameter
-
 class GUIInterface():
 	"""
 	The interface between the GUI of SOFA and the imported force volumes.
@@ -100,20 +90,23 @@ class GUIInterface():
 	Attributes
 	----------
 	importedDataSets : Dict
-		.
+		Contains the imported force volumes and their associated
+		PlotInterfaces.
 	keyActiveForceVolume : ttk.StringVar
 		Variable that stores the name of active force volume.
 	linePlotParameters : nt.LinePlotParameters
-		
+		Contains all GUI elements of the main window
+		which are related to the line plot.
 	heatmapParameters : nt.HeatmapParameters
-
+		Contains all GUI elements of the main window
+		which are related to the heatmap.
 	histogramParameters : nt.HistogramParameters
-
+		Contains all GUI elements of the main window
+		which are related to the histogram.
 	"""
 	def __init__(self) -> None:
 		"""
-		Initialize a blank interface. The attributes can only be 
-		set after 
+		Initialize a blank gui interface. 
 		"""
 		self.importedDataSets: Dict = {}
 		self.keyActiveForceVolume: ttk.StringVar
@@ -123,12 +116,14 @@ class GUIInterface():
 
 	def set_gui_parameters(self, guiParameters: Dict) -> None:
 		"""
-
+		Set the plot parameters of the main window of SOFA
+		in the gui interface.
 		
 		Parameters
 		----------
 		guiParameters : dict
-
+			Contains the relevant parameters of every plot
+			in the main window of SOFA.
 		"""
 		self.keyActiveForceVolume = guiParameters["keyActiveForceVolume"]
 
@@ -154,11 +149,15 @@ class GUIInterface():
 
 	def create_force_volume(self, importedData: Dict) -> None: 
 		"""
-
+		Create a force volume from the imported measurement
+		data, initialize it's associated plot interface and
+		display the force volume in the main window of SOFA.
 
 		Parameters
 		----------
 		importedData : Dict
+			Contains the data of the imported 
+			measurement files.
 		"""
 		forceVolume = ForceVolume(importedData)
 		plotInterface = PlotInterface(
@@ -190,7 +189,17 @@ class GUIInterface():
 		activePlotInterface: PlotInterface
 	) -> None:
 		"""
-		
+		Display the force distance curves of
+		a force volume in a line plot.
+
+		Parameters
+		----------
+		activeForceVolume : ForceVolume
+			Contains the imported and corrected
+			measurement data.
+		activePlotInterface: PlotInterface
+			Interface between a force volume and 
+			the different plots.
 		"""
 		plt_data.plot_line_plot(
 			self.linePlotParameters.holder, 
@@ -206,6 +215,20 @@ class GUIInterface():
 		keyActiveHeatmapChannel: str
 	) -> None: 
 		"""
+		Display a channel of a force volume as 
+		a heatmap.
+
+		Parameters
+		----------
+		activeForceVolume : ForceVolume
+			Contains the imported and corrected
+			measurement data.
+		activePlotInterface : PlotInterface
+			Interface between a force volume and 
+			the different plots.
+		keyActiveHeatmapChannel : str
+			Name of currently active channel
+			displayed in the heatmap.
 		"""
 		plt_data.plot_heatmap(
 			self.heatmapParameters.holder,
@@ -226,8 +249,22 @@ class GUIInterface():
 		keyActiveHistogramChannel: str
 	) -> None:
 		"""
+		Display a channel of a force volume as 
+		a histogram.
+
+		Parameters
+		----------
+		activeForceVolume : ForceVolume
+			Contains the imported and corrected
+			measurement data.
+		activePlotInterface : PlotInterface
+			Interface between a force volume and 
+			the different plots.
+		keyActiveHeatmapChannel : str
+			Name of currently active channel
+			displayed in the histogram.
 		"""
-		plt_data.plot_histogram(
+		activePlotInterface.binValues = plt_data.plot_histogram(
 			self.histogramParameters.holder, 
 			activeForceVolume.get_histogram_data(keyActiveHistogramChannel),
 			activeForceVolume.get_active_histogram_data(
@@ -240,15 +277,13 @@ class GUIInterface():
 
 	def restrict_histogram_min_down(
 		self,
-		binValues,
-		indexMinBinValue,
-		indexMaxBinValue,
-		data
 	) -> None: 
 		"""
-		
+		Restrict the histogram by decreasing the
+		border for the minimum value.
 		"""
-		# create decorator
+		restrictionParameters = self._get_histogram_restriction_parameters()
+
 		minimumTreshold = heatmapParameter.binValues[heatmapParameter.indexMinValue + 1]
 		inactiveDataPoints = np.where(
 			heatmapParameter.histogramData < minimumTreshold
@@ -259,8 +294,11 @@ class GUIInterface():
 		self
 	) -> None: 
 		"""
-
+		Restrict the histogram by increasing the
+		border for the minimum value.
 		"""
+		restrictionParameters = self._get_histogram_restriction_parameters()
+
 		while True:
 
 
@@ -271,27 +309,48 @@ class GUIInterface():
 		self
 	) -> None: 
 		"""
-
+		Restrict the histogram by decreasing the
+		border for the maximum value.
 		"""
-		pass
+		restrictionParameters = self._get_histogram_restriction_parameters()
 
 	def restrict_histogram_max_up(
 		self
 	) -> None: 
 		"""
-
+		Restrict the histogram by increasing the
+		border for the maximum value.
 		"""
-		pass
+		restrictionParameters = self._get_histogram_restriction_parameters()
 
 	@decorator_get_active_histogram_channel
 	@decorator_get_active_data_set
-	def _get_histogram_parameters(
+	def _get_histogram_restriction_parameters(
 		self,
 		activeForceVolume: ForceVolume,
 		activePlotInterface: PlotInterface,
 		keyActiveHistogramChannel: str
 	) -> Tuple:
 		"""
+		Get all parameters needed to restrict the
+		borders of the histogram.
+
+		Parameters
+		----------
+		activeForceVolume : ForceVolume
+			Contains the imported and corrected
+			measurement data.
+		activePlotInterface : PlotInterface
+			Interface between a force volume and 
+			the different plots.
+		keyActiveHistogramChannel : str
+			Name of currently active channel
+			displayed in the histogram.
+
+		Returns
+		-------
+		restrictionParameters : nt.HistogramRestrictionParameters
+			
 		"""
 		data = activeForceVolume.get_histogram_data(
 			keyActiveHistogramChannel
@@ -304,7 +363,7 @@ class GUIInterface():
 		indexMinBinValue = binValues[np.where(binValues <= np.min(activeData))[0][-1]]
 		indexMaxBinValue = binValues[np.where(binValues >= np.max(activeData))[0][0]]
 
-		return (
+		return nt.HistogramRestrictionParameters(
 			data,
 			activeData,
 			binValues,
@@ -314,6 +373,7 @@ class GUIInterface():
 
 	def update_active_force_volume_plots(self) -> None: 
 		"""
+		Update the inactive data points in every plot.
 		"""
 		self.update_line_plot()
 		self.plot_heatmap()
@@ -321,6 +381,9 @@ class GUIInterface():
 
 	def update_inactive_data_points_line_plot(self) -> None:
 		"""
+		Check if a change to the inactive data points
+		from the line plot, updates only the line plot
+		or all plots.
 		"""
 		if self.linePlotParameters.linked.get():
 			self.update_active_force_volume_plots()
@@ -329,6 +392,9 @@ class GUIInterface():
 
 	def update_inactive_data_points_heatmap(self) -> None:
 		"""
+		Check if a change to the inactive data points
+		from the heatmap, updates only the heatmap
+		or all plots.
 		"""
 		if self.heatmapParameters.linked.get():
 			self.update_active_force_volume_plots()
@@ -337,6 +403,9 @@ class GUIInterface():
 
 	def update_inactive_data_points_histogram(self) -> None:
 		"""
+		Check if a change to the inactive data points
+		from the histogram, updates only the histogram
+		or all plots.
 		"""
 		if self.histogramParameters.linked.get():
 			self.update_active_force_volume_plots()
@@ -350,6 +419,18 @@ class GUIInterface():
 		activePlotInterface: PlotInterface
 	) -> None:
 		"""
+		Update the state of every force distance
+		curve displayed in the line plot and if
+		selected the average to.
+
+		Parameters
+		----------
+		activeForceVolume : ForceVolume
+			Contains the imported and corrected
+			measurement data.
+		activePlotInterface : PlotInterface
+			Interface between a force volume and 
+			the different plots.
 		"""
 		plt_data.update_line_plot(
 			self.linePlotParameters.holder,
@@ -383,6 +464,8 @@ class GUIInterface():
 
 	def check_imported_data_set(self) -> bool: 
 		"""
+		Checks whether measurement data has 
+		already been imported.
 		"""
 		if self.importedDataSets:
 			return True
@@ -391,35 +474,41 @@ class GUIInterface():
 
 	def get_active_force_volume(self) -> ForceVolume:
 		"""
-
+		Get the currently selected force volume.
 
 		Returns
 		-------
 		activeForceVolume : ForceVolume
-
+			Active force volume.
 		"""
 		return self.importedDataSets[self.keyActiveForceVolume.get()]["forceVolume"]
 
 	def get_active_plot_interface(self) -> ForceVolume:
 		"""
-
+		Get the associated plot interface of the currently
+		selected force volume.
 
 		Returns
 		-------
 		activeForceVolume : ForceVolume
-
+			Plot interface of the active force volume.
 		"""
 		return self.importedDataSets[self.keyActiveForceVolume.get()]["plotInterface"]
 
 	@staticmethod
 	def _text_to_camel_case(inputString: str) -> str:
-		"""Converts text string to a lower CamelCase format.
+		"""
+		Converts text string to a lower CamelCase format.
 
-		Parameters:
-			inputString(str): Text string.
+		Parameters
+		----------
+		inputString : str
+			Text string.
 
-		Returns:
-			outputString(str): String in lower CamelCase.
+		Returns
+		-------
+		outputString : str
+			String in lower CamelCase.
 		"""
 		inputString = inputString.replace(" ", "")
 		inputString = inputString[0].lower() + inputString[1:]

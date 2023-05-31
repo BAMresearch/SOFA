@@ -274,6 +274,11 @@ def plot_histogram(
 	zoom : bool
 		If true adjust the view limits to the current 
 		minimum and maximum values.
+
+	Returns
+	-------
+	binValues : list
+		Values of the bins from the general channel data.
 	"""
 	ax = get_axes(holder)
 
@@ -306,6 +311,8 @@ def plot_histogram(
 		ax.set_xlim(auto=True)
 
 	holder.draw()
+
+	return binValues
 
 def add_average_to_line_plot(
 	holder: mpl.backends.backend_tkagg.FigureCanvasTkAgg,
