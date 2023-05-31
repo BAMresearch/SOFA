@@ -23,6 +23,20 @@ def calculate_average(
 	activeForceDistanceCurves: List,
 ) -> nt.AverageForceDistanceCurve:
 	"""
+	Calculate the average and standard deviation
+	of the active force distance curves.
+
+	Parameters
+	----------
+	activeForceDistanceCurves : list[nt.ForceDistanceCurve]
+		Piezo(x) and deflection (y) values of the
+		active force distance curves.
+	
+	Returns
+	-------
+	averageForceDistanceCurve : nt.AverageForceDistanceCurve
+		Contains the piezo(x) and deflection (y) values
+		of the average curve and the standard deviation.
 	"""
 	normedCurves = _interpolate_normed_curves(
 		activeForceDistanceCurves
@@ -60,6 +74,17 @@ def _interpolate_normed_curves(
 	activeForceDistanceCurves
 ) -> None:
 	"""
+	
+
+	Parameters
+	----------
+	activeForceDistanceCurves : list[nt.ForceDistanceCurve]
+		Piezo(x) and deflection (y) values of the
+		active force distance curves.
+	
+	Returns
+	-------
+	: nt.NormedCurves
 	"""
 	numberOfDataPoints = 2000
 
@@ -101,6 +126,20 @@ def _get_minimum_piezo(
 	activeForceDistanceCurves
 ) -> float:
 	"""
+	Find the minimum piezo value of all
+	active force distance curves.
+
+	Parameters
+	----------
+	activeForceDistanceCurves : list[nt.ForceDistanceCurve]
+		Piezo(x) and deflection (y) values of the
+		active force distance curves.
+
+	Returns
+	-------
+	minimumPiezoValue : float
+		The smallest piezo value of all active
+		force distance curves.
 	"""
 	piezoValues = [
 		forceDistanceCurve.dataApproachCorrected.piezo
@@ -114,6 +153,20 @@ def _get_maximum_deflection(
 	activeForceDistanceCurves
 ) -> float:
 	"""
+	Find the maximum deflection value of all
+	active force distance curves.
+
+	Parameters
+	----------
+	activeForceDistanceCurves : list[nt.ForceDistanceCurve]
+		Piezo(x) and deflection (y) values of the
+		active force distance curves.
+
+	Returns
+	-------
+	maximumDeflectionValue : float
+		The biggest deflection value of all 
+		active force distance curves.
 	"""
 	deflectionValues = [
 		forceDistanceCurve.dataApproachCorrected.deflection
