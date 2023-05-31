@@ -152,13 +152,13 @@ class MainWindow(ttk.Frame):
 			frameFiles, text="Import Data", 
 			bootstyle="", command=self._create_import_window
 		)
-		buttonImport.grid(row=0, column=0, padx=10, sticky=W)
+		buttonImport.grid(row=0, column=0, padx=10, pady=5, sticky=W)
 
 		buttonExport = ttk.Button(
 			frameFiles, text="Export Data",
 			bootstyle="", command=self._create_export_window
 		)
-		buttonExport.grid(row=1, column=0, padx=10, pady=10, sticky=W)
+		buttonExport.grid(row=1, column=0, padx=10, pady=5, sticky=W)
 
 	def _create_frame_active_data(
 		self, 
@@ -191,43 +191,48 @@ class MainWindow(ttk.Frame):
 			command=self._update_force_volume,
 			bootstyle=""
 		)
-		self.dropdownForceVolumes.grid(row=0, column=2, padx=10, sticky=E)
+		self.dropdownForceVolumes.grid(row=0, column=3, padx=10, sticky=E)
 
 		labelActiveData = ttk.Label(
 			frameActiveData, 
 			text="Name:"
 		)
-		labelActiveData.grid(row=0, column=0, padx=10, sticky=W)
+		labelActiveData.grid(row=0, column=0, padx=10, pady=5, sticky=W)
 
 		valueActiveData = ttk.Label(
 			frameActiveData,
 			textvariable=self.stringVarActiveData
 		)
-		valueActiveData.grid(row=0, column=1, padx=10, sticky=W)
+		valueActiveData.grid(row=0, column=1, padx=10, pady=5, sticky=W)
 
 		labelActiveDataSize = ttk.Label(
 			frameActiveData, 
 			text="Size:"
 		)
-		labelActiveDataSize.grid(row=1, column=0, padx=10, sticky=W)
+		labelActiveDataSize.grid(row=1, column=0, padx=10, pady=5, sticky=W)
 
 		valueActiveDataSize = ttk.Label(
 			frameActiveData,
 			textvariable=self.stringVarActiveDataSize
 		)
-		valueActiveDataSize.grid(row=1, column=1, padx=10, sticky=W)
+		valueActiveDataSize.grid(row=1, column=1, padx=10, pady=5, sticky=W)
 
 		labelActiveDataLocation = ttk.Label(
 			frameActiveData, 
 			text="Location:"
 		)
-		labelActiveDataLocation.grid(row=2, column=0, padx=10, sticky=W)
+		labelActiveDataLocation.grid(row=2, column=0, padx=10, pady=5, sticky=W)
 
 		valueActiveDataLocation = ttk.Label(
 			frameActiveData,
 			textvariable=self.stringVarActiveDataLocation
 		)
-		valueActiveDataLocation.grid(row=2, column=1, padx=10, sticky=W)
+		valueActiveDataLocation.grid(row=2, column=1, padx=10, pady=5, sticky=W)
+
+		frameActiveData.columnconfigure(0, weight=1)
+		frameActiveData.columnconfigure(1, weight=1)
+		frameActiveData.columnconfigure(2, weight=1)
+		frameActiveData.columnconfigure(3, weight=1)
 
 	def _create_frame_linked_plots(
 		self, 
@@ -252,7 +257,7 @@ class MainWindow(ttk.Frame):
 			variable=self.interactiveLinePlot,
 			bootstyle="round-toggle"
 		)
-		checkbuttonInteractiveLinePlot.grid(row=0, column=0, padx=10, sticky=W)
+		checkbuttonInteractiveLinePlot.grid(row=0, column=0, padx=10, pady=5, sticky=W)
 
 		self.interactiveHeatmap = tk.BooleanVar(self, value=False)
 		checkbuttonInteractiveHeatmap = ttk.Checkbutton(
@@ -261,7 +266,7 @@ class MainWindow(ttk.Frame):
 			variable=self.interactiveHeatmap,
 			bootstyle="round-toggle"
 		)
-		checkbuttonInteractiveHeatmap.grid(row=1, column=0, padx=10, sticky=W)
+		checkbuttonInteractiveHeatmap.grid(row=1, column=0, padx=10, pady=5, sticky=W)
 
 		self.interactiveHistogram = tk.BooleanVar(self, value=False)
 		checkbuttonInteractiveHistogram = ttk.Checkbutton(
@@ -270,7 +275,7 @@ class MainWindow(ttk.Frame):
 			variable=self.interactiveHistogram,
 			bootstyle="round-toggle"
 		)
-		checkbuttonInteractiveHistogram.grid(row=2, column=0, padx=10, sticky=W)
+		checkbuttonInteractiveHistogram.grid(row=2, column=0, padx=10, pady=5, sticky=W)
 
 		buttonUpdatePlots = ttk.Button(
 			frameInteractivePlots, 
@@ -278,7 +283,7 @@ class MainWindow(ttk.Frame):
 			command=self._update_plots,
 			bootstyle=""
 		)
-		buttonUpdatePlots.grid(row=1, column=2, padx=10, sticky=E)
+		buttonUpdatePlots.grid(row=0, column=2, padx=10, sticky=E)
 
 		frameInteractivePlots.columnconfigure(0, weight=1)
 		frameInteractivePlots.columnconfigure(1, weight=1)
