@@ -2,7 +2,10 @@
 Using SOFA
 ==========
 
-Include image of the SOFA GUI after importing some test data
+.. figure:: images/sofa_gui.jpg
+	:alt: image of the main window of SOFA
+
+	Main window of SOFA showing the selection process.
 
 .. _import data:
 

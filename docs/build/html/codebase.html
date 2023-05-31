@@ -298,13 +298,13 @@ The decorator <code class="code docutils literal notranslate"><span class="pre">
 <p>This package is responsible for the processing of the force spectroscopy data. This includes the import and correction of the measurement data, the calulation of the different channels and an average force distance curve and the export of the data from SOFA. These modules use a procedural approach.</p>
 <div class="section" id="import-data">
 <span id="import-data-implementation"></span><h4>Import Data<a class="headerlink" href="#import-data" title="Permalink to this heading">#</a></h4>
-<p>The import data package handles the import of the different file formats. To add new file types create a new module in the <a class="reference internal" href="#import-formats"><span class="std std-ref">import formats</span></a> folder, import it in the <a class="reference internal" href="#import-data-wrapper-implementation"><span class="std std-ref">import data</span></a> module and extend the dictionary <code class="code docutils literal notranslate"><span class="pre">importFunctions</span></code>. For detailed information about the given input and expected output of the import functions, see the <a class="reference internal" href="architecture.html#test"><span class="std std-ref">import architecture</span></a> section.</p>
+<p>The import data package handles the import of the different file formats. To add new file types create a new module in the <a class="reference internal" href="#import-formats-implementation"><span class="std std-ref">import formats</span></a> folder, import it in the <a class="reference internal" href="#import-data-wrapper-implementation"><span class="std std-ref">import data</span></a> module and extend the dictionary <code class="code docutils literal notranslate"><span class="pre">importFunctions</span></code>. For detailed information about the given input and expected output of the import functions, see the <a class="reference internal" href="architecture.html#test"><span class="std std-ref">import architecture</span></a> section.</p>
 <div class="section" id="import-data-wrapper">
 <span id="import-data-wrapper-implementation"></span><h5>Import Data Wrapper<a class="headerlink" href="#import-data-wrapper" title="Permalink to this heading">#</a></h5>
-<p>The Import Data module is responsible for the import of measurement data with the selected data type. It imports all modules from the <a class="reference internal" href="#import-formats"><span class="std std-ref">import formats</span></a> folder and maps the selected data type to the corresponding import function.</p>
+<p>The Import Data module is responsible for the import of measurement data with the selected data type. It imports all modules from the <a class="reference internal" href="supported_data_types.html#import-formats"><span class="std std-ref">import formats</span></a> folder and maps the selected data type to the corresponding import function.</p>
 </div>
 <div class="section" id="import-formats">
-<span id="id1"></span><h5>Import Formats<a class="headerlink" href="#import-formats" title="Permalink to this heading">#</a></h5>
+<span id="import-formats-implementation"></span><h5>Import Formats<a class="headerlink" href="#import-formats" title="Permalink to this heading">#</a></h5>
 <p>This folder contains modules with import functions for every currently supported import data type.</p>
 <div class="section" id="import-ibw-data">
 <h6>Import Ibw Data<a class="headerlink" href="#import-ibw-data" title="Permalink to this heading">#</a></h6>
@@ -318,14 +318,11 @@ The decorator <code class="code docutils literal notranslate"><span class="pre">
 </div>
 <div class="section" id="calculate-channel-data">
 <span id="calculate-channel-data-implementation"></span><h4>Calculate Channel Data<a class="headerlink" href="#calculate-channel-data" title="Permalink to this heading">#</a></h4>
-<p>enthält funktionen um die einzelnen channel zu berechen
-weitere channel braucht funktion die bestimmte argumente bekommt und folgendes zurück liefert
-erweiterung in <em>active_channels</em>
-decorator konvertiert daten in two dimensional np array
-verweiß zu test</p>
+<p>This module is responsible for calculating the different <a class="reference internal" href="channels.html#channels"><span class="std std-ref">channels</span></a> after the force distance curves have been corrected. It contains a function for every channel, some helper functions and the <code class="code docutils literal notranslate"><span class="pre">active_channels</span></code> dictionary, which is needed to map the different channels to their corresponding function. The decorator <code class="code docutils literal notranslate"><span class="pre">decorator_reshape_channel_data</span></code> converts the channel values to a two dimensional numpy array. To add a custom channel write a function to caluclate the channel values and extend the <code class="code docutils literal notranslate"><span class="pre">active_channels</span></code> dictionary. For further informations about provided input arguments and expected out of a function calculating a custom channel, see the <a class="reference internal" href="architecture.html#test"><span class="std std-ref">test</span></a> section.</p>
 </div>
 <div class="section" id="calculate-average">
 <span id="calculate-average-implementation"></span><h4>Calculate Average<a class="headerlink" href="#calculate-average" title="Permalink to this heading">#</a></h4>
+<p>The calculate average module can calculate an average of the currently active force distance curves.</p>
 </div>
 <div class="section" id="export-data">
 <span id="export-data-implementation"></span><h4>Export Data<a class="headerlink" href="#export-data" title="Permalink to this heading">#</a></h4>

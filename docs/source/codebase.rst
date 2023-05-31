@@ -131,7 +131,7 @@ This package is responsible for the processing of the force spectroscopy data. T
 Import Data
 ~~~~~~~~~~~
 
-The import data package handles the import of the different file formats. To add new file types create a new module in the :ref:`import formats <import formats>` folder, import it in the :ref:`import data <import data wrapper implementation>` module and extend the dictionary :code:`importFunctions`. For detailed information about the given input and expected output of the import functions, see the :ref:`import architecture <test>` section.
+The import data package handles the import of the different file formats. To add new file types create a new module in the :ref:`import formats <import formats implementation>` folder, import it in the :ref:`import data <import data wrapper implementation>` module and extend the dictionary :code:`importFunctions`. For detailed information about the given input and expected output of the import functions, see the :ref:`import architecture <test>` section.
 
 .. _import data wrapper implementation:
 
@@ -140,7 +140,7 @@ Import Data Wrapper
 
 The Import Data module is responsible for the import of measurement data with the selected data type. It imports all modules from the :ref:`import formats <import formats>` folder and maps the selected data type to the corresponding import function.
 
-.. _import formats:
+.. _import formats implementation:
 
 Import Formats
 """"""""""""""

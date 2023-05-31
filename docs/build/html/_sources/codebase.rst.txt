@@ -131,7 +131,7 @@ This package is responsible for the processing of the force spectroscopy data. T
 Import Data
 ~~~~~~~~~~~
 
-The import data package handles the import of the different file formats. To add new file types create a new module in the :ref:`import formats <import formats>` folder, import it in the :ref:`import data <import data wrapper implementation>` module and extend the dictionary :code:`importFunctions`. For detailed information about the given input and expected output of the import functions, see the :ref:`import architecture <test>` section.
+The import data package handles the import of the different file formats. To add new file types create a new module in the :ref:`import formats <import formats implementation>` folder, import it in the :ref:`import data <import data wrapper implementation>` module and extend the dictionary :code:`importFunctions`. For detailed information about the given input and expected output of the import functions, see the :ref:`import architecture <test>` section.
 
 .. _import data wrapper implementation:
 
@@ -140,7 +140,7 @@ Import Data Wrapper
 
 The Import Data module is responsible for the import of measurement data with the selected data type. It imports all modules from the :ref:`import formats <import formats>` folder and maps the selected data type to the corresponding import function.
 
-.. _import formats:
+.. _import formats implementation:
 
 Import Formats
 """"""""""""""
@@ -162,18 +162,14 @@ The correct data module is responsible for correcting the approach part of force
 Calculate Channel Data
 ~~~~~~~~~~~~~~~~~~~~~~
 
-
-
-enthält funktionen um die einzelnen channel zu berechen
-weitere channel braucht funktion die bestimmte argumente bekommt und folgendes zurück liefert
-erweiterung in *active_channels*
-decorator konvertiert daten in two dimensional np array
-verweiß zu test
+This module is responsible for calculating the different :ref:`channels <channels>` after the force distance curves have been corrected. It contains a function for every channel, some helper functions and the :code:`active_channels` dictionary, which is needed to map the different channels to their corresponding function. The decorator :code:`decorator_reshape_channel_data` converts the channel values to a two dimensional numpy array. To add a custom channel write a function to caluclate the channel values and extend the :code:`active_channels` dictionary. For further informations about provided input arguments and expected out of a function calculating a custom channel, see the :ref:`test <test>` section.
 
 .. _calculate average implementation:
 
 Calculate Average
 ~~~~~~~~~~~~~~~~~
+
+The calculate average module can calculate an average of the currently active force distance curves.
 
 .. _export data implementation:
 
