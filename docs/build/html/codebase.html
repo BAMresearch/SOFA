@@ -1,11 +1,11 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Glossary" href="glossary.html" /><link rel="prev" title="Software Architecture" href="architecture.html" />
 
-    <meta name="generator" content="sphinx-4.5.0, furo 2022.04.07"/>
+    <meta name="generator" content="sphinx-5.3.0, furo 2022.04.07"/>
         <title>Codebase - SOFA</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=68f4518137b9aefe99b631505a2064c3c42c9852" />
@@ -213,7 +213,7 @@
         </div>
         <article role="main">
           <section id="codebase">
-<h1>Codebase<a class="headerlink" href="#codebase" title="Permalink to this headline">#</a></h1>
+<h1>Codebase<a class="headerlink" href="#codebase" title="Permalink to this heading">#</a></h1>
 <p>SOFA is written in Python (should require Python 3.6.1 at minimum) and uses the following external modules and libraries:</p>
 <ul class="simple">
 <li><p><strong>NumPy</strong> - for basic mathematical computations (tested with NumPy version 1.22.1)</p></li>
@@ -224,7 +224,7 @@
 <li><p><strong>ttkbootstrap</strong> - to give the Tkinter GUI a modern look (tested with ttkbootstrap version 1.5.1)</p></li>
 </ul>
 <section id="sofa-packages">
-<h2>SOFA Packages<a class="headerlink" href="#sofa-packages" title="Permalink to this headline">#</a></h2>
+<h2>SOFA Packages<a class="headerlink" href="#sofa-packages" title="Permalink to this heading">#</a></h2>
 <p>The general aim of SOFA was to write code which is simple to read and easy to extend. The implementation followed the principle of separation of concerns. Therefore SOFA is comprised of multiple distinct packages. On the code level functions are keept short and only take responsibility for one single functionality. To increase the readability of the code, SOFA tries to implement the following PEP’s:</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://peps.python.org/pep-0008/">PEP 8</a> - The Style Guide for Python Code</p></li>
@@ -233,10 +233,10 @@
 </ul>
 <p>The implementation uses a mixture of object oriented and procedural programming, depending on which is more suitable for the different requirements at hand.</p>
 <section id="gui">
-<span id="gui-implementation"></span><h3>GUI<a class="headerlink" href="#gui" title="Permalink to this headline">#</a></h3>
+<span id="gui-implementation"></span><h3>GUI<a class="headerlink" href="#gui" title="Permalink to this heading">#</a></h3>
 <p>The GUI of SOFA is written in Tkinter and uses the ttkbootstrap theme extension, to give it a modern look. It consists of of three windows, the main window and two subwindows for the data import and export. All of them are written in an object oriented approach.</p>
 <section id="main-window-source">
-<span id="main-window-implementation"></span><h4>Main Window  <a class="reference external" href="https://github.com/2Puck/sofa/tree/development">source</a><a class="headerlink" href="#main-window-source" title="Permalink to this headline">#</a></h4>
+<span id="main-window-implementation"></span><h4>Main Window  <a class="reference external" href="https://github.com/2Puck/sofa/tree/development">source</a><a class="headerlink" href="#main-window-source" title="Permalink to this heading">#</a></h4>
 <p>The main window of SOFA contains … . The widgets . The main window uses mostly the pack geometry manager. Only for complexer layouts like in the in … frame the grid manager is used.</p>
 <p>einzelne frames erklären
 wie sind plots in tkinter eingebunden
@@ -245,38 +245,38 @@ interaktionsmöglichkeiten toolbars histogram buttons
 import and export window ansprechen</p>
 </section>
 <section id="import-window">
-<h4>Import Window<a class="headerlink" href="#import-window" title="Permalink to this headline">#</a></h4>
+<h4>Import Window<a class="headerlink" href="#import-window" title="Permalink to this heading">#</a></h4>
 <p>The import window is a small subwindow to handle the import of measurement data. Like in the main window the different widgets are arranged in rows using only the pack geometry manager. It contains a indeterminate progressbar to show if the import process is still runing and which process is currently being executed. The decorator <em>decorator_check_required_folder_path</em> checks if a required measurement folder is selected before the import process starts.</p>
 <p>During the import process the selected measurement files are first imported and combined into one data dictionary with the selected import function of the <a class="reference internal" href="#import-data-implementation"><span class="std std-ref">Import Data</span></a> module. Afterwards the data dictionary is passed to the <a class="reference internal" href="#gui-interface-implementation"><span class="std std-ref">GUI Interface</span></a>, where a new force volume will be created. Finally the foldername, size and folderpath of the imported measurement data are set in the Active Data frame of the <a class="reference internal" href="#main-window-implementation"><span class="std std-ref">Main Window</span></a>.</p>
 <p>If an error occurs during the import process the user is informed via a message box and the import process is terminated. If the data could sucessfully be imported the window closes it self and informs the user via a message box.</p>
 </section>
 <section id="export-window">
-<h4>Export Window<a class="headerlink" href="#export-window" title="Permalink to this headline">#</a></h4>
+<h4>Export Window<a class="headerlink" href="#export-window" title="Permalink to this heading">#</a></h4>
 <p>The export window is a small subwindow to handle the export of the imported force volumes. Like in the main window the different widgets are arranged in rows using only the pack geometry manager. It contains a indeterminate progressbar to show if the import process is still runing.
 The decorator <em>decorator_check_required_folder_path</em> and <em>decorator_check_required_folder_name</em> check if the required folder path and folder name for the ouput folder are selected before the export process starts.</p>
 <p>In the export process the data of the selected force volume can be exported to the selected <a class="reference internal" href="supported_data_types.html#export-formats"><span class="std std-ref">export formats</span></a>. The <a class="reference internal" href="#export-data-implementation"><span class="std std-ref">Export Data</span></a> module creates an output folder for data with the selected location and name. After this the data of the selected force volume is exported to the different formats.</p>
 </section>
 <section id="window-settings">
-<h4>Window Settings<a class="headerlink" href="#window-settings" title="Permalink to this headline">#</a></h4>
+<h4>Window Settings<a class="headerlink" href="#window-settings" title="Permalink to this heading">#</a></h4>
 </section>
 </section>
 <section id="interfaces">
-<h3>Interfaces<a class="headerlink" href="#interfaces" title="Permalink to this headline">#</a></h3>
+<h3>Interfaces<a class="headerlink" href="#interfaces" title="Permalink to this heading">#</a></h3>
 <section id="gui-interface">
-<span id="gui-interface-implementation"></span><h4>GUI Interface<a class="headerlink" href="#gui-interface" title="Permalink to this headline">#</a></h4>
+<span id="gui-interface-implementation"></span><h4>GUI Interface<a class="headerlink" href="#gui-interface" title="Permalink to this heading">#</a></h4>
 </section>
 <section id="plot-interface">
-<h4>Plot Interface<a class="headerlink" href="#plot-interface" title="Permalink to this headline">#</a></h4>
+<h4>Plot Interface<a class="headerlink" href="#plot-interface" title="Permalink to this heading">#</a></h4>
 </section>
 </section>
 <section id="toolbar">
-<span id="toolbar-implementation"></span><h3>Toolbar<a class="headerlink" href="#toolbar" title="Permalink to this headline">#</a></h3>
+<span id="toolbar-implementation"></span><h3>Toolbar<a class="headerlink" href="#toolbar" title="Permalink to this heading">#</a></h3>
 <p>The toolbar package contains the line plot and heatmap toolbars to select a certain subgroup of force curves and inspect the data more closely. Both are written as a seperate class inherted from the Matplotlib NavigationToolbar2Tk, but have custom <a class="reference internal" href="toolbars.html#toolbar-funcitionalities"><span class="std std-ref">funcitionalities</span></a>. With Matplotlib version 3.5.1 it is no longer possible to load toolbar icons from a custom location. Therefore, both toolbars have to overwrite a part of the NavigationToolbar2Tk <em>__init__</em> function. Additionally they adjust the background color of the toolbar icons to the background color of the main window.</p>
 <section id="sofa-toolbar">
-<h4>SOFA Toolbar<a class="headerlink" href="#sofa-toolbar" title="Permalink to this headline">#</a></h4>
+<h4>SOFA Toolbar<a class="headerlink" href="#sofa-toolbar" title="Permalink to this heading">#</a></h4>
 </section>
 <section id="lineplot-toolbar">
-<h4>Lineplot Toolbar<a class="headerlink" href="#lineplot-toolbar" title="Permalink to this headline">#</a></h4>
+<h4>Lineplot Toolbar<a class="headerlink" href="#lineplot-toolbar" title="Permalink to this heading">#</a></h4>
 <p>The lineplot toolbar allows the selection of single or multiple force distance curves. In addition it is possible to zoom in and out of the lineplot and toggle the different display options, like displaying the average curve.</p>
 <p>hat mode und setzt aktiven button state
 zoom ansprechen - speichert immer nur letzen zoom dadurch muss nicht init werden
@@ -284,34 +284,34 @@ auswahl an kurven - einzelne kurven über pick radius - gruppe and kurven über 
 show inactive average errorbar alle über gui interface auf architecture verweisen</p>
 </section>
 <section id="heatmap-toolbar">
-<h4>Heatmap Toolbar<a class="headerlink" href="#heatmap-toolbar" title="Permalink to this headline">#</a></h4>
+<h4>Heatmap Toolbar<a class="headerlink" href="#heatmap-toolbar" title="Permalink to this heading">#</a></h4>
 <p>bereich auswählen - rechteck relativ selbsterklärend - freie fläche wie wird das gemacht - alles umkreisen duplikate löschen
 bereich einschliesen ausschliesen - ändert inaktive datenpunkte
 flip und rotieren ohne achsen anpassen erklären bzw auf arcitecture heatmap orientation verweisen</p>
 </section>
 </section>
 <section id="force-spectroscopy-data">
-<h3>Force Spectroscopy Data<a class="headerlink" href="#force-spectroscopy-data" title="Permalink to this headline">#</a></h3>
+<h3>Force Spectroscopy Data<a class="headerlink" href="#force-spectroscopy-data" title="Permalink to this heading">#</a></h3>
 <section id="force-volume">
-<h4>Force Volume<a class="headerlink" href="#force-volume" title="Permalink to this headline">#</a></h4>
+<h4>Force Volume<a class="headerlink" href="#force-volume" title="Permalink to this heading">#</a></h4>
 </section>
 <section id="force-distance-curve">
-<h4>Force Distance Curve<a class="headerlink" href="#force-distance-curve" title="Permalink to this headline">#</a></h4>
+<h4>Force Distance Curve<a class="headerlink" href="#force-distance-curve" title="Permalink to this heading">#</a></h4>
 </section>
 <section id="channel">
-<h4>Channel<a class="headerlink" href="#channel" title="Permalink to this headline">#</a></h4>
+<h4>Channel<a class="headerlink" href="#channel" title="Permalink to this heading">#</a></h4>
 </section>
 <section id="average-force-distance-curve">
-<h4>Average Force Distance Curve<a class="headerlink" href="#average-force-distance-curve" title="Permalink to this headline">#</a></h4>
+<h4>Average Force Distance Curve<a class="headerlink" href="#average-force-distance-curve" title="Permalink to this heading">#</a></h4>
 </section>
 </section>
 <section id="data-processing">
-<h3>Data Processing<a class="headerlink" href="#data-processing" title="Permalink to this headline">#</a></h3>
+<h3>Data Processing<a class="headerlink" href="#data-processing" title="Permalink to this heading">#</a></h3>
 <p>This package is responsible for the processing of the force spectroscopy data. This includes the import and correction of the measurement data, the calulation of the different channels and the export of the data from SOFA. These modules use a procedural approach
 - warum procedural einfacher zu testen und eigenständiger
 - named tuples und custom exception</p>
 <section id="import-data">
-<span id="import-data-implementation"></span><h4>Import Data<a class="headerlink" href="#import-data" title="Permalink to this headline">#</a></h4>
+<span id="import-data-implementation"></span><h4>Import Data<a class="headerlink" href="#import-data" title="Permalink to this heading">#</a></h4>
 <p>modul zuständig für den import von messdaten
 enthält sämtliche verfügbaren import optionen bzw datenformate
 weitere hinzufügen benötigt funktion zum import und erweitern von <em>importFunctions</em> wird automatisch übernommen
@@ -320,14 +320,14 @@ kann importiert werden - image und channel
 decortator to check if size matches</p>
 </section>
 <section id="correct-data">
-<h4>Correct Data<a class="headerlink" href="#correct-data" title="Permalink to this headline">#</a></h4>
+<h4>Correct Data<a class="headerlink" href="#correct-data" title="Permalink to this heading">#</a></h4>
 <p>corrects the approch part of a single force distance curve
 wie wird mit möglichen fehlern error umgegangen
 vorgehen verweiß correction algorithm
 verweiß zu test</p>
 </section>
 <section id="calculate-channel-data">
-<span id="calculate-channel-data-implementation"></span><h4>Calculate Channel Data<a class="headerlink" href="#calculate-channel-data" title="Permalink to this headline">#</a></h4>
+<span id="calculate-channel-data-implementation"></span><h4>Calculate Channel Data<a class="headerlink" href="#calculate-channel-data" title="Permalink to this heading">#</a></h4>
 <p>enthält funktionen um die einzelnen channel zu berechen
 weitere channel braucht funktion die bestimmte argumente bekommt und folgendes zurück liefert
 erweiterung in <em>active_channels</em>
@@ -335,7 +335,7 @@ decorator konvertiert daten in two dimensional np array
 verweiß zu test</p>
 </section>
 <section id="export-data">
-<span id="export-data-implementation"></span><h4>Export Data<a class="headerlink" href="#export-data" title="Permalink to this headline">#</a></h4>
+<span id="export-data-implementation"></span><h4>Export Data<a class="headerlink" href="#export-data" title="Permalink to this heading">#</a></h4>
 <p>exportiert daten eines force volumes aus SOFA
 erstellt dafür ordner
 konvertiert dann daten zunächst in pandas dataframes - einfacher zu exportieren
@@ -343,38 +343,38 @@ konvertiert dann daten zunächst in pandas dataframes - einfacher zu exportieren
 warum die beiden</p>
 </section>
 <section id="named-tuples">
-<h4>Named Tuples<a class="headerlink" href="#named-tuples" title="Permalink to this headline">#</a></h4>
+<h4>Named Tuples<a class="headerlink" href="#named-tuples" title="Permalink to this heading">#</a></h4>
 <p>To increase the readability of the code SOFA uses NamedTuple, which are all defined in this file. They are divided into different categories and use type hints, to make it easier to understand the code.</p>
 </section>
 <section id="custom-exceptions">
-<h4>Custom Exceptions<a class="headerlink" href="#custom-exceptions" title="Permalink to this headline">#</a></h4>
+<h4>Custom Exceptions<a class="headerlink" href="#custom-exceptions" title="Permalink to this heading">#</a></h4>
 <p>To better undestand possible errors when importing and correcting the measurement data, SOFA uses some custom exceptions. Both cases have a general exception <em>ImportError</em> and <em>CorrectionError</em> and further specific exceptions. This structure allows to catch a general type of exception with a descriptive name that should make it easier to understand the problem.</p>
 </section>
 </section>
 <section id="data-visualization">
-<h3>Data Visualization<a class="headerlink" href="#data-visualization" title="Permalink to this headline">#</a></h3>
+<h3>Data Visualization<a class="headerlink" href="#data-visualization" title="Permalink to this heading">#</a></h3>
 <section id="plot-data">
-<h4>Plot Data<a class="headerlink" href="#plot-data" title="Permalink to this headline">#</a></h4>
+<h4>Plot Data<a class="headerlink" href="#plot-data" title="Permalink to this heading">#</a></h4>
 </section>
 </section>
 </section>
 <section id="tests">
-<span id="tests-implementation"></span><h2>Tests<a class="headerlink" href="#tests" title="Permalink to this headline">#</a></h2>
+<span id="tests-implementation"></span><h2>Tests<a class="headerlink" href="#tests" title="Permalink to this heading">#</a></h2>
 <section id="data-correction">
-<h3>Data Correction<a class="headerlink" href="#data-correction" title="Permalink to this headline">#</a></h3>
+<h3>Data Correction<a class="headerlink" href="#data-correction" title="Permalink to this heading">#</a></h3>
 </section>
 <section id="channel-calculation">
-<h3>Channel Calculation<a class="headerlink" href="#channel-calculation" title="Permalink to this headline">#</a></h3>
+<h3>Channel Calculation<a class="headerlink" href="#channel-calculation" title="Permalink to this heading">#</a></h3>
 </section>
 <section id="average">
-<h3>Average<a class="headerlink" href="#average" title="Permalink to this headline">#</a></h3>
+<h3>Average<a class="headerlink" href="#average" title="Permalink to this heading">#</a></h3>
 </section>
 <section id="using-syfos-data">
-<h3>Using SyFoS Data<a class="headerlink" href="#using-syfos-data" title="Permalink to this headline">#</a></h3>
+<h3>Using SyFoS Data<a class="headerlink" href="#using-syfos-data" title="Permalink to this heading">#</a></h3>
 </section>
 </section>
 <section id="docs">
-<h2>Docs<a class="headerlink" href="#docs" title="Permalink to this headline">#</a></h2>
+<h2>Docs<a class="headerlink" href="#docs" title="Permalink to this heading">#</a></h2>
 <p>The SOFA documentation is written using Sphinx, uses the Furo theme and is hosted with Gihub Pages.</p>
 </section>
 </section>
@@ -505,7 +505,9 @@ warum die beiden</p>
 </div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/scripts/furo.js"></script>
     </body>
 </html>

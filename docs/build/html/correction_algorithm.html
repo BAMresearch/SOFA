@@ -1,11 +1,11 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Channels" href="channels.html" /><link rel="prev" title="Supported Data Types" href="supported_data_types.html" />
 
-    <meta name="generator" content="sphinx-4.5.0, furo 2022.04.07"/>
+    <meta name="generator" content="sphinx-5.3.0, furo 2022.04.07"/>
         <title>Correction Algorithm - SOFA</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=68f4518137b9aefe99b631505a2064c3c42c9852" />
@@ -213,7 +213,7 @@
         </div>
         <article role="main">
           <section id="correction-algorithm">
-<span id="id1"></span><h1>Correction Algorithm<a class="headerlink" href="#correction-algorithm" title="Permalink to this headline">#</a></h1>
+<span id="id1"></span><h1>Correction Algorithm<a class="headerlink" href="#correction-algorithm" title="Permalink to this heading">#</a></h1>
 <p>To be able to analyze the imported measurement data statistically, for example average a subgroup of force curves, the data needs to be corrected. Due to the experiment setup each force curve is exposed to a topography offset and a virtual deflection, shifting the curve in the x and y direction. SOFA automatically tries to shift the point of contact of each force curve to zero, correcting the errors and alignig all curves. SOFA relies on the fact that Force Curves are expected to have a certain typical shape in order to interpret the contact between probe and sample according to theories and physical models. When the quality of the force curves decreases SOFA might not be able to correct them anymore. Below some cases are listed, for which SOFA can not correct the data.</p>
 <ul class="simple">
 <li><p>In case a curve shows any deviation from F = 0 for Z &lt; 0 beyond certain noise, the point of contact can not be identified conclusively.</p></li>
@@ -221,7 +221,7 @@
 </ul>
 <p>Force curves which can not be corrected are discarded by SOFA. For more detailed information about the edge cases SOFA can’t currently handle, see the <a class="reference internal" href="codebase.html#tests-implementation"><span class="std std-ref">Tests</span></a> section. To shift the point of contact of a single force curve to zero, first its <a class="reference internal" href="#correction-force"><span class="std std-ref">force values</span></a> and then the <a class="reference internal" href="#correction-piezo"><span class="std std-ref">pizeo values</span></a> are corrected.</p>
 <section id="correction-of-the-force">
-<span id="correction-force"></span><h2>Correction of the force<a class="headerlink" href="#correction-of-the-force" title="Permalink to this headline">#</a></h2>
+<span id="correction-force"></span><h2>Correction of the force<a class="headerlink" href="#correction-of-the-force" title="Permalink to this heading">#</a></h2>
 <figure class="align-default" id="id4">
 <a class="reference internal image-reference" href="_images/force_correction.svg"><img alt="image of the correction of the force values of an approach part of a force distance curve" src="_images/force_correction.svg" width="600"/></a>
 <figcaption>
@@ -230,10 +230,10 @@
 </figure>
 <p>To correct the virtual deflection the force distance curve is shifted to zero along the deflection (y) axis using the end of the zeroline. Additionally the noise in the deflection values before the point of contact is smoothed. For this, the <a class="reference internal" href="#calculate-end-of-zero-line"><span class="std std-ref">end of the zero line</span></a> must first be found. With the end of the zero line a <a class="reference internal" href="#fit-zero-line"><span class="std std-ref">fit of the zero line</span></a> can be calculated. Using this fit the deflection values are <a class="reference internal" href="#fit-zero-line"><span class="std std-ref">shifted along the deflection (y) axis</span></a>.</p>
 <section id="calculate-the-end-of-the-zero-line">
-<span id="calculate-end-of-zero-line"></span><h3>Calculate the end of the zero line<a class="headerlink" href="#calculate-the-end-of-the-zero-line" title="Permalink to this headline">#</a></h3>
+<span id="calculate-end-of-zero-line"></span><h3>Calculate the end of the zero line<a class="headerlink" href="#calculate-the-end-of-the-zero-line" title="Permalink to this heading">#</a></h3>
 <p>The end of the zero line is the last measurement point before attractive forces start to appear between the probe and sample. In other words it is the last measurement point with a positive slope before the jump to contact. To calculate the end of the zero line the <a class="reference internal" href="#restrict-search-area"><span class="std std-ref">search area is first restricted</span></a>. Afterwards the end of the zero line can be <a class="reference internal" href="#locate-end-of-zero-line"><span class="std std-ref">located within this area</span></a>.</p>
 <section id="restrict-search-area">
-<span id="id2"></span><h4>Restrict search area<a class="headerlink" href="#restrict-search-area" title="Permalink to this headline">#</a></h4>
+<span id="id2"></span><h4>Restrict search area<a class="headerlink" href="#restrict-search-area" title="Permalink to this heading">#</a></h4>
 <figure class="align-default" id="id5">
 <a class="reference internal image-reference" href="_images/restrict_search_area.svg"><img alt="image of the restriction process to find the end of the zero line" src="_images/restrict_search_area.svg" width="600"/></a>
 <figcaption>
@@ -243,21 +243,21 @@
 <p>In order to narrow down the area where the end of the zero line is located, a left and right boundary is calculated. For this a linear fit to the approach curve is calculated. The slope and interception values of this linear fit are cached and used to calculate the <a class="reference internal" href="channels.html#raw-offset-stiffness"><span class="std std-ref">raw offset and raw stiffness</span></a> channel. The left boundary is the first point of the approach curve where it’s deflection value is smaller than that of the linear fit, similar to the first intersection point between the two curves. To determine the right boundary the second intersection point of the approach curve and it’s linear fit is defined as the last point of the approach curve where it’s deflection value is smaller than that of the linear fit. Subsequently the differences between the deflection values of the approach curve and the linear fit are calculated. Then the point with the maximum deflection difference within the area of the left and right intersection is determined. From this point, the right boundary is obtained by shifting the point slighty to the right. The exact amount is five percent of the difference between the right intersection and the point with the maximum deflection difference. After determining the left and right borders the end of the zero line can be located.</p>
 </section>
 <section id="locate-the-end-of-the-zero-line">
-<span id="locate-end-of-zero-line"></span><h4>Locate the end of the zero line<a class="headerlink" href="#locate-the-end-of-the-zero-line" title="Permalink to this headline">#</a></h4>
+<span id="locate-end-of-zero-line"></span><h4>Locate the end of the zero line<a class="headerlink" href="#locate-the-end-of-the-zero-line" title="Permalink to this heading">#</a></h4>
 <p>To find the measurement point with the first negative slope before the jump to contact the approach curve must first be derived. Afterwards the first derivation is smoothed by a gaussian filter with a smooth factor of 10. The first point of the smoothed first derivation of the deflection values within the left and right boundary wiht a negative slope is determined as the end of the zero line. The end of the zero line is later used to calculate the length of the attractive area which is needed to calculate the <a class="reference internal" href="channels.html#attractive-area-z-attractive"><span class="std std-ref">attractive area and z attractive channel</span></a>. If there is no point with a negative slope in this area, the force distance curve cannot be corrected and the correction process is aborted for this curve.</p>
 </section>
 </section>
 <section id="fit-the-zero-line">
-<span id="fit-zero-line"></span><h3>Fit the zero line<a class="headerlink" href="#fit-the-zero-line" title="Permalink to this headline">#</a></h3>
+<span id="fit-zero-line"></span><h3>Fit the zero line<a class="headerlink" href="#fit-the-zero-line" title="Permalink to this heading">#</a></h3>
 <p>With the end of the zero line another linear fit of the approach curve until the end of the zero line is calculated.</p>
 </section>
 <section id="shift-the-force-values">
-<span id="shift-force-values"></span><h3>Shift the force values<a class="headerlink" href="#shift-the-force-values" title="Permalink to this headline">#</a></h3>
+<span id="shift-force-values"></span><h3>Shift the force values<a class="headerlink" href="#shift-the-force-values" title="Permalink to this heading">#</a></h3>
 <p>Using the linear fit of the approach curve until the end of the zero line the deflection values can be corrected. For this the deflection values of the linear fit are subtracted from the deflection values of the approach curve until the point of contact. The remaining deflection values of the approach curve are subtracted by the last deflection value of the linear fit of the end of the zero line.</p>
 </section>
 </section>
 <section id="correction-of-the-piezo-displacement">
-<span id="correction-piezo"></span><h2>Correction of the piezo displacement<a class="headerlink" href="#correction-of-the-piezo-displacement" title="Permalink to this headline">#</a></h2>
+<span id="correction-piezo"></span><h2>Correction of the piezo displacement<a class="headerlink" href="#correction-of-the-piezo-displacement" title="Permalink to this heading">#</a></h2>
 <figure class="align-default" id="id6">
 <a class="reference internal image-reference" href="_images/piezo_correction.svg"><img alt="image of the correction of the piezo values of an approach part of a force distance curve" src="_images/piezo_correction.svg" width="800"/></a>
 <figcaption>
@@ -266,15 +266,15 @@
 </figure>
 <p>To correct the topography offset the force distance curve is shifted to zero along the piezo (x) axis using the point of contact. This can only be done after the correction of the deflection values, since the point of contact is defined as the first zero crossing after the jump to contact. First the <a class="reference internal" href="#calculate-zero-crossing"><span class="std std-ref">zero crossing</span></a> is determined. Afterwards the exact <a class="reference internal" href="#interpolate-point-of-contact"><span class="std std-ref">point of contact is interpolated</span></a>. Finally the pizeo values of the approach curve can be <a class="reference internal" href="#shift-piezo-values"><span class="std std-ref">shifted using the point of contact</span></a>.</p>
 <section id="calculate-the-zero-crossing">
-<span id="calculate-zero-crossing"></span><h3>Calculate the zero crossing<a class="headerlink" href="#calculate-the-zero-crossing" title="Permalink to this headline">#</a></h3>
+<span id="calculate-zero-crossing"></span><h3>Calculate the zero crossing<a class="headerlink" href="#calculate-the-zero-crossing" title="Permalink to this heading">#</a></h3>
 <p>To locate the first zero crossing, the last measuring point with a negative deflection value after the end of the zero line is searched for. If there are no points with negative deflection values after the end of the zeroline, the force distance curve cannot be corrected and the correction process is aborted for this curve.</p>
 </section>
 <section id="interpolate-point-of-contact">
-<span id="id3"></span><h3>Interpolate point of contact<a class="headerlink" href="#interpolate-point-of-contact" title="Permalink to this headline">#</a></h3>
+<span id="id3"></span><h3>Interpolate point of contact<a class="headerlink" href="#interpolate-point-of-contact" title="Permalink to this heading">#</a></h3>
 <p>With the last measurement point before and after the zero crossing the exact piezo value at which the deflection becomes zero is calculated.</p>
 </section>
 <section id="shift-the-piezo-values">
-<span id="shift-piezo-values"></span><h3>Shift the piezo values<a class="headerlink" href="#shift-the-piezo-values" title="Permalink to this headline">#</a></h3>
+<span id="shift-piezo-values"></span><h3>Shift the piezo values<a class="headerlink" href="#shift-the-piezo-values" title="Permalink to this heading">#</a></h3>
 <p>The piezo values of the measurement curve are subtracted by the piezo value of the point of contact shifting the point of contact to (0, 0) and completing the correction process of the force distance curve.</p>
 </section>
 </section>
@@ -373,7 +373,9 @@
 </div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/scripts/furo.js"></script>
     </body>
 </html>
