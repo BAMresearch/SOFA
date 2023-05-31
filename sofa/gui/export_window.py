@@ -286,7 +286,7 @@ class ExportWindow(ttk.Frame):
 			exportParameters.folderPath,
 			exportParameters.folderName
 		)
-		activeForceVolume = self.guiInterface._get_active_force_volume()
+		activeForceVolume = self.guiInterface.get_active_force_volume()
 
 		if exportParameters.exportToCsv:
 			self._update_progressbar_label("Exporting to csv...")
