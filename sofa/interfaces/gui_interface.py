@@ -293,7 +293,7 @@ class GUIInterface():
 			the different plots.
 		"""
 		restrictionParameters = self._get_histogram_restriction_parameters()
-		print(restrictionParameters)
+		
 		if restrictionParameters.indexMinBinValue >= restrictionParameters.indexMaxBinValue - 1:
 			return
 
@@ -320,7 +320,7 @@ class GUIInterface():
 			the different plots.
 		"""
 		restrictionParameters = self._get_histogram_restriction_parameters()
-		print(restrictionParameters)
+		
 		indexMinBinValue = restrictionParameters.indexMinBinValue
 
 		if indexMinBinValue <= 0:
@@ -360,7 +360,7 @@ class GUIInterface():
 			the different plots.
 		"""
 		restrictionParameters = self._get_histogram_restriction_parameters()
-		print(restrictionParameters)
+		
 		indexMaxBinValue = restrictionParameters.indexMaxBinValue
 
 		if indexMaxBinValue >= int(self.histogramParameters.numberOfBins.get()):
