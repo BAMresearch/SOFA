@@ -169,10 +169,10 @@ class Channel():
 			force distance curves without potential nan values.
 		"""
 		histogramData = self.rawData.copy().flatten()
-		activeHistogramData = np.delete(histogramData, inactiveDataPoints)
-		validActiveHistogramData = self._remove_nan_values(activeHistogramData)
-
-		return validActiveHistogramData
+		validHistogramData = self._remove_nan_values(histogramData)
+		activeValidHistogramData = np.delete(validHistogramData, inactiveDataPoints)
+		
+		return activeValidHistogramData
 
 	@staticmethod
 	def _remove_nan_values(channelData: np.ndarray) -> np.ndarray:
