@@ -305,31 +305,31 @@ class MainWindow(ttk.Frame):
 		frameLinePlot.pack(side=LEFT, fill=BOTH, expand=YES, padx=(0, 15))
 
 		self.displayAverage = tk.BooleanVar(self, value=False)
-		checkbuttonZoom = ttk.Checkbutton(
+		checkbuttonAverage = ttk.Checkbutton(
 			frameLinePlot, 
 			text="Display Average", 
 			variable=self.displayAverage,
 			command=self._update_line_plot,
 			bootstyle="round-toggle")
-		checkbuttonZoom.grid(row=0, column=0, padx=5, pady=15, sticky=W)
+		checkbuttonAverage.grid(row=0, column=0, padx=5, pady=15, sticky=W)
 
 		self.displayErrorbar = tk.BooleanVar(self, value=False)
-		checkbuttonZoom = ttk.Checkbutton(
+		checkbuttonErrorbar = ttk.Checkbutton(
 			frameLinePlot, 
 			text="Display Errorbar", 
 			variable=self.displayErrorbar,
 			command=self._update_line_plot,
 			bootstyle="round-toggle")
-		checkbuttonZoom.grid(row=0, column=1, padx=5)
+		checkbuttonErrorbar.grid(row=0, column=1, padx=5)
 
 		self.displayInactiveCurves = tk.BooleanVar(self, value=False)
-		checkbuttonZoom = ttk.Checkbutton(
+		checkbuttonInactiveCurves = ttk.Checkbutton(
 			frameLinePlot, 
 			text="Display Inactive Curves", 
 			variable=self.displayInactiveCurves,
 			command=self._update_line_plot,
 			bootstyle="round-toggle")
-		checkbuttonZoom.grid(row=0, column=2, padx=5, sticky=E)
+		checkbuttonInactiveCurves.grid(row=0, column=2, padx=5, sticky=E)
 
 		figureLineplot = Figure(figsize=(6, 4.8), facecolor=self.colorPlot)
 		self.holderFigureLineplot = FigureCanvasTkAgg(figureLineplot, frameLinePlot)
