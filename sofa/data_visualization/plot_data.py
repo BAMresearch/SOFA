@@ -97,69 +97,7 @@ def create_corrected_line(
 		pickradius=1.0, 
 		zorder=5
 	)
-
-def create_average_line(
-	averageCurve: np.ndarray
-) -> mpl.lines.Line2D:
-	"""
-	Construct a displayable matplotlib line for
-	the calculated average values.
-
-	Parameters
-	----------
-	averageCurve : nt.ForceDistanceCurve
-		Average Piezo (x) and deflection (y) values
-		of all active force distance curves.
-
-	Returns
-	-------
-	averageLine : mpl.lines.Line2D
-		Line representation of the average of 
-		the active force distance curves.
-	"""
-	return mpl.lines.Line2D(
-		averageCurve.piezo, 
-		averageCurve.deflection, 
-		c="black", 
-		label="average_data",
-		zorder=6
-	)
-
-def create_average_errorbar(
-	averageCurve: np.ndarray,
-	standardDeviation: np.ndarray
-) -> mpl.container.ErrorbarContainer:
-	"""
-	Construct a displayable matplotlib object for
-	the calculated average values and the 
-	corresponding standard deviation.
-
-	Parameters
-	----------
-	averageCurve : nt.ForceDistanceCurve
-		Average Piezo (x) and deflection (y) values
-		of all active force distance curves.
-	standardDeviation : np.ndarray
-		Standard deviation of the calculated average
-		values.
-
-	Returns
-	-------
-	averageErrorbar : mpl.container.ErrorbarContainer
-		Line representation of the average of 
-		the active force distance curves with
-		the standard deviation as errorbars.
-	"""
-	return mpl.container.ErrorbarContainer(
-		averageCurve.piezo, 
-		averageCurve.deflection, 
-		yerr=standardDeviation,
-		c="black",
-		ecolor="black",
-		label="average_data_with_std",
-		zorder=6
-	)
-
+	
 def get_axes(
 	holder: mpl.backends.backend_tkagg.FigureCanvasTkAgg
 ) -> mpl.axes:
@@ -314,78 +252,209 @@ def plot_histogram(
 
 	return binValues
 
-def add_average_to_line_plot(
+def plot_average(
 	holder: mpl.backends.backend_tkagg.FigureCanvasTkAgg,
-	averageLine: mpl.lines.Line2D
-) -> None: 
+	averageData: nt.AverageForceDistanceCurve
+) -> List[mpl.lines.Line2D]:
 	"""
-	Add the average to the line plot.
+	Plot the average force distance curve consisting of the
+	non contact and contact part.
 
 	Parameters
 	----------
 	holder : mpl.backends.backend_tkagg.FigureCanvasTkAgg
 		Interface between the matplotlib figure and the 
 		main window in which the plot is located.
-	averageLine : mpl.lines.Line2D
-		Line representation of a average force distance
-		curve.
+	averageData : nt.AverageForceDistanceCurve
+		Contains the piezo(x) and deflection (y) values
+		of the average curve and the standard deviation.
+
+	Returns
+	-------
+	averageLineNonContact : mpl.lines.Line2D
+		Line representation of the non contact part
+		of the average force distance curve.
+	averageLineContact : mpl.lines.Line2D
+		Line representation of the contact part
+		of the average force distance curve.
 	"""
-	ax = get_axes(holder)
-
-	ax.add_line(averageLine)
-
-	holder.draw() 
-
-def add_errorbar_to_line_plot(
-	holder: mpl.backends.backend_tkagg.FigureCanvasTkAgg,
-	errorbar: mpl.container.ErrorbarContainer
-) -> None: 
-	"""
-	Add the average with the standard deviation as 
-	errorbar to the line plot.
-
-	Parameters
-	----------
-	holder : mpl.backends.backend_tkagg.FigureCanvasTkAgg
-		Interface between the matplotlib figure and the 
-		main window in which the plot is located.
-	errorbar : mpl.container.ErrorbarContainer
-		Line representation of a average force distance
-		curve with the standard deviation as errorbars.
-	"""
-	ax = get_axes(holder)
-
-	ax.add_container(errorbar)
-
+	axes = get_axes(holder)
+	averageLineNonContact = plot_average_line(
+		axes,
+		averageData.piezoNonContact,
+		averageData.deflectionNonContact
+	)
+	# Swap piezo and deflection values to plot the part correctly.
+	averageLineContact = plot_average_line(
+		axes,
+		averageData.deflectionContact,
+		averageData.piezoContact
+	)
 	holder.draw()
 
-def remove_average_curve_from_line_plot(
-	averageLine: mpl.lines.Line2D
-) -> None:
+	return averageLineNonContact, averageLineContact
+
+def plot_average_line(
+	axes: mpl.axes,
+	piezoValues: np.ndarray,
+	deflectionValues: np.ndarray
+) -> mpl.lines.Line2D: 
 	"""
-	Remove the average curve from the line plot.
+	Plot a part of the average force distance
+	curve.
 
 	Parameters
 	----------
+	axes : mpl.axes
+		Contains all elements of the line plot figure.
+	piezoValues : np.ndarray
+		Piezo (x) values of the part of the 
+		force distance curve.
+	deflectionValues : np.ndarray
+		Deflection (y) values of the part of the 
+		force distance curve.
+
+	Returns
+	-------
 	averageLine : mpl.lines.Line2D
-		Line representation of a average force distance
-		curve.
+		Line representation of one part of
+		the average force distance curve.
 	"""
-	averageLine.remove()
+	return axes.plot(
+		piezoValues,
+		deflectionValues,
+		c="black", 
+		label="average_data",
+		zorder=6
+	)[0]
 
-def remove_errorbar_from_line_plot(
-	errorbar: mpl.container.ErrorbarContainer
-) -> None:
+def plot_errorbar(
+	holder: mpl.backends.backend_tkagg.FigureCanvasTkAgg,
+	averageData: nt.AverageForceDistanceCurve
+) -> List[mpl.lines.Line2D]:
 	"""
-	Remove the errorbar from the line plot.
+	Plot the average force distance curve consisting of the
+	non contact and contact part with the standard deviation
+	as an errorbar.
 
 	Parameters
 	----------
-	errorbar : mpl.container.ErrorbarContainer
-		Line representation of a average force distance
-		curve with the standard deviation as errorbars.
+	holder : mpl.backends.backend_tkagg.FigureCanvasTkAgg
+		Interface between the matplotlib figure and the 
+		main window in which the plot is located.
+	averageData : nt.AverageForceDistanceCurve
+		Contains the piezo(x) and deflection (y) values
+		of the average curve and the standard deviation.
+
+	Returns
+	-------
+	averageErrorbarNonContact : mpl.container.ErrorbarContainer
+		Errorbar representation of the non contact part
+		of the average force distance curve.
+	averageErrorbarContact : mpl.container.ErrorbarContainer
+		Errorbar representation of the contact part
+		of the average force distance curve.
 	"""
-	errorbar.remove()
+	axes = get_axes(holder)
+	averageErrorbarNonContact = plot_average_errorbar_non_contact(
+		axes,
+		averageData.piezoNonContact,
+		averageData.deflectionNonContact,
+		averageData.standardDeviationNonContact
+	)
+	averageErrorbarContact = plot_average_errorbar_contact(
+		axes,
+		averageData.deflectionContact,
+		averageData.piezoContact,
+		averageData.standardDeviationContact
+	)
+	holder.draw()
+
+	return averageErrorbarNonContact, averageErrorbarContact
+
+def plot_average_errorbar_non_contact(
+	axes: mpl.axes,
+	piezoValues: np.ndarray,
+	deflectionValues: np.ndarray,
+	standardDeviation: np.ndarray
+) -> mpl.container.ErrorbarContainer: 
+	"""
+	Plot the non contact part of the average force
+	distance curve as an errorbar with the standard
+	devitation of the deflection values as y error.
+
+	Parameters
+	----------
+	axes : mpl.axes
+		Contains all elements of the line plot figure.
+	piezoValues : np.ndarray
+		Piezo (x) values of the non contact part of the 
+		force distance curve.
+	deflectionValues : np.ndarray
+		Deflection (y) values of the non contact part 
+		of the force distance curve.
+	standardDeviation : np.ndarray
+		Standard deviation of the deflection values 
+		of the non contact part of the average force
+		distance curve.
+
+	Returns
+	-------
+	averageErrorbarNonContact : mpl.container.ErrorbarContainer
+		Errorbar representation of the non contact 
+		part of the average force distance curve.
+	"""
+	return axes.errorbar(
+		piezoValues,
+		deflectionValues,
+		yerr=standardDeviation,
+		c="black",
+		ecolor="black",
+		label="average_data_with_std",
+		zorder=6
+	)
+
+def plot_average_errorbar_contact(
+	axes: mpl.axes,
+	piezoValues: np.ndarray,
+	deflectionValues: np.ndarray,
+	standardDeviation: np.ndarray
+) -> mpl.container.ErrorbarContainer: 
+	"""
+	Plot the contact part of the average force
+	distance curve as an errorbar with the standard
+	devitation of the piezo values as x error.
+
+	Parameters
+	----------
+	axes : mpl.axes
+		Contains all elements of the line plot figure.
+	piezoValues : np.ndarray
+		Piezo (x) values of the contact part of the 
+		force distance curve.
+	deflectionValues : np.ndarray
+		Deflection (y) values of the contact part of the 
+		force distance curve.
+	standardDeviation : np.ndarray
+		Standard deviation of the piezo values 
+		of the contact part of the average force
+		distance curve.
+
+	Returns
+	-------
+	averageErrorbarContact : mpl.container.ErrorbarContainer
+		Errorbar representation of the contact 
+		part of the average force distance curve.
+	"""
+	return axes.errorbar(
+		piezoValues,
+		deflectionValues,
+		xerr=standardDeviation,
+		c="black",
+		ecolor="black",
+		label="average_data_with_std",
+		zorder=6
+	)
 
 def update_line_plot(
 	holder: mpl.backends.backend_tkagg.FigureCanvasTkAgg,

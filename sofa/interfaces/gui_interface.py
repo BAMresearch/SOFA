@@ -541,6 +541,7 @@ class GUIInterface():
 			Interface between a force volume and 
 			the different plots.
 		"""
+		activePlotInterface.delete_average_lines()
 		plt_data.update_line_plot(
 			self.linePlotParameters.holder,
 			activePlotInterface.forceDistanceLines,
@@ -551,24 +552,44 @@ class GUIInterface():
 		if self.linePlotParameters.plotAverage.get():
 			self.update_line_plot_average()
 
-	@decorator_get_active_force_volume
+	@decorator_get_active_data_set
 	def update_line_plot_average(
 		self,
-		activeForceVolume: ForceVolume
+		activeForceVolume: ForceVolume,
+		activePlotInterface: PlotInterface
 	) -> None: 
 		"""
+		Update the average force distance curve
+		and it's line representation in the line 
+		plot.
+
+		Parameters
+		----------
+		activeForceVolume : ForceVolume
+			Contains the imported and corrected
+			measurement data.
+		activePlotInterface : PlotInterface
+			Interface between a force volume and 
+			the different plots.
 		"""
-		# Remove old average
-		# Check if any points are still active
-		# Calculate average
-
+		if activePlotInterface.check_active_data_points() == False:
+			return
+		activeForceVolume.calculate_average(
+			activePlotInterface.inactiveDataPoints
+		)
 		if self.linePlotParameters.plotErrorbar.get():
-			plt_data.add_errorbar_to_line_plot(
-
+			activePlotInterface.averageLines.extend(
+				plt_data.plot_errorbar(
+					self.linePlotParameters.holder,
+					activeForceVolume.average
+				)
 			)
 		else:
-			plt_data.add_average_to_line_plot(
-
+			activePlotInterface.averageLines.extend(
+				plt_data.plot_average(
+					self.linePlotParameters.holder,
+					activeForceVolume.average
+				)
 			)
 
 	def check_imported_data_set(self) -> bool: 

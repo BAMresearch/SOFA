@@ -185,10 +185,9 @@ class ForceVolume():
 		Calculate the average from the currently active 
 		force distance curves.
 		"""
-		activeForceDistanceCurves = self.get_active_force_distance_curves_data(
+		activeForceDistanceCurves = self.get_active_force_distance_curves(
 			inactiveDataPoints
 		)
-
 		self.average = calculate_average(
 			activeForceDistanceCurves
 		)
@@ -213,7 +212,7 @@ class ForceVolume():
 			if forceDistanceCurve.couldBeCorrected
 		]
 
-	def get_active_force_distance_curves_data(
+	def get_active_force_distance_curves(
 		self,
 		inactiveDataPoints: List[int]
 	) -> List:
@@ -234,7 +233,7 @@ class ForceVolume():
 			active and corrected force distance curve.
 		"""
 		return [
-			forceDistanceCurve.dataApproachCorrected
+			forceDistanceCurve
 			for index, forceDistanceCurve
 			in enumerate(self.forceDistanceCurves)
 			if (

@@ -69,11 +69,16 @@ class ChannelMetadata(NamedTuple):
 	coefficientsFitApproachCurve: CoefficientsFitApproachCurve
 
 class AverageForceDistanceCurve(NamedTuple):
-	standardDeviation: ndarray
+	piezoNonContact: ndarray
+	deflectionNonContact: ndarray
+	piezoContact: ndarray
+	deflectionContact: ndarray
+	standardDeviationNonContact: ndarray
+	standardDeviationContact: ndarray
 
 class NormedCurves(NamedTuple):
-	piezoApproach: ndarray
-	deflectionApproach: ndarray
+	piezoNonContact: ndarray
+	deflectionNonContact: ndarray
 	piezoContact: ndarray
 	deflectionContact: ndarray
 

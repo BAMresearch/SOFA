@@ -104,6 +104,30 @@ class PlotInterface():
 				)
 			)
 
+	def delete_average_lines(self) -> None: 
+		"""
+		Delete the line representations of 
+		the average force distance curve.
+		"""
+		for line in self.averageLines:
+			line.remove()
+		self.averageLines = []
+
+	def check_active_data_points(self) -> bool:
+		"""
+		Checks if any data points are still active
+
+		Returns
+		-------
+		hasActiveDataPoints : bool
+			True if any data point is still active
+			false otherwise
+		"""
+		numberOfDataPoints = self.size[0] * self.size[1]
+		if len(self.inactiveDataPoints) == numberOfDataPoints:
+			return False 
+		return True
+
 	def init_orientation_matrix(self) -> None:
 		"""
 		Initialize the orientation matrix with the default

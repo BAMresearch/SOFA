@@ -28,7 +28,7 @@ def calculate_average(
 
 	Parameters
 	----------
-	activeForceDistanceCurves : list[nt.ForceDistanceCurve]
+	activeForceDistanceCurves : list[ForceDistanceCurve]
 		Piezo(x) and deflection (y) values of the
 		active force distance curves.
 	
@@ -38,39 +38,35 @@ def calculate_average(
 		Contains the piezo(x) and deflection (y) values
 		of the average curve and the standard deviation.
 	"""
-	normedCurves = _interpolate_normed_curves(
+	normedCurves = interpolate_normed_curves(
 		activeForceDistanceCurves
 	)
-	
-	averagedDeflectionApproach = [
+	averagedDeflectionNonContact = [
 		np.mean(nthValues) 
 		for nthValues 
-		in zip(*NormedCurves.deflectionApproach)
+		in zip(*normedCurves.deflectionNonContact)
 	]
 	averagedDeflectionContact = [
 		np.mean(nthValues) 
 		for nthValues 
-		in zip(*NormedCurves.deflectionContact)
+		in zip(*normedCurves.deflectionContact)
 	]
-
-	standardDeviationApproach = [
-		np.std(nthValues) for nthValues in zip(*NormedCurves.deflectionApproach)
+	standardDeviationNonContact = [
+		np.std(nthValues) for nthValues in zip(*normedCurves.deflectionNonContact)
 	]
 	standardDeviationContact = [
-		np.std(nthValues) for nthValues in zip(*NormedCurves.deflectionContact)
+		np.std(nthValues) for nthValues in zip(*normedCurves.deflectionContact)
 	]
-
-	averageForceDistanceCurve = nt.ForceDistanceCurve(
-		piezo=np.concatenate(normedCurves.piezoApproach , normedCurves.piezoContact),
-		deflection=np.concatenate(averagedDeflectionApproach, averagedDeflectionContact)
-	)
-	standardDeviation = standardDeviationApproach + standardDeviationContact
-
 	return nt.AverageForceDistanceCurve(
-		
+		piezoNonContact=normedCurves.piezoNonContact,
+		deflectionNonContact=averagedDeflectionNonContact,
+		piezoContact=normedCurves.piezoContact,
+		deflectionContact=averagedDeflectionContact,
+		standardDeviationNonContact=standardDeviationNonContact,
+		standardDeviationContact=standardDeviationContact
 	)
 
-def _interpolate_normed_curves(
+def interpolate_normed_curves(
 	activeForceDistanceCurves
 ) -> None:
 	"""
@@ -84,46 +80,33 @@ def _interpolate_normed_curves(
 	
 	Returns
 	-------
-	: nt.NormedCurves
+	normedCurves : nt.NormedCurves
+		
 	"""
 	numberOfDataPoints = 2000
+	minimumPizeo = get_minimum_piezo(activeForceDistanceCurves)
+	maximumDeflection = get_maximum_deflection(activeForceDistanceCurves)
 
-	minimumPizeo = _get_minimum_piezo(activeForceDistanceCurves)
-	maximumDeflection = _get_maximum_deflection(activeForceDistanceCurves)
-
-	normedPiezoApproach = np.linspace(minimumPizeo, 0, numberOfDataPoints)
-	normedDeflectionApproach = []
-	normedDeflectionContact = np.linspace(0, maximumDeflection, numberOfDataPoints)
-	normedPiezoContact = []
-
-	# Interpolate y values for the left and right part.
-	for forceDistanceCurve in activeForceDistanceCurves:
-		indexZeroCrossing = forceDistanceCurve.channelMetadata.pointOfContact.index
-
-		normedDeflectionApproach.append(
-			np.interp(
-				normedPiezoApproach, 
-				forceDistanceCurve.dataApproachCorrected.piezo[:indexZeroCrossing], 
-				forceDistanceCurve.dataApproachCorrected.deflection[:indexZeroCrossing]
-			)
-		)
-		normedPiezoContact.append(
-			np.interp(
-				normedDeflectionContact, 
-				forceDistanceCurve.dataApproachCorrected.deflection[indexZeroCrossing:], 
-				forceDistanceCurve.dataApproachCorrected.piezo[indexZeroCrossing:]
-			)
-		)
-
-	return nt.NormedCurves(
-		normedPiezoApproach, 
-		np.asarray(normedDeflectionApproach), 
-		normedDeflectionContact, 
-		np.asarray(normedPiezoContact)
+	normedPiezoNonContact, normedDeflectionNonContact = interpolate_non_contact_part(
+		activeForceDistanceCurves,
+		minimumPizeo,
+		numberOfDataPoints
+	)
+	normedPiezoContact, normedDeflectionContact = interpolate_contact_part(
+		activeForceDistanceCurves,
+		maximumDeflection,
+		numberOfDataPoints
 	)
 
-def _get_minimum_piezo(
-	activeForceDistanceCurves
+	return nt.NormedCurves(
+		piezoNonContact=normedPiezoNonContact, 
+		deflectionNonContact=normedDeflectionNonContact, 
+		piezoContact=normedPiezoContact, 
+		deflectionContact=normedDeflectionContact
+	)
+
+def get_minimum_piezo(
+	activeForceDistanceCurves: List
 ) -> float:
 	"""
 	Find the minimum piezo value of all
@@ -131,7 +114,7 @@ def _get_minimum_piezo(
 
 	Parameters
 	----------
-	activeForceDistanceCurves : list[nt.ForceDistanceCurve]
+	activeForceDistanceCurves : list[ForceDistanceCurve]
 		Piezo(x) and deflection (y) values of the
 		active force distance curves.
 
@@ -141,16 +124,15 @@ def _get_minimum_piezo(
 		The smallest piezo value of all active
 		force distance curves.
 	"""
-	piezoValues = [
-		forceDistanceCurve.dataApproachCorrected.piezo
+	minimumPiezoValues = [
+		np.min(forceDistanceCurve.dataApproachCorrected.piezo)
 		for forceDistanceCurve
 		in activeForceDistanceCurves
 	]
+	return np.min(minimumPiezoValues)
 
-	return np.min(piezoValues)
-
-def _get_maximum_deflection(
-	activeForceDistanceCurves
+def get_maximum_deflection(
+	activeForceDistanceCurves: List
 ) -> float:
 	"""
 	Find the maximum deflection value of all
@@ -168,10 +150,72 @@ def _get_maximum_deflection(
 		The biggest deflection value of all 
 		active force distance curves.
 	"""
-	deflectionValues = [
-		forceDistanceCurve.dataApproachCorrected.deflection
+	maximumDeflectionValues = [
+		np.max(forceDistanceCurve.dataApproachCorrected.deflection)
 		for forceDistanceCurve
 		in activeForceDistanceCurves
 	]
+	return np.max(maximumDeflectionValues)
 
-	return np.max(deflectionValues)
+def interpolate_non_contact_part(
+	activeForceDistanceCurves: List,
+	minimumPizeo: float,
+	numberOfDataPoints: int
+) -> Tuple[np.ndarray]:
+	"""
+	"""
+	normedPiezoNonContact = np.linspace(minimumPizeo, 0, numberOfDataPoints)
+	normedDeflectionNonContact = []
+
+	for forceDistanceCurve in activeForceDistanceCurves:
+		indexZeroCrossing = forceDistanceCurve.channelMetadata.pointOfContact.index
+		normedDeflectionNonContact.append(
+			np.interp(
+				normedPiezoNonContact, 
+				forceDistanceCurve.dataApproachCorrected.piezo[:indexZeroCrossing], 
+				forceDistanceCurve.dataApproachCorrected.deflection[:indexZeroCrossing]
+			)
+		)
+	normedDeflectionNonContact = np.asarray(normedDeflectionNonContact)
+
+	return normedPiezoNonContact, normedDeflectionNonContact
+
+def interpolate_contact_part(
+	activeForceDistanceCurves: List,
+	maximumDeflection: float,
+	numberOfDataPoints: int
+) -> Tuple[np.ndarray]:
+	"""
+
+
+	Parameters
+	----------
+	activeForceDistanceCurves : list[nt.ForceDistanceCurve]
+		Piezo(x) and deflection (y) values of the
+		active force distance curves.
+	maximumDeflection : float
+		
+	numberOfDataPoints : int
+		
+
+	Returns
+	-------
+	normedPiezoContact : np.ndarray
+
+	normedDeflectionContact : np.ndarray
+	"""
+	normedPiezoContact = np.linspace(0, maximumDeflection, numberOfDataPoints)
+	normedDeflectionContact = []
+
+	for forceDistanceCurve in activeForceDistanceCurves:
+		indexZeroCrossing = forceDistanceCurve.channelMetadata.pointOfContact.index
+		normedDeflectionContact.append(
+			np.interp(
+				normedPiezoContact, 
+				forceDistanceCurve.dataApproachCorrected.deflection[indexZeroCrossing:], 
+				forceDistanceCurve.dataApproachCorrected.piezo[indexZeroCrossing:]
+			)
+		)
+	normedDeflectionContact = np.asarray(normedDeflectionContact)
+
+	return normedPiezoContact, normedDeflectionContact
