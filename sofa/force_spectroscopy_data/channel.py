@@ -16,6 +16,7 @@ along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 from typing import List, Dict, Tuple
 
 import numpy as np
+import numpy.ma as ma
 
 import data_processing.named_tuples as nt
 
@@ -146,7 +147,7 @@ class Channel():
 			One dimensional channel data without potential nan values.
 		"""
 		histogramData = self.rawData.copy().flatten()
-		validHistogramData = self._remove_nan_values(histogramData)
+		validHistogramData = self._mask_nan_values(histogramData)
 
 		return validHistogramData
 
@@ -169,15 +170,15 @@ class Channel():
 			force distance curves without potential nan values.
 		"""
 		histogramData = self.rawData.copy().flatten()
-		validHistogramData = self._remove_nan_values(histogramData)
+		validHistogramData = self._mask_nan_values(histogramData)
 		activeValidHistogramData = np.delete(validHistogramData, inactiveDataPoints)
-		
+
 		return activeValidHistogramData
 
 	@staticmethod
-	def _remove_nan_values(channelData: np.ndarray) -> np.ndarray:
+	def _mask_nan_values(channelData: np.ndarray) -> np.ndarray:
 		"""
-		Remove potential nan values from the channel data, to 
+		Mask potential nan values from the channel data, to 
 		ensure the data is displayable as a histogram.
 
 		Parameters
@@ -191,7 +192,7 @@ class Channel():
 		validChannelData : np.ndarray
 			Channel values with no nan values.
 		"""
-		return channelData[np.isfinite(channelData)]
+		return ma.masked_where(np.isnan(channelData), channelData)
 
 	def flip_channel_horizontal(self) -> None: 
 		"""

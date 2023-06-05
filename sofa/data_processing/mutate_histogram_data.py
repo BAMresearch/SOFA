@@ -40,7 +40,7 @@ def get_index_of_minimum_bin_value(
 		Index of the lower limit of the
 		active data.
 	"""
-	return np.where(binValues <= np.min(activeData))[0][-1]
+	return np.where(binValues <= np.nanmin(activeData))[0][-1]
 
 def get_index_of_maximum_bin_value(
 	binValues: List,
@@ -64,7 +64,7 @@ def get_index_of_maximum_bin_value(
 		Index of the upper limit of the
 		active data.
 	"""
-	return np.where(binValues >= np.max(activeData))[0][0]
+	return np.where(binValues >= np.nanmax(activeData))[0][0]
 
 def restrict_histogram_min_up(
 	indexMinBinValue: int,

@@ -231,7 +231,6 @@ def plot_histogram(
 		orientation="horizontal", 
 		color="blue"
 	)
-
 	ax.hist(
 		activeData, 
 		bins=numberOfBins, 
