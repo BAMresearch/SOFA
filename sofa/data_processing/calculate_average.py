@@ -70,7 +70,9 @@ def interpolate_normed_curves(
 	activeForceDistanceCurves
 ) -> None:
 	"""
-	
+	Align the measurement points of every force distance
+	curve of the force volume to be able to calculate the
+	average.
 
 	Parameters
 	----------
@@ -81,7 +83,9 @@ def interpolate_normed_curves(
 	Returns
 	-------
 	normedCurves : nt.NormedCurves
-		
+		Contains the aligned piezo (x) and deflection (y)
+		values of every force distance curve divided into
+		the non contact and contact part.
 	"""
 	numberOfDataPoints = 2000
 	minimumPizeo = get_minimum_piezo(activeForceDistanceCurves)
@@ -163,6 +167,29 @@ def interpolate_non_contact_part(
 	numberOfDataPoints: int
 ) -> Tuple[np.ndarray]:
 	"""
+	Align the non contact parts of each force distance
+	curve in a force volume.
+
+	Parameters
+	----------
+	activeForceDistanceCurves : list[nt.ForceDistanceCurve]
+		Piezo(x) and deflection (y) values of the
+		active force distance curves.
+	minimumPizeo : float
+		Minimum piezo value of all force distance curves
+		in the force volume, which is the minimum border for 
+		each aligned curve in the non contact part.
+	numberOfDataPoints : int
+		Number of measurement points in the non contact part of 
+		each force distance curve.
+
+	Returns
+	-------
+	normedPiezoContact : np.ndarray
+		Aligned piezo (x) values of the non contact part.
+	normedDeflectionContact : np.ndarray
+		Aligned deflecttion (y) values of each force
+		distance curve.
 	"""
 	normedPiezoNonContact = np.linspace(minimumPizeo, 0, numberOfDataPoints)
 	normedDeflectionNonContact = []
@@ -186,7 +213,8 @@ def interpolate_contact_part(
 	numberOfDataPoints: int
 ) -> Tuple[np.ndarray]:
 	"""
-
+	Align the contact parts of each force distance
+	curve in a force volume.
 
 	Parameters
 	----------
@@ -194,15 +222,20 @@ def interpolate_contact_part(
 		Piezo(x) and deflection (y) values of the
 		active force distance curves.
 	maximumDeflection : float
-		
+		Maximum deflection value of all force distance curves
+		in the force volume, which is the maximum border for 
+		each aligned curve in the contact part.
 	numberOfDataPoints : int
-		
+		Number of measurement points in the contact part of 
+		each force distance curve.
 
 	Returns
 	-------
 	normedPiezoContact : np.ndarray
-
+		Aligned deflection (y) values of the contact part.
 	normedDeflectionContact : np.ndarray
+		Aligned piezo (x) values of each force
+		distance curve.
 	"""
 	normedPiezoContact = np.linspace(0, maximumDeflection, numberOfDataPoints)
 	normedDeflectionContact = []
