@@ -35,6 +35,8 @@ class ForceVolume():
 	size : tuple[int]
 		Number of force distance curves as the width and height 
 		of the measurement grid.
+	filePath : str
+		File path of the measurement data.
 	imageData : dict
 		Optional image data.
 	forceDistanceCurves : list[ForceDistanceCurve]
@@ -45,7 +47,11 @@ class ForceVolume():
 		The average data of the currently active force 
 		distance curves.
 	"""
-	def __init__(self, importedData: Dict) -> None:
+	def __init__(
+		self, 
+		importedData: Dict,
+		filePathImportedData: str
+	) -> None:
 		"""
 		Initialize a force volume by setting its name, size and if
 		imported an additonal image and channel. Create a ForceDistanceCurve
@@ -56,9 +62,12 @@ class ForceVolume():
 		----------
 		importedData : Dict 
 			Data of all imported measurement files.
+		filePathImportedData : str.
+			File path of the imported measurement files.
 		"""
 		self.name: str = importedData["measurementData"].folderName
 		self.size: Tuple[int] = importedData["measurementData"].size
+		self.location: str = filePathImportedData
 
 		self.imageData: Dict = {}
 		self.forceDistanceCurves: List[ForceDistanceCurve] = []
