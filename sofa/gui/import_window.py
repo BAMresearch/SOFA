@@ -57,10 +57,6 @@ class ImportWindow(ttk.Frame):
 		the data is still running. 
 	labelProgressbarVariable : tk.Stringvar
 		Indicates the current running process.
-	update_main_window_active_data : function
-		Method of the MainWindow class to set the
-		filename, size and location of the imported
-		data in the main window of SOFA. 
 	dataTypes : dict_keys
 		Every available import format of SOFA.
 	filePathData : tk.StringVar
@@ -77,7 +73,6 @@ class ImportWindow(ttk.Frame):
 		self, 
 		root, 
 		guiInterface, 
-		set_data_active_force_volume
 	) -> None:
 		"""
 		Create a subwindow to import measurement data.
@@ -88,7 +83,6 @@ class ImportWindow(ttk.Frame):
 
 		self.toplevel = root
 		self.guiInterface = guiInterface
-		self.update_main_window_active_data = set_data_active_force_volume
 		self.dataTypes = imp_data.importFunctions.keys()
 
 		self._setup_input_variables()
@@ -249,7 +243,7 @@ class ImportWindow(ttk.Frame):
 
 		self.progressbar = ttk.Progressbar(
 			self,
-			mode=INDETERMINATE, 
+			mode=DETERMINATE, 
             bootstyle=SUCCESS
 		)
 		self.progressbar.pack(fill=X, expand=YES, padx=15, pady=(5, 15))
@@ -301,12 +295,11 @@ class ImportWindow(ttk.Frame):
 		userFeedback : messagebox
 			Informs the user whether the data could be imported or not.
 		"""
-		self._update_progressbar_label("Importing data...")
-		self._start_progressbar()
-
+		self._update_progressbar("Importing data...", 0.0)
+		
 		selected_import_function = imp_data.importFunctions[self.selectedDataType.get()][0]
 		selectedImportParameters = self._create_selected_import_parameters()
-
+		
 		try:
 			importedData = selected_import_function(
 				selectedImportParameters
@@ -315,22 +308,17 @@ class ImportWindow(ttk.Frame):
 			self._stop_progressbar()
 			return messagebox.showerror("Error", str(e), parent=self)
 		else:
-			self._update_progressbar_label("Processing data...")
-			self.guiInterface.create_force_volume(importedData)
-
-		# Set the name, size and location of the imported data in the main window.
-		self.update_main_window_active_data(
-			importedData["measurementData"].folderName,
-			importedData["measurementData"].size,
-			selectedImportParameters.filePathData
-		)
-
-		self._stop_progressbar()
+			self._update_progressbar("Processing data...", 50.0)
+			self.guiInterface.create_force_volume(
+				importedData,
+				selectedImportParameters.filePathData
+			)
+		self._reset_progrressbar()
 
 		self.toplevel.destroy()
 
 		return messagebox.showinfo("Success", "Data was successfully imported.")
-
+		
 	def _create_selected_import_parameters(self) -> nt.ImportParameter:
 		"""
 		Combine the selected import parameters.
@@ -348,32 +336,30 @@ class ImportWindow(ttk.Frame):
 			showPoorCurves=self.showPoorCurves.get()
 		)
 
-	def _start_progressbar(self) -> None:
-		"""
-		Start indeterminate progressbar.
-		"""
-		self.progressbar.start()
-
-	def _stop_progressbar(self) -> None:
-		"""
-		Stop indeterminate progressbar and reset the 
-		label of the progressbar.
-		"""
-		self.progressbar.stop()
-		self.progressbarCurrentLabel.set("")
-
-	def _update_progressbar_label(
+	def _update_progressbar(
 		self, 
-		label=""
+		label: str,
+		progressValue: float
 	) -> None:
 		"""
-		Update the label of procressbar to show the
-		current process.
+		Update the value and label of procressbar to 
+		show the current process.
 
 		Parameters
 		----------
 		label : str
 			Description of the current process.
+		progressValue : float.
+			Indicates current progress made.
 		"""
+		self.progressbar["value"] += progressValue
 		self.progressbarCurrentLabel.set(label)
+		self.update_idletasks()
+
+	def _reset_progrressbar(self) -> None: 
+		"""
+		Reset the value and label of the progressbar.
+		"""
+		self.progressbar["value"] = 0
+		self.progressbarCurrentLabel.set("")
 		self.update_idletasks()

@@ -248,7 +248,7 @@ class ExportWindow(ttk.Frame):
 
 		self.progressbar = ttk.Progressbar(
 			self,
-			mode=INDETERMINATE, 
+			mode=DETERMINATE, 
             bootstyle=SUCCESS
 		)
 		self.progressbar.pack(fill=X, expand=YES, padx=15, pady=(5, 15))
@@ -278,8 +278,7 @@ class ExportWindow(ttk.Frame):
 			Informs the user whether the data could 
 			be exported or not.
 		"""
-		self._start_progressbar()
-		self._update_progressbar_label("Exporting data...")
+		self._update_progressbar("Exporting data...", 0)
 
 		exportParameters = self._create_selected_export_parameters()
 		outputFolder = exp_data.setup_output_folder(
@@ -289,15 +288,15 @@ class ExportWindow(ttk.Frame):
 		activeForceVolume = self.guiInterface.get_active_force_volume()
 
 		if exportParameters.exportToCsv:
-			self._update_progressbar_label("Exporting to csv...")
+			self._update_progressbar("Exporting to csv...", 25.0)
 			exp_data.export_to_csv(activeForceVolume, outputFolder)
 
 		if exportParameters.exportToXlsx:
-			self._update_progressbar_label("Exporting to xlsx...")
+			self._update_progressbar("Exporting to xlsx...", 25.0)
 			exp_data.export_to_xlsx(activeForceVolume, outputFolder)
 
 		if exportParameters.exportPlots:
-			self._update_progressbar_label("Exporting plots...")
+			self._update_progressbar("Exporting plots...", 25.0)
 			exp_data.export_plots(
 				self.guiInterface.linePlotParameters.holder,
 				self.guiInterface.heatmapParameters.holder,
@@ -305,7 +304,7 @@ class ExportWindow(ttk.Frame):
 				outputFolder
 			)
 
-		self._stop_progressbar()
+		self._reset_progrressbar()
 
 		self.toplevel.destroy()
 
@@ -330,31 +329,30 @@ class ExportWindow(ttk.Frame):
 			exportPlots=self.exportPlots.get(),
 		)
 
-	def _start_progressbar(self) -> None:
-		"""
-		Start the indeterminate progressbar.
-		"""
-		self.progressbar.start()
-
-	def _stop_progressbar(self) -> None:
-		"""
-		Stop indeterminate progressbar and reset the 
-		label of the progressbar.
-		"""
-		self.progressbar.stop()
-		self.progressbarCurrentLabel.set("")
-
-	def _update_progressbar_label(
+	def _update_progressbar(
 		self, 
-		label=""
+		label: str,
+		progressValue: float
 	) -> None:
 		"""
-		Update the label of procressbar to show the
-		current process.
+		Update the value and label of procressbar to 
+		show the current process.
 
 		Parameters
 		----------
 		label : str
 			Description of the current process.
+		progressValue : float.
+			Indicates current progress made.
 		"""
+		self.progressbar["value"] += progressValue
 		self.progressbarCurrentLabel.set(label)
+		self.update_idletasks()
+
+	def _reset_progrressbar(self) -> None: 
+		"""
+		Reset the value and label of the progressbar.
+		"""
+		self.progressbar["value"] = 0
+		self.progressbarCurrentLabel.set("")
+		self.update_idletasks()
