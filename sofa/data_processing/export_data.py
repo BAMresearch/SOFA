@@ -178,7 +178,7 @@ def get_force_volume_data(
 	dataFrameMetaData = create_data_frame_metadata(forceVolume)
 	dataFramerawCurves = create_data_frame_raw_curves(forceVolume.forceDistanceCurves)
 	dataFrameCorrectedCurves = create_data_frame_corrected_curves(forceVolume.forceDistanceCurves)
-	dataFrameAverageData = create_data_frame_average_data(forceVolume.average)
+	dataFrameAverageData = create_data_frame_average_data(forceVolume)
 	dataFrameChannelData = create_data_frame_channel_data(forceVolume.channels)
 
 	return nt.DataFramesForceVolume(
@@ -296,7 +296,7 @@ def create_data_frame_corrected_curves(
 
 @decorator_check_average
 def create_data_frame_average_data(
-	average: nt.AverageForceDistanceCurve
+	forceVolume
 ) -> pd.DataFrame:
 	"""
 	Cache the the calculated average data in a 
@@ -304,9 +304,9 @@ def create_data_frame_average_data(
 
 	Parameters
 	----------
-	averageForceDistanceCurve : AverageForceDistanceCurve
-		Average of the active force distance curve with
-		the standard deviation.
+	forceVolume : ForceVolume
+		Contains the raw and calculated data from the 
+		imported measurement.
 
 	Returns
 	-------
@@ -315,12 +315,12 @@ def create_data_frame_average_data(
 		curve.
 	"""
 	return pd.DataFrame(
-		average.piezoNonContact,
-		average.deflectionNonContact,
-		average.piezoContact,
-		average.deflectionContact,
-		average.standardDeviationNonContact,
-		average.standardDeviationContact,
+		forceVolume.average.piezoNonContact,
+		forceVolume.average.deflectionNonContact,
+		forceVolume.average.piezoContact,
+		forceVolume.average.deflectionContact,
+		forceVolume.average.standardDeviationNonContact,
+		forceVolume.average.standardDeviationContact,
 		columns=[
 			"average piezo non contact", 
 			"average deflection non contact",
