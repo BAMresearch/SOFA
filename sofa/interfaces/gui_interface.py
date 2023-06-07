@@ -93,8 +93,9 @@ class GUIInterface():
 	importedDataSets : Dict
 		Contains the imported force volumes and their associated
 		PlotInterfaces.
-	keyActiveForceVolume : ttk.StringVar
-		Variable that stores the name of active force volume.
+	activeForceVolumeParameters : nt.ActiveForceVolumeParameters
+		Contains all GUI elements of the main window
+		which are related to the active force volume.
 	linePlotParameters : nt.LinePlotParameters
 		Contains all GUI elements of the main window
 		which are related to the line plot.
@@ -110,7 +111,7 @@ class GUIInterface():
 		Initialize a blank gui interface. 
 		"""
 		self.importedDataSets: Dict = {}
-		self.keyActiveForceVolume: ttk.StringVar
+		self.activeForceVolumeParameters: nt.ActiveForceVolumeParameters
 		self.linePlotParameters: nt.LinePlotParameters 
 		self.heatmapParameters: nt.HeatmapParameters
 		self.histogramParameters: nt.HistogramParameters
@@ -126,8 +127,14 @@ class GUIInterface():
 			Contains the relevant parameters of every plot
 			in the main window of SOFA.
 		"""
-		self.keyActiveForceVolume = guiParameters["keyActiveForceVolume"]
-
+		self.activeForceVolumeParameters = nt.ActiveForceVolumeParameters(
+			key=guiParameters["keyActiveForceVolume"],
+			name=guiParameters["activeForceVolumeName"],
+			size=guiParameters["activeForceVolumeSize"],
+			location=guiParameters["activeForceVolumeLocation"],
+			dropdownList=guiParameters["activeForceVolumeDropdownList"],
+			dropdown=guiParameters["activeForceVolumeDropdown"]
+		)
 		self.linePlotParameters = nt.LinePlotParameters(
 			linked=guiParameters["linkedLinePlot"],
 			holder=guiParameters["holderLinePlot"],
@@ -148,7 +155,11 @@ class GUIInterface():
 			numberOfBins=guiParameters["numberOfBins"]
 		)
 
-	def create_force_volume(self, importedData: Dict) -> None: 
+	def create_force_volume(
+		self, 
+		importedData: Dict,
+		filePathImportedData: str
+	) -> None: 
 		"""
 		Create a force volume from the imported measurement
 		data, initialize it's associated plot interface and
@@ -159,8 +170,14 @@ class GUIInterface():
 		importedData : Dict
 			Contains the data of the imported 
 			measurement files.
+		filePathImportedData : str
+			File path of the imported measurement 
+			files.
 		"""
-		forceVolume = ForceVolume(importedData)
+		forceVolume = ForceVolume(
+			importedData,
+			filePathImportedData
+		)
 		plotInterface = PlotInterface(
 			forceVolume.size,
 			forceVolume.get_force_distance_curves_data()
@@ -170,19 +187,62 @@ class GUIInterface():
 			"forceVolume": forceVolume,
 			"plotInterface": plotInterface
 		}
-		self.keyActiveForceVolume.set(forceVolume.name)
+		self.activeForceVolumeParameters.key.set(forceVolume.name)
 
-		self.plot_active_force_volume()
+		self.update_active_force_volume(
+			newlyImportedForceVolume=True
+		)
 
-	def plot_active_force_volume(self) -> None:
+	def update_active_force_volume(
+		self,
+		newlyImportedForceVolume: bool = False
+	) -> None:
 		"""
-		Plot the processed data of a newly imported force volume
-		as a line plot, heatmap and histogram.
+		Update the active force volume in the main
+		window of SOFA by updating the plots and 
+		labels in the active data frame.
+
+		Parameters
+		----------
+		newlyImportedForceVolume : bool
+			Indicates wheter the force volume was newly
+			imported or not.
 		"""
+		self._update_active_force_volume_meta_data(
+			newlyImportedForceVolume
+		)
 		self._plot_line_plot()
 		self.plot_heatmap()
 		self.plot_histogram()
 	
+	@decorator_get_active_force_volume
+	def _update_active_force_volume_meta_data(
+		self,
+		activeForceVolume: ForceVolume,
+		newlyImportedForceVolume: bool
+	) -> None: 
+		"""
+		Update the active data frame in the main window
+		of SOFA. 
+
+		Parameters
+		----------
+		newlyImportedForceVolume : bool
+			Indicates wheter the force volume was newly
+			imported or not.
+		"""
+		self.activeForceVolumeParameters.name.set(activeForceVolume.name)
+		self.activeForceVolumeParameters.size.set(activeForceVolume.size)
+		self.activeForceVolumeParameters.location.set(activeForceVolume.location)
+
+		# If the force volume was newly imported add it to the dropdown menu.
+		if newlyImportedForceVolume: 
+			self.activeForceVolumeParameters.dropdownList.append(activeForceVolume.name)
+			self.activeForceVolumeParameters.dropdown.set_menu(
+				"", 
+				*self.activeForceVolumeParameters.dropdownList
+			)
+
 	@decorator_get_active_data_set
 	def _plot_line_plot(
 		self, 
@@ -611,7 +671,7 @@ class GUIInterface():
 		activeForceVolume : ForceVolume
 			Active force volume.
 		"""
-		return self.importedDataSets[self.keyActiveForceVolume.get()]["forceVolume"]
+		return self.importedDataSets[self.activeForceVolumeParameters.key.get()]["forceVolume"]
 
 	def get_active_plot_interface(self) -> ForceVolume:
 		"""
@@ -623,7 +683,7 @@ class GUIInterface():
 		activeForceVolume : ForceVolume
 			Plot interface of the active force volume.
 		"""
-		return self.importedDataSets[self.keyActiveForceVolume.get()]["plotInterface"]
+		return self.importedDataSets[self.activeForceVolumeParameters.key.get()]["plotInterface"]
 
 	@staticmethod
 	def _text_to_camel_case(inputString: str) -> str:

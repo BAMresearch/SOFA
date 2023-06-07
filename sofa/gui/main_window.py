@@ -188,7 +188,7 @@ class MainWindow(ttk.Frame):
 			self.activeForceVolume, 
 			"",
 			*self.forceVolumes, 
-			command=self._update_force_volume,
+			command=self._update_active_force_volume,
 			bootstyle=""
 		)
 		self.dropdownForceVolumes.grid(row=0, column=3, padx=10, sticky=E)
@@ -476,6 +476,11 @@ class MainWindow(ttk.Frame):
 		"""
 		guiParameters = {
 			"keyActiveForceVolume": self.activeForceVolume,
+			"activeForceVolumeName": self.stringVarActiveData,
+			"activeForceVolumeSize": self.stringVarActiveDataSize,
+			"activeForceVolumeLocation": self.stringVarActiveDataLocation,
+			"activeForceVolumeDropdownList": self.forceVolumes,
+			"activeForceVolumeDropdown": self.dropdownForceVolumes,
 			"holderLinePlot": self.holderFigureLineplot,
 			"linkedLinePlot": self.interactiveLinePlot,
 			"displayAverage": self.displayAverage,
@@ -492,40 +497,6 @@ class MainWindow(ttk.Frame):
 		}
 		self.guiInterface.set_gui_parameters(guiParameters)
 
-	def set_data_active_force_volume(
-		self,
-		name: str,
-		size: Tuple[int],
-		location: str
-	) -> None:
-		"""
-		Update the name, size and location of the active
-		force volume in the active data frame.
-
-		Parameters
-		----------
-		name : str
-			Name of the active force volume.
-		size : tuple[int]
-			Size of the measurement grid of the active
-			force volume.
-		location : str
-			Location of the corresponding measurement files.
-		"""
-		self.stringVarActiveData.set(name)
-		self.stringVarActiveDataSize.set(str(size))
-		self.stringVarActiveDataLocation.set(location)
-
-		self.forceVolumes.append(name)
-		self._update_dropdown_force_volumes()
-
-	def _update_dropdown_force_volumes(self) -> None:
-		"""
-		Update the dropdown menu options for the
-		imported force volumes.
-		"""
-		self.dropdownForceVolumes.set_menu("", *self.forceVolumes)
-
 	def _create_import_window(self) -> None:
 		"""
 		Create a subwindow to import data.
@@ -533,8 +504,7 @@ class MainWindow(ttk.Frame):
 		toplevelImport = ttk.Toplevel("Import Data")
 		ImportWindow(
 			toplevelImport,
-			self.guiInterface, 
-			self.set_data_active_force_volume
+			self.guiInterface
 		)
 
 	@decorator_check_imported_data_set_with_feedback
@@ -548,11 +518,11 @@ class MainWindow(ttk.Frame):
 			self.guiInterface
 		)
 
-	def _update_force_volume(self, _) -> None: 
+	def _update_active_force_volume(self, _) -> None: 
 		"""
 		Update the active force volume.
 		"""
-		self.guiInterface.plot_active_force_volume()
+		self.guiInterface.update_active_force_volume()
 
 	@decorator_check_imported_data_set_with_feedback
 	def _update_plots(self) -> None:

@@ -23,6 +23,14 @@ import tkinter as tk
 import ttkbootstrap as ttk
 
 # GUI interface
+class ActiveForceVolumeParameters(NamedTuple):
+	key: ttk.StringVar
+	name: ttk.StringVar
+	size: ttk.StringVar
+	location: ttk.StringVar
+	dropdownList: List
+	dropdown: ttk.OptionMenu
+
 class LinePlotParameters(NamedTuple):
 	linked: tk.BooleanVar
 	holder: FigureCanvasTkAgg
