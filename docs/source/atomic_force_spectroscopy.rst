@@ -60,25 +60,31 @@ Points of Interest
 End Of Zeroline
 ~~~~~~~~~~~~~~~
 
+Text in progress.
+
 Jump To Contact
 ~~~~~~~~~~~~~~~
 
+Text in progress.
+
 Point Of Contact
 ~~~~~~~~~~~~~~~~
+
+Text in progress.
 
 .. _measurement erros:
 
 Measurement Erros
 =================
 
-During the measurement each force distance curve 
+During the measurement each force distance curve is shifted in the x any y direction due to the experimental setup. 
 
 Topography Offset
 -----------------
 
-The topography offset is a shift of the force distance curve in the piezo (x) axis. This error arises because
+The topography offset is a shift of the force distance curve in the piezo (x) axis. This error arises because the spring beam does not return to the exact same starting position after each measurement point.
 
 Virtual Deflection
 ------------------
 
-The virtual deflection is a shift of the force distance curve in force (y) axis. This error is caused by the fact that 
+The virtual deflection is a shift of the force distance curve in force (y) axis. This error is caused by the fact that the distance between the measuring surface and the measuring tip is not always equal.
