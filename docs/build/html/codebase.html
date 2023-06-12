@@ -222,145 +222,34 @@
 <li><p><strong>igor</strong> - to read files in the .ibw (igor binary wave) file format (tested with igor version 0.3)</p></li>
 <li><p><strong>ttkbootstrap</strong> - to give the Tkinter GUI a modern look (tested with ttkbootstrap version 1.5.1)</p></li>
 </ul>
-<div class="section" id="sofa-packages">
-<h2>SOFA Packages<a class="headerlink" href="#sofa-packages" title="Permalink to this heading">#</a></h2>
-<p>The general aim of SOFA was to write code which is simple to read and easy to extend. The implementation followed the principle of separation of concerns. Therefore SOFA is comprised of multiple distinct packages. On the code level functions are keept short and only take responsibility for one single functionality. To increase the readability of the code, SOFA tries to implement the following PEP’s:</p>
+<p>The general aim of SOFA was to write code which is simple to read and easy to extend. The implementation followed the principle of separation of concerns. Therefore functions are keept short and only take responsibility for one single functionality. To increase the readability of the code, SOFA tries to implement the following PEP’s:</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://peps.python.org/pep-0008/">PEP 8</a> - The Style Guide for Python Code</p></li>
 <li><p><a class="reference external" href="https://peps.python.org/pep-0257/">PEP 257</a> - Docstring Conventions</p></li>
 <li><p><a class="reference external" href="https://peps.python.org/pep-0484/">PEP 484</a> - Type Hints</p></li>
 </ul>
 <p>The implementation uses a mixture of object oriented and procedural programming, depending on which is more suitable for the different requirements at hand.</p>
+<div class="section" id="packages-peculiarities">
+<h2>Packages Peculiarities<a class="headerlink" href="#packages-peculiarities" title="Permalink to this heading">#</a></h2>
 <div class="section" id="gui">
-<span id="gui-implementation"></span><h3>GUI<a class="headerlink" href="#gui" title="Permalink to this heading">#</a></h3>
-<p>The GUI of SOFA is written in Tkinter and uses the ttkbootstrap theme extension, to give it a modern look. It consists of of three windows, the main window and two subwindows for the data import and export. All of them are written in an object oriented approach.</p>
-<div class="section" id="main-window-source">
-<span id="main-window-implementation"></span><h4>Main Window  <a class="reference external" href="https://github.com/2Puck/sofa/tree/development">source</a><a class="headerlink" href="#main-window-source" title="Permalink to this heading">#</a></h4>
-<p>The main window of SOFA allows the user to import, process and export experimental force spectroscopy data. To improve the clarity of the window it is divided into smaller frames. The different plots are embedded into the GUI using the <code class="code docutils literal notranslate"><span class="pre">FigureCanvasTkAgg</span></code> from the Matplotlib tkinter backend. To arrange the different widgets the pack geometry manager is prefered over grid.</p>
-<p>To interact with the different imported force volumes the main window creates a <a class="reference internal" href="#gui-interface-implementation"><span class="std std-ref">GUI Interface</span></a> object. This object is passed to the line plot and heatmap <a class="reference internal" href="#toolbar-implementation"><span class="std std-ref">toolbars</span></a> and to the <a class="reference internal" href="#import-window-implementation"><span class="std std-ref">import</span></a> and <a class="reference internal" href="#export-window-implementation"><span class="std std-ref">export</span></a> window when they are opened. After all widgets have been created the interactive parameters for the different plots, like the variables behind the checkboxes from the Line Plot or Linked Plots frame, are set in the GUI Interface. This way the various data plots can all be connected with each other.</p>
-</div>
-<div class="section" id="import-window">
-<span id="import-window-implementation"></span><h4>Import Window<a class="headerlink" href="#import-window" title="Permalink to this heading">#</a></h4>
-<p>The import window is a small subwindow to handle the import of measurement data. Like in the main window the different widgets are arranged in rows using only the pack geometry manager. It contains a indeterminate progressbar to show if the import process is still runing and which process is currently being executed. The decorator <code class="code docutils literal notranslate"><span class="pre">decorator_check_required_folder_path</span></code> checks if a required measurement folder is selected before the import process starts.</p>
-<p>During the import process the selected measurement files are first imported and combined into one data dictionary with the selected import function of the <a class="reference internal" href="#import-data-implementation"><span class="std std-ref">Import Data</span></a> module. Afterwards the data dictionary is passed to the <a class="reference internal" href="#gui-interface-implementation"><span class="std std-ref">GUI Interface</span></a>, where a new force volume will be created. Finally the foldername, size and folderpath of the imported measurement data are set in the Active Data frame of the <a class="reference internal" href="#main-window-implementation"><span class="std std-ref">Main Window</span></a>.</p>
-<p>If an error occurs during the import process the user is informed via a message box and the import process is terminated. If the data could sucessfully be imported the window closes it self and informs the user via a message box.</p>
-</div>
-<div class="section" id="export-window">
-<span id="export-window-implementation"></span><h4>Export Window<a class="headerlink" href="#export-window" title="Permalink to this heading">#</a></h4>
-<p>The export window is a small subwindow to handle the export of the imported force volumes. Like in the main window the different widgets are arranged in rows using only the pack geometry manager. It contains a indeterminate progressbar to show if the import process is still runing.
-The decorator <code class="code docutils literal notranslate"><span class="pre">decorator_check_required_folder_path</span></code> and <code class="code docutils literal notranslate"><span class="pre">decorator_check_required_folder_name</span></code> check if the required folder path and folder name for the ouput folder are selected before the export process starts.</p>
-<p>In the export process the data of the selected force volume can be exported to the selected <a class="reference internal" href="supported_data_types.html#export-formats"><span class="std std-ref">export formats</span></a>. The <a class="reference internal" href="#export-data-implementation"><span class="std std-ref">Export Data</span></a> module creates an output folder for data with the selected location and name. After this the data of the selected force volume is exported to the different formats.</p>
-</div>
-<div class="section" id="window-settings">
-<h4>Window Settings<a class="headerlink" href="#window-settings" title="Permalink to this heading">#</a></h4>
-<p>This file should contain all of the general window settings, sutch as spacing parameters between widgets or background colors for the different GUI elements, making it easier to adjust the different windows of the GUI.</p>
-</div>
+<h3>GUI<a class="headerlink" href="#gui" title="Permalink to this heading">#</a></h3>
+<p>The GUI of SOFA is written in Tkinter and uses the ttkbootstrap theme extension, to give it a modern look. To embed the different plots in the <code class="code docutils literal notranslate"><span class="pre">MainWindow</span></code> SOFA uses the <code class="code docutils literal notranslate"><span class="pre">FigureCanvasTkAgg</span></code> from the Matplotlib tkinter backend. If an error occurs during the import or export process the user is informed via a message box. Both the Import and Export Window contain a progressbar to show the current progress. The <code class="code docutils literal notranslate"><span class="pre">indeterminate</span></code> mode of the Tkinter toolbar did not work therefore they run as a very simple <code class="code docutils literal notranslate"><span class="pre">determinate</span></code> version. In the <code class="code docutils literal notranslate"><span class="pre">ImportWindow</span></code> this was probadly due to the fact how SOFA handles exceptions during the import process.</p>
 </div>
 <div class="section" id="toolbar">
-<span id="toolbar-implementation"></span><h3>Toolbar<a class="headerlink" href="#toolbar" title="Permalink to this heading">#</a></h3>
-<p>The toolbar package contains the line plot and heatmap toolbars to select a certain subgroup of force curves and inspect the data more closely. Since they share some similarities they both inheret from the SOFA Toolbar which in turn is inhereted from the Matplotlib <code class="code docutils literal notranslate"><span class="pre">NavigationToolbar2Tk</span></code>.</p>
-<div class="section" id="sofa-toolbar">
-<h4>SOFA Toolbar<a class="headerlink" href="#sofa-toolbar" title="Permalink to this heading">#</a></h4>
-<p>With Matplotlib version 3.5.1 it is no longer possible to load toolbar icons from a custom location. Therefore, the toolbar has to overwrite a part of the NavigationToolbar2Tk <code class="code docutils literal notranslate"><span class="pre">__init__</span></code> function. Additionally it adjusts the background color of the toolbar icons to the background color of the main window. Furthermore the functions to switch between the different modes of the toolbar are defined here. The active mode is displayed next to the toolbar icons and the button of the active mode is highlighted.</p>
-</div>
+<h3>Toolbar<a class="headerlink" href="#toolbar" title="Permalink to this heading">#</a></h3>
+<p>The <code class="code docutils literal notranslate"><span class="pre">SofaToolbar</span></code> base class for the different toolbars of SOFA is inhereted from the Matplotlib <code class="code docutils literal notranslate"><span class="pre">NavigationToolbar2Tk</span></code>.</p>
 <div class="section" id="line-plot-toolbar">
 <h4>Line Plot Toolbar<a class="headerlink" href="#line-plot-toolbar" title="Permalink to this heading">#</a></h4>
-<p>The line plot toolbar allows the selection of single or multiple force distance curves. In addition it is possible to zoom in and out of the line plot or reset the made selections. Always having to cache the basic view limits felt inefficient. Therefore when zooming into the plot, the old view limits are cached and not the new ones. Making it easier to revert a single step or to reset the zoom as a whole. The selection mode of single force distance curves uses the Matplotlib <code class="code docutils literal notranslate"><span class="pre">pick_event</span></code> in combination with the <code class="code docutils literal notranslate"><span class="pre">pickradius</span></code> attribute of the <code class="code docutils literal notranslate"><span class="pre">Line2D</span></code> objects. While this mode is active mouse clicks which are close enough to a curve will toggle their state. The function to select multiple force distance curves uses the current view limits and tries to disable all curves within the current view. However, the current implementation only disables all curves that actually have a data point within the current view. This neglects all cases where curves only intersect the current view limits. An older version of SOFA calculated whether a curve intersects the boundaries of the current view if it has no data points in the boundaries. However, this increases the computational effort considerably, which is especially problematic for large force volumes with a lot of force distance curves. Therefore, the faster but somewhat less precise solution was chosen in the end.</p>
+<p>When zooming in or out of the plot it felt inefficient to always cache the basic view limits. Therefore when zooming into the plot, the old view limits are cached and not the new ones. Making it easier to revert a single step or to reset the zoom as a whole. The selection mode of single force distance curves uses the Matplotlib <code class="code docutils literal notranslate"><span class="pre">pick_event</span></code> in combination with the <code class="code docutils literal notranslate"><span class="pre">pickradius</span></code> attribute of the <code class="code docutils literal notranslate"><span class="pre">Line2D</span></code> objects. While this mode is active mouse clicks which are close enough to a curve will toggle their state. The function to select multiple force distance curves uses the current view limits and tries to disable all curves within the current view. However, the current implementation only disables all curves that actually have a data point within the current view. This neglects all cases where curves only intersect the current view limits. An older version of SOFA calculated whether a curve intersects the boundaries of the current view if it has no data points in the boundaries. However, this increases the computational effort considerably, which is especially problematic for large force volumes with a lot of force distance curves. Therefore, the faster but somewhat less precise solution was chosen in the end.</p>
 </div>
 <div class="section" id="heatmap-toolbar">
 <h4>Heatmap Toolbar<a class="headerlink" href="#heatmap-toolbar" title="Permalink to this heading">#</a></h4>
-<p>With the heatmap toolbar a certain section of the heatmap can be selected and disabled and the heatmap can be rotated or flipped without changing the axis. There are two different modes to select an area of the heatmap and both use the <code class="code docutils literal notranslate"><span class="pre">button_press_event</span></code> and <code class="code docutils literal notranslate"><span class="pre">button_release_event</span></code> of matplotlib to capture the movement of the mouse while the mouse button is pressed. To select a rectangular area, a rectangle is drawn between the start and end points of the mouse movement. Start and end point are defined by clicking and releasing the mouse button. To indicate the selected area, red lines are drawn around the resulting rectangle. The other mode allows to select any area. To do this, a tuple with the x and y indices of every data point of the heatmap over which the mouse moves while the button is pressed are cached. Indicating such a created area by outlining it with red lines is difficult. To achieve this, each point of the selected area is first outlined with red lines. This already results in the the outline of the area, but there are also unwanted red lines within the area. To delete the unwanted marking lines every line which exists exactly twice, is deleted. After an area is selected, either all points in or outside the area can be disabled. When the heatmap is flipped or rotated the selected area and the marking lines indicating it are flipped/rotated as well. Because the axis are not rotated/flipped, problems can occur. After a rotation, for example, the point at poistion (0, 0) of the heatmap no longer corresponds to the first data point. To get around this problem the <a class="reference internal" href="#plot-interface-implementation"><span class="std std-ref">Plot Interface</span></a> has an attribute called <code class="code docutils literal notranslate"><span class="pre">heatmapOrientationMatrix</span></code> which is a two dimensional NumPy array with the same size as the heatmap that stores the positon of the data points in current orientation. When the heatmap is rotated or flipped the same transformation is performed on the NumPy array. And if new inactive data points are added from the heatmap or some datapoints in the heatmap needs to be disabled the points of the heatmap can be mapped to their actual datapoints with the help of the <code class="code docutils literal notranslate"><span class="pre">heatmapOrientationMatrix</span></code> array.</p>
-</div>
-</div>
-<div class="section" id="interfaces">
-<h3>Interfaces<a class="headerlink" href="#interfaces" title="Permalink to this heading">#</a></h3>
-<div class="section" id="gui-interface">
-<span id="gui-interface-implementation"></span><h4>GUI Interface<a class="headerlink" href="#gui-interface" title="Permalink to this heading">#</a></h4>
-</div>
-<div class="section" id="plot-interface">
-<span id="plot-interface-implementation"></span><h4>Plot Interface<a class="headerlink" href="#plot-interface" title="Permalink to this heading">#</a></h4>
-</div>
-</div>
-<div class="section" id="force-spectroscopy-data">
-<h3>Force Spectroscopy Data<a class="headerlink" href="#force-spectroscopy-data" title="Permalink to this heading">#</a></h3>
-<div class="section" id="force-volume">
-<h4>Force Volume<a class="headerlink" href="#force-volume" title="Permalink to this heading">#</a></h4>
-</div>
-<div class="section" id="force-distance-curve">
-<h4>Force Distance Curve<a class="headerlink" href="#force-distance-curve" title="Permalink to this heading">#</a></h4>
-</div>
-<div class="section" id="channel">
-<h4>Channel<a class="headerlink" href="#channel" title="Permalink to this heading">#</a></h4>
+<p>The two different modes to select an area of the heatmap both use the <code class="code docutils literal notranslate"><span class="pre">button_press_event</span></code> and <code class="code docutils literal notranslate"><span class="pre">button_release_event</span></code> of matplotlib to capture the movement of the mouse while the mouse button is pressed. To select a rectangular area, a rectangle is drawn between the start and end points of the mouse movement. Start and end point are defined by clicking and releasing the mouse button. To indicate the selected area, red lines are drawn around the resulting rectangle. The other mode allows to select any area. To do this, a tuple with the x and y indices of every data point of the heatmap over which the mouse moves while the button is pressed are cached. Indicating such a created area by outlining it with red lines is difficult. To achieve this, each point of the selected area is first outlined with red lines. This already results in the the outline of the area, but there are also unwanted red lines within the area. To delete the unwanted marking lines every line which exists exactly twice, is deleted. After an area is selected, either all points in or outside the area can be disabled.</p>
 </div>
 </div>
 <div class="section" id="data-processing">
 <h3>Data Processing<a class="headerlink" href="#data-processing" title="Permalink to this heading">#</a></h3>
-<p>This package is responsible for the processing of the force spectroscopy data. This includes the import and correction of the measurement data, the calulation of the different channels and an average force distance curve and the export of the data from SOFA. These modules use a procedural approach.</p>
-<div class="section" id="import-data">
-<span id="import-data-implementation"></span><h4>Import Data<a class="headerlink" href="#import-data" title="Permalink to this heading">#</a></h4>
-<p>The import data package handles the import of the different file formats. To add new file types create a new module in the <a class="reference internal" href="#import-formats-implementation"><span class="std std-ref">import formats</span></a> folder, import it in the <a class="reference internal" href="#import-data-wrapper-implementation"><span class="std std-ref">import data</span></a> module and extend the dictionary <code class="code docutils literal notranslate"><span class="pre">importFunctions</span></code>. For detailed information about the given input and expected output of the import functions, see the <a class="reference internal" href="architecture.html#test"><span class="std std-ref">import architecture</span></a> section.</p>
-<div class="section" id="import-data-wrapper">
-<span id="import-data-wrapper-implementation"></span><h5>Import Data Wrapper<a class="headerlink" href="#import-data-wrapper" title="Permalink to this heading">#</a></h5>
-<p>The Import Data module is responsible for the import of measurement data with the selected data type. It imports all modules from the <a class="reference internal" href="supported_data_types.html#import-formats"><span class="std std-ref">import formats</span></a> folder and maps the selected data type to the corresponding import function.</p>
-</div>
-<div class="section" id="import-formats">
-<span id="import-formats-implementation"></span><h5>Import Formats<a class="headerlink" href="#import-formats" title="Permalink to this heading">#</a></h5>
-<p>This folder contains modules with import functions for every currently supported import data type.</p>
-<div class="section" id="import-ibw-data">
-<h6>Import Ibw Data<a class="headerlink" href="#import-ibw-data" title="Permalink to this heading">#</a></h6>
-<p>This module handles the import of measurement data in the <code class="code docutils literal notranslate"><span class="pre">.ibw</span></code> BAM file format. In addition to the required measurement data, other optional files like an image file or data for additional channels can be imported as well. At first the required measurement data are imported. All data files in the folder are collected and seperated into the piezo and deflection data. Afterwards the piezo and deflection data files are loaded using the <a class="reference external" href="https://github.com/wking/igor">Igor</a>. Then invalid values are removed and the curve is splitted into it’s approach and retract part. After this process is finished, the optional data is imported. The decorators <code class="code docutils literal notranslate"><span class="pre">decorator_check_file_size_image</span></code> and <code class="code docutils literal notranslate"><span class="pre">decorator_check_file_size_channel</span></code> check whether all data matches in size.</p>
-</div>
-</div>
-</div>
-<div class="section" id="correct-data">
-<h4>Correct Data<a class="headerlink" href="#correct-data" title="Permalink to this heading">#</a></h4>
-<p>The correct data module is responsible for correcting the approach part of force distance curve. This process is described in detail in the <a class="reference internal" href="correction_algorithm.html#correction-algorithm"><span class="std std-ref">correction algorithm</span></a> section. If an error occurs during this process a <a class="reference internal" href="#custom-exeptions-implementation"><span class="std std-ref">custom exeptions</span></a> is raised and catched by the <code class="code docutils literal notranslate"><span class="pre">_import_data</span></code> function of the <a class="reference internal" href="#import-window-implementation"><span class="std std-ref">import window</span></a>.</p>
-</div>
-<div class="section" id="calculate-channel-data">
-<span id="calculate-channel-data-implementation"></span><h4>Calculate Channel Data<a class="headerlink" href="#calculate-channel-data" title="Permalink to this heading">#</a></h4>
-<p>This module is responsible for calculating the different <a class="reference internal" href="channels.html#channels"><span class="std std-ref">channels</span></a> after the force distance curves have been corrected. It contains a function for every channel, some helper functions and the <code class="code docutils literal notranslate"><span class="pre">active_channels</span></code> dictionary, which is needed to map the different channels to their corresponding function. The decorator <code class="code docutils literal notranslate"><span class="pre">decorator_reshape_channel_data</span></code> converts the channel values to a two dimensional numpy array. To add a custom channel write a function to caluclate the channel values and extend the <code class="code docutils literal notranslate"><span class="pre">active_channels</span></code> dictionary. For further informations about provided input arguments and expected out of a function calculating a custom channel, see the <a class="reference internal" href="architecture.html#test"><span class="std std-ref">test</span></a> section.</p>
-</div>
-<div class="section" id="calculate-average">
-<span id="calculate-average-implementation"></span><h4>Calculate Average<a class="headerlink" href="#calculate-average" title="Permalink to this heading">#</a></h4>
-<p>The calculate average module can calculate an average of the currently active force distance curves.</p>
-</div>
-<div class="section" id="export-data">
-<span id="export-data-implementation"></span><h4>Export Data<a class="headerlink" href="#export-data" title="Permalink to this heading">#</a></h4>
-<p>exportiert daten eines force volumes aus SOFA
-erstellt dafür ordner
-konvertiert dann daten zunächst in pandas dataframes - einfacher zu exportieren
-<em>exportFormats</em> enthält alle verfügbaren export formate mit dazugehörigen export funktionen
-warum die beiden</p>
-</div>
-<div class="section" id="named-tuples">
-<h4>Named Tuples<a class="headerlink" href="#named-tuples" title="Permalink to this heading">#</a></h4>
-<p>To increase the readability of the code SOFA uses NamedTuple, which are all defined in this file. They are divided into different categories and use type hints, to make it easier to understand the code.</p>
-</div>
-<div class="section" id="custom-exceptions">
-<span id="custom-exeptions-implementation"></span><h4>Custom Exceptions<a class="headerlink" href="#custom-exceptions" title="Permalink to this heading">#</a></h4>
-<p>To better undestand possible errors when importing and correcting the measurement data, SOFA uses some custom exceptions. Both cases have a general exception <code class="code docutils literal notranslate"><span class="pre">ImportError</span></code> and <code class="code docutils literal notranslate"><span class="pre">CorrectionError</span></code> and further specific exceptions. This structure allows to catch a general type of exception with a descriptive name that should make it easier to understand the problem.</p>
-</div>
-</div>
-<div class="section" id="data-visualization">
-<h3>Data Visualization<a class="headerlink" href="#data-visualization" title="Permalink to this heading">#</a></h3>
-<div class="section" id="plot-data">
-<h4>Plot Data<a class="headerlink" href="#plot-data" title="Permalink to this heading">#</a></h4>
-</div>
-</div>
-</div>
-<div class="section" id="tests">
-<span id="tests-implementation"></span><h2>Tests<a class="headerlink" href="#tests" title="Permalink to this heading">#</a></h2>
-<div class="section" id="data-correction">
-<h3>Data Correction<a class="headerlink" href="#data-correction" title="Permalink to this heading">#</a></h3>
-</div>
-<div class="section" id="channel-calculation">
-<h3>Channel Calculation<a class="headerlink" href="#channel-calculation" title="Permalink to this heading">#</a></h3>
-</div>
-<div class="section" id="average">
-<h3>Average<a class="headerlink" href="#average" title="Permalink to this heading">#</a></h3>
-</div>
-<div class="section" id="using-syfos-data">
-<h3>Using SyFoS Data<a class="headerlink" href="#using-syfos-data" title="Permalink to this heading">#</a></h3>
+<p>To import data files in the ibw file format SOFA uses <a class="reference external" href="https://github.com/wking/igor">Igor</a>.</p>
 </div>
 </div>
 <div class="section" id="docs">
@@ -432,59 +321,14 @@ warum die beiden</p>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Codebase</a><ul>
-<li><a class="reference internal" href="#sofa-packages">SOFA Packages</a><ul>
-<li><a class="reference internal" href="#gui">GUI</a><ul>
-<li><a class="reference internal" href="#main-window-source">Main Window  source</a></li>
-<li><a class="reference internal" href="#import-window">Import Window</a></li>
-<li><a class="reference internal" href="#export-window">Export Window</a></li>
-<li><a class="reference internal" href="#window-settings">Window Settings</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#packages-peculiarities">Packages Peculiarities</a><ul>
+<li><a class="reference internal" href="#gui">GUI</a></li>
 <li><a class="reference internal" href="#toolbar">Toolbar</a><ul>
-<li><a class="reference internal" href="#sofa-toolbar">SOFA Toolbar</a></li>
 <li><a class="reference internal" href="#line-plot-toolbar">Line Plot Toolbar</a></li>
 <li><a class="reference internal" href="#heatmap-toolbar">Heatmap Toolbar</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#interfaces">Interfaces</a><ul>
-<li><a class="reference internal" href="#gui-interface">GUI Interface</a></li>
-<li><a class="reference internal" href="#plot-interface">Plot Interface</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#force-spectroscopy-data">Force Spectroscopy Data</a><ul>
-<li><a class="reference internal" href="#force-volume">Force Volume</a></li>
-<li><a class="reference internal" href="#force-distance-curve">Force Distance Curve</a></li>
-<li><a class="reference internal" href="#channel">Channel</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#data-processing">Data Processing</a><ul>
-<li><a class="reference internal" href="#import-data">Import Data</a><ul>
-<li><a class="reference internal" href="#import-data-wrapper">Import Data Wrapper</a></li>
-<li><a class="reference internal" href="#import-formats">Import Formats</a><ul>
-<li><a class="reference internal" href="#import-ibw-data">Import Ibw Data</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#correct-data">Correct Data</a></li>
-<li><a class="reference internal" href="#calculate-channel-data">Calculate Channel Data</a></li>
-<li><a class="reference internal" href="#calculate-average">Calculate Average</a></li>
-<li><a class="reference internal" href="#export-data">Export Data</a></li>
-<li><a class="reference internal" href="#named-tuples">Named Tuples</a></li>
-<li><a class="reference internal" href="#custom-exceptions">Custom Exceptions</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#data-visualization">Data Visualization</a><ul>
-<li><a class="reference internal" href="#plot-data">Plot Data</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#tests">Tests</a><ul>
-<li><a class="reference internal" href="#data-correction">Data Correction</a></li>
-<li><a class="reference internal" href="#channel-calculation">Channel Calculation</a></li>
-<li><a class="reference internal" href="#average">Average</a></li>
-<li><a class="reference internal" href="#using-syfos-data">Using SyFoS Data</a></li>
+<li><a class="reference internal" href="#data-processing">Data Processing</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#docs">Docs</a></li>

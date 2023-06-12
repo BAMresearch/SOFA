@@ -213,19 +213,134 @@
         <article role="main">
           <div class="section" id="software-architecture">
 <h1>Software Architecture<a class="headerlink" href="#software-architecture" title="Permalink to this heading">#</a></h1>
-<div class="section" id="repository">
-<h2>Repository<a class="headerlink" href="#repository" title="Permalink to this heading">#</a></h2>
+<p>SOFA is a graphical user interface to process experimental force spectroscopy data. As such, it must provide various functionalities, from the GUI itself to the import, processing and display of the measurement data and other. To make it easier to maintain and extend SOFA the architecture is divded into the different functionalities. This results in the following folder structure of SOFA.</p>
 <div class="figure align-default" id="id1">
-<img alt="image of the sofa file structure" src="_images/sofa_file_structure.svg"/><p class="caption"><span class="caption-text">SOFA file structure.</span><a class="headerlink" href="#id1" title="Permalink to this image">#</a></p>
+<img alt="image of the sofa folder structure" src="_images/sofa_folder_structure.svg"/><p class="caption"><span class="caption-text">SOFA folder structure with the different packages and their modules.</span><a class="headerlink" href="#id1" title="Permalink to this image">#</a></p>
 </div>
-<p>strukturdiagramm einfügen ordnerstruktur</p>
-<p>klassendiagramm force volume</p>
-<p>genereller Überblick über SOFA module</p>
-<p>wie funktioniert dass die Darstellungen zusammenhängen -&gt; inactive data points zusammenspiel erklären - flussdiagram für import und änderung in toolbar</p>
-<p>auf schnittstellen der eizelnen module eingehen ein- und ausgabeformate</p>
+<div class="section" id="sofa-packages">
+<h2>SOFA Packages<a class="headerlink" href="#sofa-packages" title="Permalink to this heading">#</a></h2>
+<div class="section" id="data-processing">
+<h3>data_processing<a class="headerlink" href="#data-processing" title="Permalink to this heading">#</a></h3>
+<p>This package is responsible for everything that has to do with the processing of the force spectroscopy data. This includes the import and correction of the measurement data, the calulation of the different channels and an average force distance curve, modifying the data from the histogram and the export of the data from SOFA. These modules use a <strong>procedural</strong> approach. In addition this package also contains the named_tuples and custom_exceptions modules.</p>
+<div class="section" id="import-data">
+<h4>import_data<a class="headerlink" href="#import-data" title="Permalink to this heading">#</a></h4>
+<p>This is a subpackage responsible for importing the measurement data in different file formats. For every new import format a new module should be added in the <code class="code docutils literal notranslate"><span class="pre">import_formats</span></code> folder and integrated in the <code class="code docutils literal notranslate"><span class="pre">import_data</span></code> module. The function to import a certain data type get’s the selected import options of the import window as a <code class="code docutils literal notranslate"><span class="pre">nt.ImportParameter</span></code> and is expected to return a dictionary with at least the required measurement data in form of a <code class="code docutils literal notranslate"><span class="pre">nt.MeasurementData</span></code>. This includes the name of the measurement, the size and data of the approach and retract curves of the measurement. An image or additional channel data can optionally be added to the dictionary.</p>
 </div>
-<div class="section" id="package-interfaces">
-<span id="test"></span><h2>Package Interfaces<a class="headerlink" href="#package-interfaces" title="Permalink to this heading">#</a></h2>
+<div class="section" id="calculate-average">
+<h4>calculate_average<a class="headerlink" href="#calculate-average" title="Permalink to this heading">#</a></h4>
+<p>This module contains the functions to calculate an average force distance curve from the currently active force distance curves of a force volume. To be able to calculate the average the measurement points of the active force distance curves need to be aligned. Currently this is done every time the average needs to be calculated. To speed up the processing time, this could probably be done once instead, after the curves have been corrected.</p>
+</div>
+<div class="section" id="calculate-channel-data">
+<span id="calculate-channel-data-architecture"></span><h4>calculate_channel_data<a class="headerlink" href="#calculate-channel-data" title="Permalink to this heading">#</a></h4>
+<p>This module contains the functions to calculate all the different channels defined in SOFA. If the number of channels will increase in the future it might be better to split this module into two, where one is responsible for channels based on parameters and the other is responsible for channels based on physical values. Each function to calculate a channels get’s a list of the <code class="code docutils literal notranslate"><span class="pre">ForceDistanceCurve</span></code> objects from a force volume. These contain the corrected piezo (x), corrected deflection (y) values and the data created during the correction process. Function to calculate a channel should return Python list, which can be reshaped into a two dimensional numpy array by the <code class="code docutils literal notranslate"><span class="pre">decorator_reshape_channel_data</span></code> decorator.</p>
+</div>
+<div class="section" id="correct-data">
+<h4>correct_data<a class="headerlink" href="#correct-data" title="Permalink to this heading">#</a></h4>
+<p>This module is responsible for correcting a single force distance curve. See the <a class="reference internal" href="correction_algorithm.html#correction-algorithm"><span class="std std-ref">correction algorithm</span></a> section for detialed information about the process.</p>
+</div>
+<div class="section" id="export-data">
+<h4>export_data<a class="headerlink" href="#export-data" title="Permalink to this heading">#</a></h4>
+<p>This module is responsible for the export of the data from a <code class="code docutils literal notranslate"><span class="pre">ForceVolume</span></code>. Functions to export the data get the currently selected force volume and the selected export options from the export window as <code class="code docutils literal notranslate"><span class="pre">nt.ExportParameter</span></code>.</p>
+</div>
+<div class="section" id="mutate-histogram-data">
+<h4>mutate_histogram_data<a class="headerlink" href="#mutate-histogram-data" title="Permalink to this heading">#</a></h4>
+<p>This module contains the functionalities to modify the data of channel by the histogram. Currently this only includes the restriction of the minimum or maximum borders of the histogram.</p>
+</div>
+<div class="section" id="custom-exceptions">
+<h4>custom_exceptions<a class="headerlink" href="#custom-exceptions" title="Permalink to this heading">#</a></h4>
+<p>This is a small helper module which contains custom exceptions, which are used in the import and correction process of the measurement data. Each type of exception has a general and further specific exceptions. This structure allows to catch a general type of exception with a descriptive name that should make it easier to understand the problem.</p>
+</div>
+<div class="section" id="named-tuples">
+<h4>named_tuples<a class="headerlink" href="#named-tuples" title="Permalink to this heading">#</a></h4>
+<p>Another small helper module which contains the definition of every <code class="code docutils literal notranslate"><span class="pre">NamedTuple</span></code> used by SOFA. Named tuples can make it easier to read the code and this module itself uses type hints to further increase the readability.</p>
+</div>
+</div>
+<div class="section" id="data-visualization">
+<h3>data_visualization<a class="headerlink" href="#data-visualization" title="Permalink to this heading">#</a></h3>
+<p>This package is responsible for everything related to the representation of the data. The modules use a <strong>procedural</strong> approach.</p>
+<div class="section" id="plot-data">
+<h4>plot_data<a class="headerlink" href="#plot-data" title="Permalink to this heading">#</a></h4>
+<p>This module contains functions to display the force spectroscopy data in a line plot, heatmap or histogram. This module could perhaps be divided into three modules, one responsible for each of the different display options.</p>
+</div>
+</div>
+<div class="section" id="force-spectroscopy-data">
+<h3>force_spectroscopy_data<a class="headerlink" href="#force-spectroscopy-data" title="Permalink to this heading">#</a></h3>
+<p>This package is responsible for caching the imported and processed measurement data. The modules use a <strong>object orientated</strong> approach.</p>
+<div class="figure align-default" id="id2">
+<img alt="image of a class diagram of the force spectroscopy data classes" src="_images/class_diagram_force_volume.svg"/><p class="caption"><span class="caption-text">Class diagram of the force spectroscopy data classes.</span><a class="headerlink" href="#id2" title="Permalink to this image">#</a></p>
+</div>
+<div class="section" id="force-volume">
+<h4>force_volume<a class="headerlink" href="#force-volume" title="Permalink to this heading">#</a></h4>
+<p>The <code class="code docutils literal notranslate"><span class="pre">ForceVolume</span></code> class serves as a container for the imported measurment data and the data created by SOFA. The data is organized like in a real experiment. Each <code class="code docutils literal notranslate"><span class="pre">ForceVolume</span></code> as a list of n x m <a class="reference internal" href="#force-distance-curve-architecture"><span class="std std-ref">force distance curves</span></a> and a dictionary with the different <a class="reference internal" href="#channel-architecture"><span class="std std-ref">channels</span></a>. The different methods of the class allow other components of SOFA to access the various data.</p>
+</div>
+<div class="section" id="force-distance-curve">
+<span id="force-distance-curve-architecture"></span><h4>force_distance_curve<a class="headerlink" href="#force-distance-curve" title="Permalink to this heading">#</a></h4>
+<p>The <code class="code docutils literal notranslate"><span class="pre">ForceDistanceCurve</span></code> class represents a single force distance curve, with their associated data and methods. This class could be extended to include the retract part of the measurement curves in a further version of SOFA.</p>
+</div>
+<div class="section" id="channel">
+<span id="channel-architecture"></span><h4>channel<a class="headerlink" href="#channel" title="Permalink to this heading">#</a></h4>
+<p>The <code class="code docutils literal notranslate"><span class="pre">Channel</span></code> class represents any channel defined in <a class="reference internal" href="#calculate-channel-data-architecture"><span class="std std-ref">calculate_channel_data</span></a> module. Through its methods, the class can manipulate the data and for example, return the active data of the channel.</p>
+</div>
+</div>
+<div class="section" id="gui">
+<h3>gui<a class="headerlink" href="#gui" title="Permalink to this heading">#</a></h3>
+<p>This package contains every window of SOFA. Every module in this package uses an <strong>object orientated</strong> approach.</p>
+<div class="section" id="main-window">
+<h4>main_window<a class="headerlink" href="#main-window" title="Permalink to this heading">#</a></h4>
+<p>This module contains the main window of SOFA, which is divided into different sections/frames. Since the histogram does not have its own toolbar the <code class="code docutils literal notranslate"><span class="pre">MainWindow</span></code> also contains widgets to manipulte the data displayed in the histogram.</p>
+</div>
+<div class="section" id="import-window">
+<h4>import_window<a class="headerlink" href="#import-window" title="Permalink to this heading">#</a></h4>
+<p>The <code class="code docutils literal notranslate"><span class="pre">ImportWindow</span></code> class is a subwindow that handles the import of measurement data.</p>
+</div>
+<div class="section" id="export-window">
+<h4>export_window<a class="headerlink" href="#export-window" title="Permalink to this heading">#</a></h4>
+<p>The <code class="code docutils literal notranslate"><span class="pre">ExportWindow</span></code> class is a subwindow that handles the export of the data of a force volume.</p>
+</div>
+</div>
+<div class="section" id="interfaces">
+<h3>interfaces<a class="headerlink" href="#interfaces" title="Permalink to this heading">#</a></h3>
+<p>This package contains the different interfaces of SOFA, which handle the interaction between the different components. All of them use an <strong>object orientated</strong> approach.</p>
+<div class="section" id="gui-interface">
+<h4>gui_interface<a class="headerlink" href="#gui-interface" title="Permalink to this heading">#</a></h4>
+<p>The <code class="code docutils literal notranslate"><span class="pre">GUIInterface</span></code> class is the interface between the different windows of SOFA, for example the main or import window, the toolbars and the imported measurment data respectively the resulting force volumes. This allows the different components of SOFA to access the same data and everything else they need.</p>
+</div>
+<div class="section" id="plot-interface">
+<span id="plot-interface-architecture"></span><h4>plot_interface<a class="headerlink" href="#plot-interface" title="Permalink to this heading">#</a></h4>
+<p>The <code class="code docutils literal notranslate"><span class="pre">PlotInterface</span></code> class contains the descriptive data to a force volume used by the different plots. These include for example the <a class="reference internal" href="#inactive-data-points-architecture"><span class="std std-ref">inactive data points</span></a> or the <code class="code docutils literal notranslate"><span class="pre">selectedArea</span></code> used by the <a class="reference internal" href="#heatmap-toolbar-architecture"><span class="std std-ref">heatmap toolbar</span></a>. Each force volume has it’s own <code class="code docutils literal notranslate"><span class="pre">PlotInterface</span></code>.</p>
+</div>
+</div>
+<div class="section" id="toolbars">
+<h3>toolbars<a class="headerlink" href="#toolbars" title="Permalink to this heading">#</a></h3>
+<p>The toolbars package contains the custom toolbars for the different plots of the measurement data, used to select a subsset of force distance curves. Every toolbar is a separate class, thus this package uses an <strong>object orientated</strong> approach.</p>
+<div class="section" id="sofa-toolbar">
+<h4>sofa_toolbar<a class="headerlink" href="#sofa-toolbar" title="Permalink to this heading">#</a></h4>
+<p>This class contains the shared functionalities of each SOFA toolbar. With Matplotlib version 3.5.1 it is no longer possible to load toolbar icons from a custom location. Therefore, the toolbar has to overwrite a part of the NavigationToolbar2Tk <code class="code docutils literal notranslate"><span class="pre">__init__</span></code> function. Additionally it adjusts the background color of the toolbar icons to the background color of the main window. Furthermore the functions to switch between the different modes of the toolbar are defined here. The active mode is displayed next to the toolbar icons and the button of the active mode is highlighted.</p>
+</div>
+<div class="section" id="line-plot-toolbar">
+<h4>line_plot_toolbar<a class="headerlink" href="#line-plot-toolbar" title="Permalink to this heading">#</a></h4>
+<p>The <code class="code docutils literal notranslate"><span class="pre">LinePlotToolbar</span></code> inherits from the <code class="code docutils literal notranslate"><span class="pre">SofaToolbar</span></code> and allows the selection of single or multiple force distance curves. In addition it is possible to zoom in and out of the line plot or reset the made selections.</p>
+</div>
+<div class="section" id="heatmap-toolbar">
+<span id="heatmap-toolbar-architecture"></span><h4>heatmap_toolbar<a class="headerlink" href="#heatmap-toolbar" title="Permalink to this heading">#</a></h4>
+<p>The <code class="code docutils literal notranslate"><span class="pre">HeatmapToolbar</span></code> inherits from the <code class="code docutils literal notranslate"><span class="pre">SofaToolbar</span></code>. With the heatmap toolbar a certain section of the heatmap can be selected and the heatmap can be rotated or flipped without changing the axis.</p>
+</div>
+</div>
+</div>
+<div class="section" id="connected-plots">
+<h2>Connected Plots<a class="headerlink" href="#connected-plots" title="Permalink to this heading">#</a></h2>
+<p>In SOFA the different plots of the measurement data are connected with each other. Selecting a curve in the line plot or a section in the heatmap will effect the other plots aswell. To make this possible the <a class="reference internal" href="#plot-interface-architecture"><span class="std std-ref">Plot Interface</span></a> has an attribute called <code class="code docutils literal notranslate"><span class="pre">inactiveDataPoints</span></code>.</p>
+<div class="section" id="inactive-data-points">
+<span id="inactive-data-points-architecture"></span><h3>Inactive Data Points<a class="headerlink" href="#inactive-data-points" title="Permalink to this heading">#</a></h3>
+<p>The <code class="code docutils literal notranslate"><span class="pre">inactiveDataPoints</span></code> is a list which stores the indices of the currently inactive force distance cuves or data points in a channel. The first curve imported from the measurement data corresponds to first force distance curve and so on. Any selection made from one of the different plots only changes the <code class="code docutils literal notranslate"><span class="pre">inactiveDataPoints</span></code> and not the corresponding data itself. But when the different plots are updated the only display the currently active data, by removing the <code class="code docutils literal notranslate"><span class="pre">inactiveDataPoints</span></code>. The flowchart below shows exemplary how the different components of SOFA interact with each other to first update the inactive data points and then update the representation of the data.</p>
+<div class="figure align-default" id="id3">
+<img alt="image of a flow chart showing the process of restricting the histogram data" src="_images/flowchart_restrict_histogram.svg"/><p class="caption"><span class="caption-text">Flow chart showing the restriction of the histogram.</span><a class="headerlink" href="#id3" title="Permalink to this image">#</a></p>
+</div>
+<div class="section" id="heapmap-orientation">
+<h4>Heapmap Orientation<a class="headerlink" href="#heapmap-orientation" title="Permalink to this heading">#</a></h4>
+<p>The heatmap can be flipped or rotated changing the axis aswell. This can cause problems with the <code class="code docutils literal notranslate"><span class="pre">inactiveDataPoints</span></code>. After a rotation, for example, the point at poistion (0, 0) of the heatmap no longer corresponds to the first data point. To get around this problem the <a class="reference internal" href="#plot-interface-architecture"><span class="std std-ref">Plot Interface</span></a> has an attribute called <code class="code docutils literal notranslate"><span class="pre">heatmapOrientationMatrix</span></code> which is a two dimensional NumPy array with the same size as the heatmap that stores the positon of the data points in current orientation. When the heatmap is rotated or flipped the same transformation is performed on the NumPy array. And if new inactive data points are added from the heatmap or some datapoints in the heatmap needs to be disabled the points of the heatmap can be mapped to their actual datapoints with the help of the <code class="code docutils literal notranslate"><span class="pre">heatmapOrientationMatrix</span></code> array.</p>
+</div>
+</div>
 </div>
 </div>
 
@@ -292,8 +407,54 @@
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Software Architecture</a><ul>
-<li><a class="reference internal" href="#repository">Repository</a></li>
-<li><a class="reference internal" href="#package-interfaces">Package Interfaces</a></li>
+<li><a class="reference internal" href="#sofa-packages">SOFA Packages</a><ul>
+<li><a class="reference internal" href="#data-processing">data_processing</a><ul>
+<li><a class="reference internal" href="#import-data">import_data</a></li>
+<li><a class="reference internal" href="#calculate-average">calculate_average</a></li>
+<li><a class="reference internal" href="#calculate-channel-data">calculate_channel_data</a></li>
+<li><a class="reference internal" href="#correct-data">correct_data</a></li>
+<li><a class="reference internal" href="#export-data">export_data</a></li>
+<li><a class="reference internal" href="#mutate-histogram-data">mutate_histogram_data</a></li>
+<li><a class="reference internal" href="#custom-exceptions">custom_exceptions</a></li>
+<li><a class="reference internal" href="#named-tuples">named_tuples</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data-visualization">data_visualization</a><ul>
+<li><a class="reference internal" href="#plot-data">plot_data</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#force-spectroscopy-data">force_spectroscopy_data</a><ul>
+<li><a class="reference internal" href="#force-volume">force_volume</a></li>
+<li><a class="reference internal" href="#force-distance-curve">force_distance_curve</a></li>
+<li><a class="reference internal" href="#channel">channel</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#gui">gui</a><ul>
+<li><a class="reference internal" href="#main-window">main_window</a></li>
+<li><a class="reference internal" href="#import-window">import_window</a></li>
+<li><a class="reference internal" href="#export-window">export_window</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#interfaces">interfaces</a><ul>
+<li><a class="reference internal" href="#gui-interface">gui_interface</a></li>
+<li><a class="reference internal" href="#plot-interface">plot_interface</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#toolbars">toolbars</a><ul>
+<li><a class="reference internal" href="#sofa-toolbar">sofa_toolbar</a></li>
+<li><a class="reference internal" href="#line-plot-toolbar">line_plot_toolbar</a></li>
+<li><a class="reference internal" href="#heatmap-toolbar">heatmap_toolbar</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#connected-plots">Connected Plots</a><ul>
+<li><a class="reference internal" href="#inactive-data-points">Inactive Data Points</a><ul>
+<li><a class="reference internal" href="#heapmap-orientation">Heapmap Orientation</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
