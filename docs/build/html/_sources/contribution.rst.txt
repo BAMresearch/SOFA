@@ -1,4 +1,0 @@
-Contribution
-============
-
-Text about contribution
