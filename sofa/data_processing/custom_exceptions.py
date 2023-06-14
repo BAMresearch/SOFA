@@ -14,12 +14,31 @@ You should have received a copy of the GNU General Public License
 along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-#import tkinter as tk
-import ttkbootstrap as ttk
+# Custom import errors
+class ImportError(Exception):
+	pass
 
-from gui.main_window import MainWindow
+class UnableToReadMeasurementFileError(ImportError):
+	pass
 
-if __name__ == "__main__":
-	app = ttk.Window("SOFA", "minty")
-	MainWindow(app)
-	app.mainloop()
+class UnableToReadImageFileError(ImportError):
+	pass
+
+class UnableToReadChannelFileError(ImportError):
+	pass
+
+class WrongImageSizeError(ImportError):
+	pass
+
+class WrongChannelSizeError(ImportError):
+	pass
+
+# Custom correction errors
+class CorrectionError(Exception):
+	pass
+
+class UnableToLocateEndOfZerolineError(CorrectionError):
+	pass
+
+class UnableToLocateZeroCrossingAfterEozlError(CorrectionError):
+	pass
