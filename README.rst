@@ -16,7 +16,7 @@ Subsets of curves are automatically averaged and can be exported for subsequent 
 
 Documentation
 =============
-For examples of how SOFA can be used and detailed information about the implementation of SOFA read the `documentation <https://2puck.github.io/sofa/build/html/index.html>`_.
+For examples of how SOFA can be used and detailed information about the implementation of SOFA read the `documentation <https://bamresearch.github.io/sofa/build/html/index.html>`_.
 
 Examples
 ========
