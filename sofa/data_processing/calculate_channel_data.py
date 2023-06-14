@@ -35,7 +35,7 @@ def decorator_reshape_channel_data(function):
 	return wrapper_reshape_channel_data
 
 def calculate_channel_data(
-	forceDistanceCurves: List[nt.ForceDistanceCurve], 
+	forceDistanceCurves: List, 
 	size: Tuple[int]
 ) -> Dict:
 	"""
@@ -43,7 +43,7 @@ def calculate_channel_data(
 	
 	Parameters
 	----------
-	forceDistanceCurves : list[nt.ForceDistanceCurve] 
+	forceDistanceCurves : list[ForceDistanceCurve] 
 		Every force distance curve of the force volume.
 	size : tuple[int] 
 		Size of the force volume.
@@ -66,7 +66,7 @@ def calculate_channel_data(
 
 @decorator_reshape_channel_data
 def calculate_topography(
-	forceDistanceCurves: List[nt.ForceDistanceCurve], 
+	forceDistanceCurves: List, 
 	size: Tuple[int]
 ) -> List:
 	"""
@@ -75,7 +75,7 @@ def calculate_topography(
 
 	Parameters
 	----------
-	forceDistanceCurves : list[nt.ForceDistanceCurve] 
+	forceDistanceCurves : list[ForceDistanceCurve] 
 		Every force distance curve of the force volume.
 	size : tuple[int] 
 		Size of the force volume.
@@ -94,7 +94,7 @@ def calculate_topography(
 
 @decorator_reshape_channel_data
 def calculate_piezo_at_maximum_deflection(
-	forceDistanceCurves: List[nt.ForceDistanceCurve],
+	forceDistanceCurves: List,
 	size: Tuple[int]
 ) -> List:
 	"""
@@ -103,7 +103,7 @@ def calculate_piezo_at_maximum_deflection(
 
 	Parameters
 	----------
-	forceDistanceCurves : list[nt.ForceDistanceCurve] 
+	forceDistanceCurves : list[ForceDistanceCurve] 
 		Every force distance curve of the force volume.
 	size : tuple[int] 
 		Size of the force volume.
@@ -123,7 +123,7 @@ def calculate_piezo_at_maximum_deflection(
 
 @decorator_reshape_channel_data
 def calculate_stiffness(
-	forceDistanceCurves: List[nt.ForceDistanceCurve],
+	forceDistanceCurves: List,
 	size: Tuple[int]
 ) -> List:
 	"""
@@ -132,7 +132,7 @@ def calculate_stiffness(
 
 	Parameters
 	----------
-	forceDistanceCurves : list[nt.ForceDistanceCurve] 
+	forceDistanceCurves : list[ForceDistanceCurve] 
 		Every force distance curve of the force volume.
 	size : tuple[int] 
 		Size of the force volume.
@@ -179,7 +179,7 @@ def calculate_slope_linear_fit_to_corrected_approach_curve(
 
 @decorator_reshape_channel_data
 def calculate_attractive_area(
-	forceDistanceCurves: List[nt.ForceDistanceCurve],
+	forceDistanceCurves: List,
 	size: Tuple[int]
 ) -> List:
 	"""
@@ -189,7 +189,7 @@ def calculate_attractive_area(
 
 	Parameters
 	----------
-	forceDistanceCurves : list[nt.ForceDistanceCurve] 
+	forceDistanceCurves : list[ForceDistanceCurve] 
 		Every force distance curve of the force volume.
 	size : tuple[int] 
 		Size of the force volume.
@@ -243,7 +243,7 @@ def calculate_surface_area_attractive_area(
 
 @decorator_reshape_channel_data
 def calculate_raw_offset(
-	forceDistanceCurves: List[nt.ForceDistanceCurve],
+	forceDistanceCurves: List,
 	size: Tuple[int]
 ) -> List:
 	"""
@@ -253,7 +253,7 @@ def calculate_raw_offset(
 
 	Parameters
 	----------
-	forceDistanceCurves : list[nt.ForceDistanceCurve] 
+	forceDistanceCurves : list[ForceDistanceCurve] 
 		Every force distance curve of the force volume.
 	size : tuple[int] 
 		Size of the force volume.
@@ -272,7 +272,7 @@ def calculate_raw_offset(
 
 @decorator_reshape_channel_data
 def calculate_raw_stiffness(
-	forceDistanceCurves: List[nt.ForceDistanceCurve],
+	forceDistanceCurves: List,
 	size: Tuple[int]
 ) -> List:
 	"""
@@ -282,7 +282,7 @@ def calculate_raw_stiffness(
 
 	Parameters
 	----------
-	forceDistanceCurves : list[nt.ForceDistanceCurve] 
+	forceDistanceCurves : list[ForceDistanceCurve] 
 		Every force distance curve of the force volume.
 	size : tuple[int] 
 		Size of the force volume.
@@ -301,7 +301,7 @@ def calculate_raw_stiffness(
 
 @decorator_reshape_channel_data
 def calculate_max_deflection(
-	forceDistanceCurves: List[nt.ForceDistanceCurve],
+	forceDistanceCurves: List,
 	size: Tuple[int]
 ) -> List:
 	"""
@@ -311,7 +311,7 @@ def calculate_max_deflection(
 
 	Parameters
 	----------
-	forceDistanceCurves : list[nt.ForceDistanceCurve] 
+	forceDistanceCurves : list[ForceDistanceCurve] 
 		Every force distance curve of the force volume.
 	size : tuple[int] 
 		Size of the force volume.
@@ -330,7 +330,7 @@ def calculate_max_deflection(
 
 @decorator_reshape_channel_data
 def calculate_z_attractive(
-	forceDistanceCurves: List[nt.ForceDistanceCurve],
+	forceDistanceCurves: List,
 	size: Tuple[int]
 ) -> List:
 	"""
@@ -340,7 +340,7 @@ def calculate_z_attractive(
 
 	Parameters
 	----------
-	forceDistanceCurves : list[nt.ForceDistanceCurve] 
+	forceDistanceCurves : list[ForceDistanceCurve] 
 		Every force distance curve of the force volume.
 	size : tuple[int] 
 		Size of the force volume.
@@ -388,7 +388,7 @@ def calculate_attractive_area_length(
 
 @decorator_reshape_channel_data
 def calculate_deflection_attractive(
-	forceDistanceCurves: List[nt.ForceDistanceCurve],
+	forceDistanceCurves: List,
 	size: Tuple[int]
 ) -> List:
 	"""
@@ -398,7 +398,7 @@ def calculate_deflection_attractive(
 
 	Parameters
 	----------
-	forceDistanceCurves : list[nt.ForceDistanceCurve] 
+	forceDistanceCurves : list[ForceDistanceCurve] 
 		Every force distance curve of the force volume.
 	size : tuple[int] 
 		Size of the force volume.
@@ -418,7 +418,7 @@ def calculate_deflection_attractive(
 
 @decorator_reshape_channel_data
 def calculate_curves_with_artifacts(
-	forceDistanceCurves: List[nt.ForceDistanceCurve],
+	forceDistanceCurves: List,
 	size: Tuple[int]
 ) -> List:
 	"""
@@ -429,7 +429,7 @@ def calculate_curves_with_artifacts(
 
 	Parameters
 	----------
-	forceDistanceCurves : list[nt.ForceDistanceCurve] 
+	forceDistanceCurves : list[ForceDistanceCurve] 
 		Every force distance curve of the force volume.
 	size : tuple[int] 
 		Size of the force volume.
