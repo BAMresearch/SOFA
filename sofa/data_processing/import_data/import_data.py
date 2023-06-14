@@ -17,6 +17,7 @@ from typing import Dict, Callable
 
 import data_processing.named_tuples as nt
 from data_processing.import_data.import_formats.import_ibw_data import import_ibw_data
+from data_processing.import_data.import_formats.import_hdf5_data import import_hdf5_data
 
 def import_data(
 	importParameter: nt.ImportParameter,
@@ -64,4 +65,5 @@ def get_import_function(
 # Defines all available import options.
 importFunctions = {
 	".ibw": (import_ibw_data, "*.ibw"),
+	".hdf5": (import_hdf5_data, "*.hdf5")
 }

@@ -15,6 +15,7 @@ along with SOFA.  If not, see <http://www.gnu.org/licenses/>.
 """
 import os
 import functools
+from typing import Callable
 
 import tkinter as tk
 from tkinter import filedialog as fd
@@ -23,19 +24,21 @@ import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
 import data_processing.named_tuples as nt
+import data_processing.custom_exceptions as ce
 import data_processing.import_data.import_data as imp_data
 
 def decorator_check_required_folder_path(function):
 	"""
 	Check if the required path for the measurement
-	folder is set.
+	data is set.
 	"""
 	@functools.wraps(function)
 	def wrapper_check_required_folder_path(self):
-		if not os.path.isdir(self.filePathData.get()):
+		if (not os.path.isdir(self.filePathData.get()) and 
+			not os.path.isfile(self.filePathData.get())):
 			return messagebox.showerror(
 				"Error", 
-				"A data dictionary is required!", 
+				"Measurement data is required!", 
 				parent=self
 			)
 		else:
@@ -250,16 +253,61 @@ class ImportWindow(ttk.Frame):
 
 	def _browse_data(self) -> None:
 		"""
-		Select the required folder that contains the 
-		measurement data.
+		Select the required folder or file that contains 
+		the measurement data.
 		"""
-		filePathData = fd.askdirectory(
-			title="Select directory",
-			parent=self
-		)
+		filedialog = self._map_data_type_to_file_dialog()
+		filePathData = filedialog()
 
 		if filePathData:
 			self.filePathData.set(filePathData)
+
+	def _map_data_type_to_file_dialog(self) -> Callable:
+		"""
+		Map the selected data type of the measurement
+		data to the associated file structure (file or
+		folder).
+
+		Returns
+		-------
+		browse_files : function
+			Function to either select a single file
+			or directory.
+		"""
+		if self.selectedDataType.get() == ".ibw":
+			return self._browse_data_directory
+
+		return self._browse_data_file
+
+	def _browse_data_file(self) -> str:
+		"""
+		Select the required file that contains the 
+		measurement data.
+
+		Returns
+		-------
+		filePathDatafile : str
+			File path to the measurement file
+		"""
+		return fd.askopenfilename(
+			title="Select file",
+			parent=self
+		)
+
+	def _browse_data_directory(self) -> str:
+		"""
+		Select the required folder that contains the 
+		measurement data.
+
+		Returns
+		-------
+		filePathDirectory : str
+			File path to the measurement folder.
+		"""
+		return fd.askdirectory(
+			title="Select directory",
+			parent=self
+		)
 
 	def _browse_image(self):
 		"""
