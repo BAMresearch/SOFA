@@ -30,7 +30,9 @@ First, get a copy of the source code. Either by cloning this repository or by do
 Windows
 -------
 
-Install miniconda or miniforge, for example `from here <https://docs.anaconda.com/free/miniconda/miniconda-other-installer-links/>`_. Open the *Miniconda Prompt* or the *Miniforge Prompt* and type the following commands. 
+Install `miniconda <https://docs.anaconda.com/free/miniconda/miniconda-other-installer-links/>`_
+or `miniforge <https://gist.github.com/ibressler/b9139ca80346eefd7550fbfee2fbd47a>`_.
+Open the *Miniconda Prompt* or the *Miniforge Prompt* and type the following commands. 
 
 First, create a new environment for *SOFA* and required packages::
 
