@@ -30,24 +30,24 @@ First, get a copy of the source code. Either by cloning this repository or by do
 Linux/Ubuntu
 ------------
 
-Install tkinter system wide packages
+Install tkinter system wide packages::
 
     sudo apt install python3-tk python3-pil.imagetk
 
-Create a Python virtual environment (venv) for SOFA required modules
+Create a Python virtual environment (venv) for SOFA required modules::
 
     python3 -m venv --system-site-packages --symlinks ~/.py11sofa
 
-Activate that venv
+Activate that venv::
 
     source ~/.py11sofa/bin/activate
 
-Install further Python packages required by SOFA
+Install further Python packages required by SOFA::
 
     cd <SOFA-directory>
     pip install -r requirements.txt
 
-Finally, run the program
+Finally, run the program::
 
     python sofa/sofa.py
 
