@@ -3,4 +3,4 @@ scipy
 matplotlib
 igor2
 pandas
-ttkbootstrap
+h5py

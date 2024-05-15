@@ -27,6 +27,31 @@ Installation
 
 First, get a copy of the source code. Either by cloning this repository or by downloading a snapshot ZIP package by clicking on that green button above.
 
+Windows
+-------
+
+Install miniconda or miniforge, for example `from here <https://docs.anaconda.com/free/miniconda/miniconda-other-installer-links/>`_. Open the *Miniconda Prompt* or the *Miniforge Prompt* and type the following commands. 
+
+First, create a new environment for *SOFA* and required packages::
+
+    conda create -n sofa
+
+Activate the new environment::
+
+    conda activate sofa
+
+Install required packages which are specified in `requirements.txt` file::
+
+    conda -c conda-forge install --file requirements.txt
+
+Install additional packages *SOFA* requires which not available through *conda*::
+
+    pip install -r requirements_pip.txt
+
+Finally, run the program::
+
+    python sofa/sofa.py
+
 Linux/Ubuntu
 ------------
 
@@ -45,7 +70,7 @@ Activate that venv::
 Install further Python packages required by SOFA::
 
     cd <SOFA-directory>
-    pip install -r requirements.txt
+    pip install -r requirements.txt -r requirements_pip.txt
 
 Finally, run the program::
 
