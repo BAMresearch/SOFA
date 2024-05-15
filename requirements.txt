@@ -1,6 +1,6 @@
 numpy
 scipy
 matplotlib
-igor
+igor2
 pandas
 ttkbootstrap

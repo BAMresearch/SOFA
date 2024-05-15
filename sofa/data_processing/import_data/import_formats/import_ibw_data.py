@@ -20,7 +20,7 @@ import re
 import functools
 
 import numpy as np
-from igor.binarywave import load as loadibw
+from igor2.binarywave import load as loadibw
 
 import data_processing.custom_exceptions as ce
 import data_processing.named_tuples as nt
