@@ -24,7 +24,32 @@ Test data can be found in the test_data folder. The data is from the FTC method.
 
 Installation
 ============
-To install the software clone the git repository, install the requirements and execute the sofa.py file.
+
+First, get a copy of the source code. Either by cloning this repository or by downloading a snapshot ZIP package by clicking on that green button above.
+
+Linux/Ubuntu
+------------
+
+Install tkinter system wide packages
+
+    sudo apt install python3-tk python3-pil.imagetk
+
+Create a Python virtual environment (venv) for SOFA required modules
+
+    python3 -m venv --system-site-packages --symlinks ~/.py11sofa
+
+Activate that venv
+
+    source ~/.py11sofa/bin/activate
+
+Install further Python packages required by SOFA
+
+    cd <SOFA-directory>
+    pip install -r requirements.txt
+
+Finally, run the program
+
+    python sofa/sofa.py
 
 Contact
 =======
