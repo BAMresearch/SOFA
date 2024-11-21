@@ -44,7 +44,7 @@ Activate the new environment::
 
 Install required packages which are specified in `requirements.txt` file::
 
-    conda -c conda-forge install --file requirements.txt
+    conda install -c conda-forge --file requirements.txt
 
 Install additional packages *SOFA* requires which not available through *conda*::
 
